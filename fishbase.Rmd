@@ -1,0 +1,699 @@
+---
+title: "fishbase"
+author: "Ilya Fischhoff"
+date: "7/1/2020"
+output: github_document
+---
+
+#####install packages
+```{r packages, echo=FALSE}
+pkgTest <- function(x)
+{
+  if (x %in% rownames(installed.packages()) == FALSE) {
+    install.packages(x, dependencies= TRUE)    
+  }
+  library(x, character.only = TRUE)
+}
+neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc")
+for (package in neededPackages){pkgTest(package)}
+
+```
+##settings
+```{r}
+cutoff = 0.2#cutoff of coverage required for inclusion
+```
+
+##look at docs about tables available from fishbase
+```{r}
+tables <- docs()
+tables
+```
+
+
+
+##read in data and fix species names
+```{r}
+DF = read.csv("docking-results.csv")
+
+DF$species = str_replace(DF$species, pattern = "_", replacement = " ")
+
+DF$species=capitalize(DF$species)
+
+A = read.csv("ACE2_sequences_fixed.csv")
+A_fish = subset(A, is_fish == 1)
+
+names(DF)[names(DF)=="species"]="Species"
+
+DF = DF[, c("Species", "haddock_score_mean", "haddock_score_sd")]
+A_fish = A_fish[,c("Species", "Order", "Class")]
+
+DF = merge(DF, A_fish)
+
+#https://cran.r-project.org/web/packages/rfishbase/vignettes/tutorial.html
+fish <- validate_names(c(DF$Species))
+
+DF$Species_ACE2 = DF$Species
+DF$Species = fish
+save(DF, file = "DF.Rdata")
+```
+
+##check out some tables in fishbase
+##brains: one entry for each individual fish: BrainWeight, BodyWeight
+##https://www.fishbase.in/manual/fishbasethe_brains_table.htm
+```{r}
+load("DF.Rdata")
+species = DF$Species
+brain_weights = rep(0, length(species))
+body_weights = rep(0, length(species))
+brain_body_ratio = rep(NA, length(species))
+for (a in 1:length(species)){
+  test = data.frame(brains(species[a]))  
+  brain_weights[a] = length(which(!is.na(test$BrainWeight)))
+  body_weights[a] = length(which(!is.na(test$BodyWeight)))
+  brain_body_ratio[a] = mean(test$BrainWeight/ test$BodyWeight)
+}
+brain_body = brain_weights/body_weights
+frac_non_na = length(which(brain_body ==1))/ length(species)
+frac_non_na
+names(test)
+DF$brain_body_ratio = brain_body_ratio
+save(DF, file = "DF.Rdata")
+
+m <- lm(haddock_score_mean ~ brain_body_ratio, data = DF, na.action = na.omit)
+```
+
+##country: multiple rows per species; for example:
+```{r}
+load("DF.Rdata")
+test = data.frame(country(DF$Species[1]))  
+head(test)
+```
+## countrysub -- multiple rows per species
+##https://www.fishbase.de/manual/english/FishBaseThe_Countries_Table.htm
+```{r}
+load("DF.Rdata")
+test = data.frame(countrysub(DF$Species[1]))  
+head(test)
+```
+
+##diet
+##https://www.fishbase.in/manual/fishbasethe_diet_table.htm
+##has multiple rows for different stages
+```{r}
+load("DF.Rdata")
+
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  test = data.frame(diet(species[a]))
+  print(dim(test)[1])
+  print(unique(test$SampleStage))
+  out = rbind(out, test)
+}
+summary(out)
+unique(out$SampleStage)
+```
+
+##diet_items -- multiple rows per species
+##https://www.fishbase.se/manual/English/fishbasethe_food_items_table.htm
+```{r}
+load("DF.Rdata")
+species = DF$Species
+#just check a few to save time
+species = species[1:5]
+out = NULL
+for (a in 1:length(species)){
+  test = data.frame(diet_items(species[a]))
+  print(dim(test)[1])
+  out = rbind(out, test)
+}
+summary(out)
+head(test)
+
+```
+
+##distribution
+##currently this is ~ FAO areas table (minus "note" field) e.g. http://www.fishbase.us/Country/FaoAreaList.php?ID=5537
+##each species may have multiple bounding boxes
+```{r}
+
+load("DF.Rdata")
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(distribution(species[a]))
+  print(dim(tmp)[1])
+  
+  ind_species =which(names(tmp) == "Species")
+  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
+  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
+                                       "_distribution")
+  tmp = merge(DF[a,], tmp)
+  out = rbind(out, tmp)
+}
+
+DF_distribution = out
+save(DF_distribution, file = "DF_distribution.Rdata")
+summary(DF_distribution)
+names(DF_distribution)
+
+```
+
+
+
+##get ecology data
+##http://fishbase.us/manual/English/FishbaseThe_ECOLOGY_Table.htm
+```{r}
+load("DF.Rdata")
+a = 1
+out = NULL
+for (a in 1:dim(DF)[1]){
+
+  ecology_tmp = ecology(species_list = DF$Species[a])
+  ind_species =which(names(ecology_tmp) == "Species")
+  inds_new = setdiff(seq(1,dim(ecology_tmp)[2]), ind_species)
+  names(ecology_tmp)[inds_new]= paste0(names(ecology_tmp)[inds_new], 
+                                       "_ecology")
+  tmp = merge(DF[a,], ecology_tmp)
+  # dist_tmp = distribution(species_list = DF$Species[a])
+  # tmp = merge(tmp, dist_tmp)
+  out = rbind(out, tmp)
+}
+# write.csv(out, file = "fish_HADDOCK_ecology.csv")
+ecology = out
+save(ecology, file = "ecology.Rdata")
+
+```
+
+##ecosystem -- couldn't find description of this online
+##multiple rows per species, one for each ecosystem
+```{r}
+load("ecology.Rdata")
+DF = ecology
+
+species = DF$Species
+out = NULL
+
+for (a in 1:length(species)){
+  tmp = data.frame(ecosystem(species[a]))
+  print(dim(tmp)[1])
+  out = rbind(out, tmp)
+}
+
+summary(out)
+head(tmp)
+
+```
+
+##estimate: a table of estimates from some models on trophic levels
+##http://www.fishbase.us/manual/English/FishbaseThe_FOOD_ITEMS_table.htm
+```{r}
+load("ecology.Rdata")
+DF = ecology
+
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(estimate(species_list = DF$Species[a]))
+  ind_species =which(names(tmp) == "Species")
+  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
+  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
+                                     "_estimate")
+  tmp = merge(DF[a,], tmp)
+  out = rbind(out, tmp)
+}
+
+summary(out)
+DF_estimate = out
+save(DF_estimate, file = "DF_estimate.Rdata")
+```
+
+##faoareas, seems to be redundant to countrysub? 
+```{r}
+test = faoareas(species_list = species[a])
+test
+```
+
+##fecundity
+##sometimes multiple rows per species. could not 
+##could not locate doc table about fecundity. spawning table seems to be something different (different fields): https://www.fishbase.in/manual/fishbasethe_spawning_table.htm
+```{r}
+load("DF_estimate.Rdata")
+DF= DF_estimate
+
+species = DF$Species
+out = NULL
+a = 2
+for (a in 1:length(species)){
+  tmp = data.frame(fecundity(species_list = DF$Species[a]))
+  print(dim(tmp)[1])#1 row per
+  # ind_species =which(names(tmp) == "Species")
+  # inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
+  # names(tmp)[inds_new]= paste0(names(tmp)[inds_new],
+  #                                    "_fecundity")
+  # tmp = merge(DF[a,], tmp)
+  # out = rbind(out, tmp)
+}
+
+```
+
+##fooditems
+##http://www.fishbase.org/manual/english/fishbasethe_food_items_table.htm
+##multiple rows per species, for different food types, life stages of predator, locality, etc. 
+```{r}
+load("DF_estimate.Rdata")
+DF= DF_estimate
+
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(fooditems(species_list = DF$Species[a]))
+  print(dim(tmp)[1])#1 row per
+}
+```
+
+##genetic -- don't think we want to use this, but including just to see what it shows
+```{r}
+load("DF_estimate.Rdata")
+DF= DF_estimate
+
+test = data.frame(genetics(DF$Species[1]))
+names(test)
+```
+
+
+##introductions -- species introductions data. for now making one new feature: the number of records about introductions; it seems that each row is a different place
+##https://www.fishbase.in/manual/fishbasethe_introduction_table.htm
+```{r}
+
+load("DF_estimate.Rdata")
+DF= DF_estimate
+
+species = DF$Species
+DF$introductions_count = NA
+for (a in 1:length(species)){
+  tmp = data.frame(introductions(species_list = DF$Species[a]))
+  # print(dim(tmp)[1])#1 row per
+  DF$introductions_count[a]= dim(tmp)[1]
+}
+#see what the other fields are
+names(tmp)
+head(tmp)
+
+m <- lm(haddock_score_mean ~ introductions_count, data = DF, na.action = na.omit)
+summary(m)
+
+DF_intro = DF
+save(DF_intro, file = "DF_intro.Rdata")
+```
+
+##larvae
+##https://www.fishbase.in/manual/fishbasethe_larvae_table.htm
+##2 out of the 74 species have multiple records w/ different values. excluding for now. 
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(larvae(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+#see what the other fields are
+
+names(tmp)
+#look at one that has multiple rows
+a = 15
+tmp = data.frame(larvae(species_list = DF$Species[a]))
+
+head(tmp)
+
+```
+
+##length_freq; multiple records for some species; excluding for now; could not find metadata
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+a = 15
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(length_freq(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+#see what the other fields are
+names(tmp)
+head(tmp)
+
+```
+
+##length_length: conversion of length types
+
+##length_weight: The LENGTH-WEIGHT table presents the a and b values of over 5,000 length-weight relationships of the form W = a x Lb, pertaining to about over 2,000 fish species.
+##multiple records for some species.
+##seems like this may only be useful in combination with length_length
+##https://www.fishbase.de/manual/FishbaseThe_LENGTH_WEIGHT_Table.htm
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+a = 1
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(length_weight(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+#see what the other fields are
+names(tmp)
+
+a = 1
+tmp = data.frame(length_weight(species_list = DF$Species[a]))
+head(tmp)
+```
+
+##maturity
+##multiple records for some species, would need to take averages if we wanted to use. there are multiple measures of maturity to choose from.
+##https://www.fishbase.in/manual/fishbasethe_maturity_table.htm
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(maturity(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+#see what the other fields are
+names(tmp)
+a = 2
+  tmp = data.frame(maturity(species_list = DF$Species[a]))
+  head(tmp)
+
+```
+
+##morphology
+##https://www.fishbase.in/manual/fishbasethe_morphology_table.htm
+##there are multiple records for some species
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(morphology(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+a = 48
+  tmp = data.frame(morphology(species_list = DF$Species[a]))
+  head(tmp)
+  names(tmp)
+```
+
+
+##morphometrics
+##there are multiple records for some species; to include we would need to take averages
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(morphometrics(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+a = 48
+  tmp = data.frame(morphometrics(species_list = DF$Species[a]))
+  head(tmp)
+  names(tmp)
+```
+
+##oxygen
+##https://www.fishbase.in/manual/fishbasethe_oxygen_table.htm
+##there are multiple records for some species (e.g. for different sexes); to include we would need to take averages
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(oxygen(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+a = 48
+tmp = data.frame(oxygen(species_list = DF$Species[a]))
+head(tmp)
+names(tmp)
+```
+
+##popchar: Table of maximum length (Lmax), weight (Wmax) and age (tmax)
+##https://www.fishbase.in/manual/fishbasethe_popchar_table.htm
+##there are multiple records for some species; to include we would need to take averages
+##
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(popchar(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+a = 48
+tmp = data.frame(popchar(species_list = DF$Species[a]))
+head(tmp)
+names(tmp)
+```
+
+##popgrowth
+##https://www.fishbase.in/manual/fishbasethe_popgrowth_table.htm
+##multiple records for some species, e.g. for different sexes; 
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(popgrowth(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+a = 48
+tmp = data.frame(popgrowth(species_list = DF$Species[a]))
+head(tmp)
+names(tmp)
+```
+
+##popqb
+##https://www.fishbase.se/manual/english/fishbasethe_popqb_table.htm
+##population-based estimates of food consumption (i.e., estimates that account for the age structure of populations)
+##multiple responses for some species. here there are two measures, popqb and maintenance qb. 
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+for (a in 1:length(species)){
+  tmp = data.frame(popqb(species_list = DF$Species[a]))
+  # print(a)
+  print(dim(tmp)[1])
+}
+a = 48
+tmp = data.frame(popqb(species_list = DF$Species[a]))
+head(tmp)
+names(tmp)
+```
+
+##predators
+##https://www.fishbase.se/manual/English/fishbasethe_predators_table.htm
+```{r}
+load("DF_intro.Rdata")
+DF= DF_intro
+species = DF$Species
+out = NULL
+out_mammal = NULL
+DF$predator_mammals = NA
+for (a in 1:length(species)){
+  tmp = data.frame(predators(species_list = DF$Species[a]))
+  tmp = subset(tmp, !is.na(PredatorI))
+  if (dim(tmp)[1]>0){
+      DF$predator_count[a] = dim(tmp)[1]
+      tmp_mammal = subset(tmp, PredatorI == "mammals")
+      DF$predator_mammals[a]= dim(tmp_mammal)[1]    
+      out_mammal = rbind(out_mammal, tmp_mammal)
+  }
+  out = rbind(out, tmp)
+}
+
+m <- lm(haddock_score_mean ~ predator_mammals, data = DF, na.action = na.omit)
+summary(m)
+
+DF_predator = DF
+save(DF_predator, file = "DF_predator.Rdata")
+a = 2
+tmp = data.frame(predators(species_list = DF$Species[a]))
+head(tmp)
+names(tmp)
+table(out_mammal$PredatorName)
+
+plot <- ggplot(data = DF_predator, aes(x = predator_mammals, y = haddock_score_mean))+
+  geom_point()+
+  geom_smooth()
+plot
+
+m <- lm(haddock_score_mean ~ predator_count, data = DF_predator, na.action = na.omit)
+summary(m)
+
+```
+
+##ration
+##�ration� (Rd) pertains to an estimate of daily food consumption by fish of a specific size
+##https://www.fishbase.in/manual/fishbasethe_ration_table.htm
+##multiple rows for some species
+```{r}
+load("DF_predator.Rdata")
+DF= DF_predator
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(ration(species_list = DF$Species[a]))
+  print(dim(tmp)[1])
+}
+names(tmp)
+```
+
+##reproduction
+##https://www.fishbase.in/manual/fishbasethe_reproduction_table.htm
+##only one row per species for these HADDOCK species; adding these fields
+```{r}
+load("DF_predator.Rdata")
+DF= DF_predator
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(reproduction(species_list = DF$Species[a]))
+  # print(dim(tmp)[1])
+
+      ind_species =which(names(tmp) == "Species")
+  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
+  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
+                                       "_reproduction")
+  tmp = merge(DF[a,], tmp)
+  out = rbind(out, tmp)
+}
+names(tmp)
+out[1:2,]
+
+DF_reproduction = out
+save(DF_reproduction, file = "DF_reproduction.Rdata")
+```
+
+##spawning
+##https://www.fishbase.in/manual/fishbasethe_spawning_table.htm
+##multiple rows per species, for different localities
+```{r}
+load("DF_reproduction.Rdata")
+DF= DF_reproduction
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(spawning(species_list = DF$Species[a]))
+  print(dim(tmp)[1])
+  out = rbind(out, tmp)
+}
+names(tmp)
+a = 5#look at one species w multiple rows
+  tmp = data.frame(spawning(species_list = DF$Species[a]))
+  tmp
+```
+
+##speed
+##https://www.fishbase.se/manual/English/PDF/FB_Book_ATorres_Swimming_Speed_RF_JG.pdf
+##https://www.fishbase.in/manual/fishbasethe_swimming_and_speed_tables.htm
+##multiple records for some species
+```{r}
+load("DF_reproduction.Rdata")
+DF= DF_reproduction
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(speed(species_list = DF$Species[a]))
+  print(dim(tmp)[1])
+  out = rbind(out, tmp)
+}
+a = 13
+  tmp = data.frame(speed(species_list = DF$Species[a]))
+names(tmp)
+head(tmp)
+
+```
+
+
+##stocks
+##https://www.fishbase.in/manual/fishbasethe_stocks_table.htm
+##multiple records for some species, one for each stock
+```{r}
+load("DF_reproduction.Rdata")
+DF= DF_reproduction
+species = DF$Species
+out = NULL
+for (a in 1:length(species)){
+  tmp = data.frame(stocks(species_list = DF$Species[a]))
+  print(dim(tmp)[1])
+  out = rbind(out, tmp)
+}
+a = 13
+  tmp = data.frame(stocks(species_list = DF$Species[a]))
+names(tmp)
+head(tmp)
+
+```
+
+##swimming
+##https://www.fishbase.in/manual/fishbasethe_swimming_and_speed_tables.htm
+##one record per species
+```{r}
+load("DF_reproduction.Rdata")
+DF= DF_reproduction
+species = DF$Species
+out = NULL
+ct = rep(NA, length(species))
+for (a in 1:length(species)){
+  tmp = data.frame(swimming(species_list = DF$Species[a]))
+  ct[a] = dim(tmp)[1]
+  ind_species =which(names(tmp) == "Species")
+  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
+  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
+                                       "_swimming")
+  tmp = merge(DF[a,], tmp)
+  out = rbind(out, tmp)
+}
+names(tmp)
+out[1:2,]
+unique(ct)
+DF_swim = DF
+save(DF_swim, file = "DF_swim.Rdata")
+fishbase_HADDOCK = DF_swim
+write.csv(fishbase_HADDOCK, file = "fishbase_HADDOCK.csv")
+```
+
+##see what coverage is
+```{r}
+load("DF_swim.Rdata")
+df = DF_swim
+name_ct = length(names(df))
+row_ct = dim(df)[1]
+non_na_frac = rep(NA, name_ct)
+for (a in 1:name_ct){
+  non_na_frac[a]= length(which(!is.na(df[,a])))/ row_ct  
+}
+  
+# non_na_frac = colSums(!is.na(df))/dim(df)[2]
+
+ok_cols = which(non_na_frac > cutoff)
+DF_fields = data.frame(field = names(df),
+                       non_na_frac = non_na_frac)
+i = sort.int(DF_fields$non_na_frac,  index.return = TRUE, decreasing = TRUE)
+
+DF_fields = DF_fields[i$ix,]
+DF_fields
+```
+
+
