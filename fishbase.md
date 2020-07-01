@@ -160,6 +160,13 @@ Ilya Fischhoff
     ## 
     ##     dotPlot
 
+    ## 
+    ## Attaching package: 'tidyr'
+
+    ## The following object is masked from 'package:S4Vectors':
+    ## 
+    ##     expand
+
 \#\#settings
 
 ``` r
@@ -6912,5 +6919,62 @@ summary(DF)
 
 ``` r
 fishbase_HADDOCK_biological = DF
-write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv")
+save(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.Rdata")
+write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv", row.names = FALSE)
+```
+
+``` r
+DF = read.csv("fishbase_HADDOCK_biological.csv")
+DF$predator_count=as.numeric(DF$predator_count)
+DF$n_r_estimate=as.numeric(DF$n_r_estimate)
+
+p<- DF %>%
+  gather(-Species, -haddock_score_mean, -haddock_score_sd, -Species_ACE2, key = "var", value = "value") %>%
+  ggplot(aes(x = value, y = haddock_score_mean, na.rm = TRUE)) +
+    geom_point(na.rm=TRUE) +
+    stat_smooth()+
+    facet_wrap(~ var, scales = "free") 
+  # theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave(plot = p, filename = "fishbase_HADDOCK.jpg", width = 20, height= 20, units = "in")
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+``` r
+p
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+![](fishbase_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+
+``` r
+p<- DF %>%
+  gather(-Species, -haddock_score_mean, -haddock_score_sd, -Species_ACE2, key = "var", value = "value") %>%
+  ggplot(aes(x = value, y = haddock_score_mean, na.rm = TRUE)) +
+    geom_point(na.rm=TRUE) +
+    stat_smooth()+
+    facet_wrap(~ var, scales = "free")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggsave(plot = p, filename = "fishbase_HADDOCK_vertical.jpg", width = 20, height= 20, units = "in")
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+``` r
+p
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+![](fishbase_files/figure-gfm/unnamed-chunk-38-2.png)<!-- -->
+
+``` r
+# NOT RUN {
+# p <- ggplot(diamonds) +
+#   geom_point(aes(carat, price), alpha = 0.1) +
+#   facet_wrap_paginate(~ cut:clarity, ncol = 3, nrow = 3, page = 1)
+# n_pages(p)
 ```
