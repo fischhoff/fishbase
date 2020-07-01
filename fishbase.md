@@ -149,6 +149,17 @@ Ilya Fischhoff
     ## 
     ##     format.pval, units
 
+    ## 
+    ## Attaching package: 'caret'
+
+    ## The following object is masked from 'package:survival':
+    ## 
+    ##     cluster
+
+    ## The following object is masked from 'package:seqinr':
+    ## 
+    ##     dotPlot
+
 \#\#settings
 
 ``` r
@@ -6158,7 +6169,17 @@ DF_fields
 DF_fields_rm = subset(DF_fields, non_na_frac == 0)
 
 names_rm = DF_fields_rm$field
+names_rm#the fields to remove
+```
 
+    ##  [1] "OHRemarks_ecology"         "IHRemarks_ecology"        
+    ##  [3] "OIRemarks_ecology"         "VRemarks_ecology"         
+    ##  [5] "TS_ecology"                "TrophPredicted_estimate"  
+    ##  [7] "seTrophPredicted_estimate" "SD_logK_estimate"         
+    ##  [9] "Linf_estimate"             "SD_logLinf_estimate"      
+    ## [11] "LengthType_estimate"       "TS_reproduction"
+
+``` r
 keep = setdiff(names(DF_swim), names_rm)
 DF_swim = DF_swim[, keep]
 
@@ -6166,7 +6187,7 @@ DF_cover = DF_swim
 save(DF_cover, file = "DF_cover.Rdata")
 ```
 
-\#\#remove non-biological fields
+\#\#remove non-biological fields and fields with near-zero variation
 
 ``` r
 load("DF_cover.Rdata")
@@ -6579,6 +6600,299 @@ summary(DF)
     ##  3rd Qu.:1.000              3rd Qu.: 0.00000                           
     ##  Max.   :2.000              Max.   : 0.00000                           
     ##  NA's   :63                 NA's   :8                                  
+    ##  BatchSpawner_reproduction RepGuild1_reproduction RepGuild2_reproduction
+    ##  Min.   :-1.0000           Length:76              Length:76             
+    ##  1st Qu.: 0.0000           Class :character       Class :character      
+    ##  Median : 0.0000           Mode  :character       Mode  :character      
+    ##  Mean   :-0.2206                                                        
+    ##  3rd Qu.: 0.0000                                                        
+    ##  Max.   : 0.0000                                                        
+    ##  NA's   :8                                                              
+    ##  ParentalCare_reproduction ParentalCareQ_reproduction RepAquarium_reproduction
+    ##  Length:76                 Min.   :1.000              Length:76               
+    ##  Class :character          1st Qu.:1.000              Class :character        
+    ##  Mode  :character          Median :1.000              Mode  :character        
+    ##                            Mean   :1.837                                      
+    ##                            3rd Qu.:3.000                                      
+    ##                            Max.   :4.000                                      
+    ##                            NA's   :27
+
+``` r
+##remove variables with zero variation
+nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
+okay_inds = which(nzv$nzv == FALSE)
+
+DF = DF[,okay_inds]#include only the columns that have variation
+
+#this also has near-zero variation
+table(DF$SchoolingFrequency_ecology)
+```
+
+    ## 
+    ##    always sometimes 
+    ##         1         1
+
+``` r
+rm = c("SchoolingFrequency_ecology")
+
+table(DF$Herbivory2_ecology)#this one has variation, and needs to be made into 1/0 variables
+```
+
+    ## 
+    ##        mainly animals (troph. 2.8 and up) 
+    ##                                        46 
+    ##    mainly plants/detritus (troph. 2-2.19) 
+    ##                                         9 
+    ## plants/detritus+animals (troph. 2.2-2.79) 
+    ##                                         6
+
+``` r
+table(DF$FeedingType_ecology)#this one has *some* variation, and needs to be made into 1/0 variables
+```
+
+    ## 
+    ##                  browsing on substrate                     filtering plankton 
+    ##                                      3                                      1 
+    ##              grazing on aquatic plants          hunting macrofauna (predator) 
+    ##                                      7                                     29 
+    ## picking parasites off a host (cleaner)             selective plankton feeding 
+    ##                                      1                                      3 
+    ##                               variable 
+    ##                                      7
+
+``` r
+table(DF$Method_ab_estimate)#this is about methods, not biological. is it okay to include multiple methods? 
+```
+
+    ## 
+    ##             all LWR estimates for this body shape 
+    ##                                                 3 
+    ##     LWR estimates for this (Sub)family-body shape 
+    ##                                                22 
+    ##           LWR estimates for this Genus-body shape 
+    ##                                                 1 
+    ##                    LWR estimates for this species 
+    ##                                                21 
+    ## LWR estimates for this species & (Sub)family-body 
+    ##                                                20 
+    ## LWR estimates for this species & Genus-body shape 
+    ##                                                 6
+
+``` r
+rm = c(rm, "Method_ab_estimate")
+
+table(DF$Fertilization_reproduction)#this has some variation, needs to be made into 1/0 variables
+```
+
+    ## 
+    ##                            external in brood pouch or similar structure 
+    ##                                  56                                   1 
+    ##                            in mouth                  internal (oviduct) 
+    ##                                   1                                   8 
+    ##                               other 
+    ##                                   2
+
+``` r
+table(DF$MatingSystem_reproduction)#this has some variation, needs to be made into 1/0 variables
+```
+
+    ## 
+    ##    monogamy   polyandry    polygyny promiscuity 
+    ##           9           3           5           1
+
+``` r
+table(DF$Spawning_reproduction)#has some variation, , needs to be made into 1/0 variables
+```
+
+    ## 
+    ##              no obvious seasonal peak              No obvious seasonal peak 
+    ##                                     7                                     1 
+    ##                    once in a lifetime      one clear seasonal peak per year 
+    ##                                     1                                    16 
+    ## throughout the year, but peaking once 
+    ##                                     3
+
+``` r
+DF$Spawning_reproduction= tolower(DF$Spawning_reproduction)
+
+table(DF$RepGuild1_reproduction)#has variation, , needs to be made into 1/0 variables
+```
+
+    ## 
+    ##     bearers    guarders nonguarders 
+    ##          18          15          33
+
+``` r
+table(DF$RepGuild2_reproduction)#has variation, , needs to be made into 1/0 variables. this seems to be a separate classification scheme from RepGuild1
+```
+
+    ## 
+    ##                         brood hiders                       clutch tenders 
+    ##                                    4                                    3 
+    ##                    external brooders                internal live bearers 
+    ##                                   11                                    7 
+    ##                              nesters open water/substratum egg scatterers 
+    ##                                   12                                   25
+
+``` r
+table(DF$ParentalCare_reproduction)#has variation, , needs to be made into 1/0 variables.
+```
+
+    ## 
+    ## biparental   maternal       none   paternal 
+    ##          1          8         31          9
+
+``` r
+table(DF$RepAquarium_reproduction)#has variation, , needs to be made into 1/0 variables.
+```
+
+    ## 
+    ##         High          Low       Medium Never/Rarely 
+    ##            5            1            6            1
+
+``` r
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+
+summary(DF)
+```
+
+    ##    Species          haddock_score_mean haddock_score_sd    Order          
+    ##  Length:76          Min.   :-167.8     Min.   :0.7569   Length:76         
+    ##  Class :character   1st Qu.:-143.9     1st Qu.:2.1368   Class :character  
+    ##  Mode  :character   Median :-139.5     Median :2.7989   Mode  :character  
+    ##                     Mean   :-137.4     Mean   :2.9628                     
+    ##                     3rd Qu.:-129.1     3rd Qu.:3.8402                     
+    ##                     Max.   :-108.5     Max.   :5.4386                     
+    ##                                                                           
+    ##  Species_ACE2       brain_body_ratio Neritic_ecology   Intertidal_ecology
+    ##  Length:76          Min.   : 0.771   Min.   :-1.0000   Min.   :-1.0000   
+    ##  Class :character   1st Qu.: 2.022   1st Qu.: 0.0000   1st Qu.: 0.0000   
+    ##  Mode  :character   Median : 2.268   Median : 0.0000   Median : 0.0000   
+    ##                     Mean   : 5.947   Mean   :-0.1791   Mean   :-0.1493   
+    ##                     3rd Qu.: 6.631   3rd Qu.: 0.0000   3rd Qu.: 0.0000   
+    ##                     Max.   :27.139   Max.   : 0.0000   Max.   : 0.0000   
+    ##                     NA's   :50       NA's   :9         NA's   :9         
+    ##  Oceanic_ecology   Epipelagic_ecology Estuaries_ecology Mangroves_ecology 
+    ##  Min.   :-1.0000   Min.   :-1.00000   Min.   :-1.0000   Min.   :-1.00000  
+    ##  1st Qu.:-1.0000   1st Qu.: 0.00000   1st Qu.:-1.0000   1st Qu.: 0.00000  
+    ##  Median : 0.0000   Median : 0.00000   Median : 0.0000   Median : 0.00000  
+    ##  Mean   :-0.3433   Mean   :-0.08955   Mean   :-0.3731   Mean   :-0.07463  
+    ##  3rd Qu.: 0.0000   3rd Qu.: 0.00000   3rd Qu.: 0.0000   3rd Qu.: 0.00000  
+    ##  Max.   : 0.0000   Max.   : 0.00000   Max.   : 0.0000   Max.   : 0.00000  
+    ##  NA's   :9         NA's   :9          NA's   :9         NA's   :9         
+    ##  MarshesSwamps_ecology Stream_ecology    Lakes_ecology     Herbivory2_ecology
+    ##  Min.   :-1.00000      Min.   :-1.0000   Min.   :-1.0000   Length:76         
+    ##  1st Qu.: 0.00000      1st Qu.:-1.0000   1st Qu.:-1.0000   Class :character  
+    ##  Median : 0.00000      Median : 0.0000   Median : 0.0000   Mode  :character  
+    ##  Mean   :-0.07463      Mean   :-0.4627   Mean   :-0.3582                     
+    ##  3rd Qu.: 0.00000      3rd Qu.: 0.0000   3rd Qu.: 0.0000                     
+    ##  Max.   : 0.00000      Max.   : 0.0000   Max.   : 0.0000                     
+    ##  NA's   :9             NA's   :9         NA's   :9                           
+    ##  FeedingType_ecology DietTroph_ecology DietSeTroph_ecology DietTLu_ecology
+    ##  Length:76           Min.   :2.000     Min.   :0.0000      Min.   :2.000  
+    ##  Class :character    1st Qu.:2.210     1st Qu.:0.0960      1st Qu.:2.930  
+    ##  Mode  :character    Median :3.385     Median :0.1790      Median :3.305  
+    ##                      Mean   :3.229     Mean   :0.2177      Mean   :3.337  
+    ##                      3rd Qu.:4.072     3rd Qu.:0.2770      3rd Qu.:4.043  
+    ##                      Max.   :4.500     Max.   :0.7600      Max.   :4.450  
+    ##                      NA's   :48        NA's   :55          NA's   :52     
+    ##  DietseTLu_ecology FoodTroph_ecology FoodSeTroph_ecology SoftBottom_ecology
+    ##  Min.   :0.0000    Min.   :2.000     Min.   :0.0000      Min.   :-1.0000   
+    ##  1st Qu.:0.1575    1st Qu.:2.875     1st Qu.:0.3075      1st Qu.: 0.0000   
+    ##  Median :0.4400    Median :3.280     Median :0.4400      Median : 0.0000   
+    ##  Mean   :0.4042    Mean   :3.232     Mean   :0.4277      Mean   :-0.1642   
+    ##  3rd Qu.:0.6350    3rd Qu.:3.607     3rd Qu.:0.5459      3rd Qu.: 0.0000   
+    ##  Max.   :0.7700    Max.   :4.400     Max.   :1.0500      Max.   : 0.0000   
+    ##  NA's   :52        NA's   :16        NA's   :16          NA's   :9         
+    ##   Sand_ecology      Mud_ecology      HardBottom_ecology Rocky_ecology    
+    ##  Min.   :-1.0000   Min.   :-1.0000   Min.   :-1.00000   Min.   :-1.0000  
+    ##  1st Qu.: 0.0000   1st Qu.: 0.0000   1st Qu.: 0.00000   1st Qu.: 0.0000  
+    ##  Median : 0.0000   Median : 0.0000   Median : 0.00000   Median : 0.0000  
+    ##  Mean   :-0.0597   Mean   :-0.0597   Mean   :-0.08955   Mean   :-0.1194  
+    ##  3rd Qu.: 0.0000   3rd Qu.: 0.0000   3rd Qu.: 0.00000   3rd Qu.: 0.0000  
+    ##  Max.   : 0.0000   Max.   : 0.0000   Max.   : 0.00000   Max.   : 0.0000  
+    ##  NA's   :9         NA's   :9         NA's   :9          NA's   :9        
+    ##  SeaGrassBeds_ecology CoralReefs_ecology MaxLengthTL_estimate Troph_estimate 
+    ##  Min.   :-1.00000     Min.   :-1.0000    Min.   :  4.00       Min.   :2.000  
+    ##  1st Qu.: 0.00000     1st Qu.: 0.0000    1st Qu.: 11.62       1st Qu.:2.855  
+    ##  Median : 0.00000     Median : 0.0000    Median : 40.60       Median :3.230  
+    ##  Mean   :-0.08955     Mean   :-0.1791    Mean   : 62.96       Mean   :3.207  
+    ##  3rd Qu.: 0.00000     3rd Qu.: 0.0000    3rd Qu.: 82.50       3rd Qu.:3.685  
+    ##  Max.   : 0.00000     Max.   : 0.0000    Max.   :305.00       Max.   :4.660  
+    ##  NA's   :9            NA's   :9                                              
+    ##  seTroph_estimate   a_estimate        sd_log10a_estimate   b_estimate   
+    ##  Min.   :0.0000   Min.   :0.0006457   Min.   :0.0247     Min.   :2.830  
+    ##  1st Qu.:0.1703   1st Qu.:0.0057544   1st Qu.:0.0617     1st Qu.:2.980  
+    ##  Median :0.3500   Median :0.0097724   Median :0.1250     Median :3.040  
+    ##  Mean   :0.3251   Mean   :0.0107931   Mean   :0.1230     Mean   :3.041  
+    ##  3rd Qu.:0.4425   3rd Qu.:0.0151356   3rd Qu.:0.1730     3rd Qu.:3.100  
+    ##  Max.   :0.7800   Max.   :0.0275423   Max.   :0.2160     Max.   :3.210  
+    ##                   NA's   :3           NA's   :3          NA's   :3      
+    ##  sd_b_estimate     prior_r_estimate lcl_r_estimate   ucl_r_estimate  
+    ##  Min.   :0.01530   Min.   :0.2822   Min.   :0.1635   Min.   :0.4462  
+    ##  1st Qu.:0.04000   1st Qu.:0.2974   1st Qu.:0.1963   1st Qu.:0.4874  
+    ##  Median :0.08010   Median :0.4545   Median :0.3000   Median :0.6817  
+    ##  Mean   :0.07068   Mean   :0.4476   Mean   :0.2903   Mean   :0.6856  
+    ##  3rd Qu.:0.09190   3rd Qu.:0.5655   3rd Qu.:0.3733   3rd Qu.:0.8483  
+    ##  Max.   :0.11800   Max.   :0.5914   Max.   :0.3903   Max.   :0.8871  
+    ##  NA's   :3         NA's   :67       NA's   :67       NA's   :67      
+    ##   n_r_estimate     K_estimate     Winf_estimate     ComDepthMin_estimate
+    ##  Min.   : 1.00   Min.   :0.0600   Min.   :    0.7   Min.   :  0.00      
+    ##  1st Qu.: 4.00   1st Qu.:0.2300   1st Qu.:  609.0   1st Qu.:  2.00      
+    ##  Median : 7.00   Median :0.3850   Median : 1041.2   Median :  4.00      
+    ##  Mean   :17.89   Mean   :0.5870   Mean   : 8864.1   Mean   : 15.78      
+    ##  3rd Qu.:40.00   3rd Qu.:0.7375   3rd Qu.: 6403.1   3rd Qu.: 16.00      
+    ##  Max.   :48.00   Max.   :2.5700   Max.   :60447.4   Max.   :150.00      
+    ##  NA's   :67      NA's   :10       NA's   :46        NA's   :39          
+    ##  ComDepthMax_estimate DepthMin_estimate DepthMax_estimate
+    ##  Min.   :  3.00       Min.   : 0.00     Min.   :   4.0   
+    ##  1st Qu.: 15.25       1st Qu.: 0.00     1st Qu.:  22.0   
+    ##  Median : 24.50       Median : 0.00     Median :  50.0   
+    ##  Mean   : 70.34       Mean   : 1.87     Mean   : 173.1   
+    ##  3rd Qu.: 89.25       3rd Qu.: 1.00     3rd Qu.: 200.0   
+    ##  Max.   :440.00       Max.   :15.00     Max.   :1540.0   
+    ##  NA's   :38           NA's   :30        NA's   :38       
+    ##  PredPreyRatioMin_estimate PredPreyRatioMax_estimate AgeMin_estimate  
+    ##  Min.   :  1.920           Min.   :   3.819          Min.   :0.01751  
+    ##  1st Qu.:  4.721           1st Qu.: 110.159          1st Qu.:0.50000  
+    ##  Median :  7.102           Median : 534.994          Median :1.00000  
+    ##  Mean   : 21.932           Mean   :1442.571          Mean   :1.06227  
+    ##  3rd Qu.: 12.260           3rd Qu.:1344.652          3rd Qu.:1.39662  
+    ##  Max.   :143.670           Max.   :7174.060          Max.   :3.49000  
+    ##                                                      NA's   :40       
+    ##  AgeMax_estimate TempPrefMin_estimate TempPrefMean_estimate
+    ##  Min.   : 0.22   Min.   :-1.70        Min.   :-0.60        
+    ##  1st Qu.: 7.25   1st Qu.: 4.90        1st Qu.: 8.40        
+    ##  Median :12.40   Median :12.80        Median :18.90        
+    ##  Mean   :14.66   Mean   :13.11        Mean   :17.61        
+    ##  3rd Qu.:25.00   3rd Qu.:21.65        3rd Qu.:27.35        
+    ##  Max.   :41.00   Max.   :28.30        Max.   :28.80        
+    ##  NA's   :45      NA's   :48           NA's   :48           
+    ##  TempPrefMax_estimate nCells_estimate  MaxLengthSL_estimate introductions_count
+    ##  Min.   : 2.40        Min.   :  54.0   Min.   :  3.280      Min.   :  1.00     
+    ##  1st Qu.:12.78        1st Qu.: 261.0   1st Qu.:  9.252      1st Qu.:  1.00     
+    ##  Median :23.35        Median : 474.5   Median : 32.960      Median :  1.00     
+    ##  Mean   :20.91        Mean   : 841.3   Mean   : 52.429      Mean   : 15.36     
+    ##  3rd Qu.:28.93        3rd Qu.: 912.0   3rd Qu.: 70.487      3rd Qu.:  7.25     
+    ##  Max.   :29.30        Max.   :4182.0   Max.   :250.000      Max.   :130.00     
+    ##  NA's   :48           NA's   :48                                               
+    ##  predator_mammals predator_count   Fertilization_reproduction
+    ##  Min.   :0.0000   Min.   : 1.000   Length:76                 
+    ##  1st Qu.:0.0000   1st Qu.: 1.000   Class :character          
+    ##  Median :0.0000   Median : 1.000   Mode  :character          
+    ##  Mean   :0.5151   Mean   : 4.553                             
+    ##  3rd Qu.:0.0000   3rd Qu.: 2.250                             
+    ##  Max.   :6.0000   Max.   :48.000                             
+    ##  NA's   :43                                                  
+    ##  MatingSystem_reproduction MatingQuality_reproduction Spawning_reproduction
+    ##  Length:76                 Min.   :1.000              Length:76            
+    ##  Class :character          1st Qu.:1.000              Class :character     
+    ##  Mode  :character          Median :1.000              Mode  :character     
+    ##                            Mean   :1.231                                   
+    ##                            3rd Qu.:1.000                                   
+    ##                            Max.   :2.000                                   
+    ##                            NA's   :63                                      
     ##  BatchSpawner_reproduction RepGuild1_reproduction RepGuild2_reproduction
     ##  Min.   :-1.0000           Length:76              Length:76             
     ##  1st Qu.: 0.0000           Class :character       Class :character      

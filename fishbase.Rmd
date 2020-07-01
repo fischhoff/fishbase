@@ -14,7 +14,7 @@ pkgTest <- function(x)
   }
   library(x, character.only = TRUE)
 }
-neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc")
+neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret")
 for (package in neededPackages){pkgTest(package)}
 
 ```
@@ -701,7 +701,7 @@ DF_fields
 DF_fields_rm = subset(DF_fields, non_na_frac == 0)
 
 names_rm = DF_fields_rm$field
-
+names_rm#the fields to remove
 keep = setdiff(names(DF_swim), names_rm)
 DF_swim = DF_swim[, keep]
 
@@ -710,7 +710,7 @@ save(DF_cover, file = "DF_cover.Rdata")
 ```
 
 
-##remove non-biological fields
+##remove non-biological fields and fields with near-zero variation
 ```{r}
 load("DF_cover.Rdata")
 DF = DF_cover
@@ -755,6 +755,43 @@ DF_biological = DF
 save(DF_biological, file = "DF_biological.Rdata")
 
 summary(DF)
+
+##remove variables with zero variation
+nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
+okay_inds = which(nzv$nzv == FALSE)
+
+DF = DF[,okay_inds]#include only the columns that have variation
+
+#this also has near-zero variation
+table(DF$SchoolingFrequency_ecology)
+rm = c("SchoolingFrequency_ecology")
+
+table(DF$Herbivory2_ecology)#this one has variation, and needs to be made into 1/0 variables
+
+table(DF$FeedingType_ecology)#this one has *some* variation, and needs to be made into 1/0 variables
+
+table(DF$Method_ab_estimate)#this is about methods, not biological. is it okay to include multiple methods? 
+rm = c(rm, "Method_ab_estimate")
+
+table(DF$Fertilization_reproduction)#this has some variation, needs to be made into 1/0 variables
+
+table(DF$MatingSystem_reproduction)#this has some variation, needs to be made into 1/0 variables
+
+table(DF$Spawning_reproduction)#has some variation, , needs to be made into 1/0 variables
+DF$Spawning_reproduction= tolower(DF$Spawning_reproduction)
+
+table(DF$RepGuild1_reproduction)#has variation, , needs to be made into 1/0 variables
+
+table(DF$RepGuild2_reproduction)#has variation, , needs to be made into 1/0 variables. this seems to be a separate classification scheme from RepGuild1
+
+table(DF$ParentalCare_reproduction)#has variation, , needs to be made into 1/0 variables.
+
+table(DF$RepAquarium_reproduction)#has variation, , needs to be made into 1/0 variables.
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+
+summary(DF)
+
 
 fishbase_HADDOCK_biological = DF
 write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv")
