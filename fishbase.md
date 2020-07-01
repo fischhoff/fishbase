@@ -6151,3 +6151,452 @@ DF_fields
     ## 159          SD_logLinf_estimate  0.00000000
     ## 161          LengthType_estimate  0.00000000
     ## 213              TS_reproduction  0.00000000
+
+\#\#remove fields with 0 coverage
+
+``` r
+DF_fields_rm = subset(DF_fields, non_na_frac == 0)
+
+names_rm = DF_fields_rm$field
+
+keep = setdiff(names(DF_swim), names_rm)
+DF_swim = DF_swim[, keep]
+
+DF_cover = DF_swim
+save(DF_cover, file = "DF_cover.Rdata")
+```
+
+\#\#remove non-biological fields
+
+``` r
+load("DF_cover.Rdata")
+DF = DF_cover
+names = names(DF)
+
+stock_inds = str_which(names, "Stock")
+names[stock_inds]
+```
+
+    ## [1] "StockCode_ecology"      "StockCode_reproduction"
+
+``` r
+#ecology sometimes has multiple stocks per species
+ecology_all = ecology()  
+tab = table(ecology_all$Species)
+tab = data.frame(tab)
+unique(tab$Freq)
+```
+
+    ## [1] 1 2 4 3
+
+``` r
+table(tab$Freq)
+```
+
+    ## 
+    ##     1     2     3     4 
+    ## 34276    18     3     2
+
+``` r
+#reproduction only ever has one stock
+repro_all = reproduction()  
+tab = table(repro_all$Species)
+tab = data.frame(tab)
+unique(tab$Freq)
+```
+
+    ## [1] 1
+
+``` r
+#confirm all "Ref" are irrelevant
+non_biological = c( "Ref" )
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+unique(DF$DietRemark_ecology)
+```
+
+    ##  [1] NA                                             
+    ##  [2] "Troph of adults from 5 studies."              
+    ##  [3] "Troph of juv./adults from 1 study."           
+    ##  [4] "Troph of adults from 1 study."                
+    ##  [5] "Troph of juv./adults from 4 studies."         
+    ##  [6] "Troph of adults and juv./adults from 1 study."
+    ##  [7] "Troph of juv./adults from 12 studies."        
+    ##  [8] "Troph of juv./adults from 2 studies."         
+    ##  [9] "Troph of adults from 2 studies."              
+    ## [10] "Troph of adults from 7 studies."              
+    ## [11] "Troph of juv./adults from 3 studies."         
+    ## [12] "Troph of adults from 3 studies."              
+    ## [13] "Troph of juv./adults from 6 studies."         
+    ## [14] "Troph of juv./adults from 13 studies."
+
+``` r
+non_biological = c("LastModified", "SpecCode", "autoctr", "StockCode", "Ref", "Remark", "AddRems", "Entered", "entered", "Expert", "Datechecked", "Comment", "Modified", "AddInfos", "DateChecked", "modified")
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+keep = setdiff(names, names[inds_rm])
+
+DF = DF[,keep]
+DF_biological = DF
+save(DF_biological, file = "DF_biological.Rdata")
+
+summary(DF)
+```
+
+    ##    Species          haddock_score_mean haddock_score_sd    Order          
+    ##  Length:76          Min.   :-167.8     Min.   :0.7569   Length:76         
+    ##  Class :character   1st Qu.:-143.9     1st Qu.:2.1368   Class :character  
+    ##  Mode  :character   Median :-139.5     Median :2.7989   Mode  :character  
+    ##                     Mean   :-137.4     Mean   :2.9628                     
+    ##                     3rd Qu.:-129.1     3rd Qu.:3.8402                     
+    ##                     Max.   :-108.5     Max.   :5.4386                     
+    ##                                                                           
+    ##     Class           Species_ACE2       brain_body_ratio Neritic_ecology  
+    ##  Length:76          Length:76          Min.   : 0.771   Min.   :-1.0000  
+    ##  Class :character   Class :character   1st Qu.: 2.022   1st Qu.: 0.0000  
+    ##  Mode  :character   Mode  :character   Median : 2.268   Median : 0.0000  
+    ##                                        Mean   : 5.947   Mean   :-0.1791  
+    ##                                        3rd Qu.: 6.631   3rd Qu.: 0.0000  
+    ##                                        Max.   :27.139   Max.   : 0.0000  
+    ##                                        NA's   :50       NA's   :9        
+    ##  SupraLittoralZone_ecology Saltmarshes_ecology LittoralZone_ecology
+    ##  Min.   :-1.00000          Min.   :-1.00000    Min.   :-1.00000    
+    ##  1st Qu.: 0.00000          1st Qu.: 0.00000    1st Qu.: 0.00000    
+    ##  Median : 0.00000          Median : 0.00000    Median : 0.00000    
+    ##  Mean   :-0.01493          Mean   :-0.01493    Mean   :-0.01493    
+    ##  3rd Qu.: 0.00000          3rd Qu.: 0.00000    3rd Qu.: 0.00000    
+    ##  Max.   : 0.00000          Max.   : 0.00000    Max.   : 0.00000    
+    ##  NA's   :9                 NA's   :9           NA's   :9           
+    ##  TidePools_ecology Intertidal_ecology SubLittoral_ecology Caves_ecology     
+    ##  Min.   :0         Min.   :-1.0000    Min.   :0           Min.   :-1.00000  
+    ##  1st Qu.:0         1st Qu.: 0.0000    1st Qu.:0           1st Qu.: 0.00000  
+    ##  Median :0         Median : 0.0000    Median :0           Median : 0.00000  
+    ##  Mean   :0         Mean   :-0.1493    Mean   :0           Mean   :-0.01493  
+    ##  3rd Qu.:0         3rd Qu.: 0.0000    3rd Qu.:0           3rd Qu.: 0.00000  
+    ##  Max.   :0         Max.   : 0.0000    Max.   :0           Max.   : 0.00000  
+    ##  NA's   :9         NA's   :9          NA's   :9           NA's   :9         
+    ##  Oceanic_ecology   Epipelagic_ecology Mesopelagic_ecology Bathypelagic_ecology
+    ##  Min.   :-1.0000   Min.   :-1.00000   Min.   :-1.00000    Min.   :0           
+    ##  1st Qu.:-1.0000   1st Qu.: 0.00000   1st Qu.: 0.00000    1st Qu.:0           
+    ##  Median : 0.0000   Median : 0.00000   Median : 0.00000    Median :0           
+    ##  Mean   :-0.3433   Mean   :-0.08955   Mean   :-0.01493    Mean   :0           
+    ##  3rd Qu.: 0.0000   3rd Qu.: 0.00000   3rd Qu.: 0.00000    3rd Qu.:0           
+    ##  Max.   : 0.0000   Max.   : 0.00000   Max.   : 0.00000    Max.   :0           
+    ##  NA's   :9         NA's   :9          NA's   :9           NA's   :9           
+    ##  Abyssopelagic_ecology Hadopelagic_ecology Estuaries_ecology Mangroves_ecology 
+    ##  Min.   :0             Min.   :-1.00000    Min.   :-1.0000   Min.   :-1.00000  
+    ##  1st Qu.:0             1st Qu.: 0.00000    1st Qu.:-1.0000   1st Qu.: 0.00000  
+    ##  Median :0             Median : 0.00000    Median : 0.0000   Median : 0.00000  
+    ##  Mean   :0             Mean   :-0.01493    Mean   :-0.3731   Mean   :-0.07463  
+    ##  3rd Qu.:0             3rd Qu.: 0.00000    3rd Qu.: 0.0000   3rd Qu.: 0.00000  
+    ##  Max.   :0             Max.   : 0.00000    Max.   : 0.0000   Max.   : 0.00000  
+    ##  NA's   :9             NA's   :9           NA's   :9         NA's   :9         
+    ##  MarshesSwamps_ecology CaveAnchialine_ecology Stream_ecology   
+    ##  Min.   :-1.00000      Min.   :0              Min.   :-1.0000  
+    ##  1st Qu.: 0.00000      1st Qu.:0              1st Qu.:-1.0000  
+    ##  Median : 0.00000      Median :0              Median : 0.0000  
+    ##  Mean   :-0.07463      Mean   :0              Mean   :-0.4627  
+    ##  3rd Qu.: 0.00000      3rd Qu.:0              3rd Qu.: 0.0000  
+    ##  Max.   : 0.00000      Max.   :0              Max.   : 0.0000  
+    ##  NA's   :9             NA's   :9              NA's   :9        
+    ##  Lakes_ecology      Cave_ecology      Cave2_ecology Herbivory2_ecology
+    ##  Min.   :-1.0000   Min.   :-1.00000   Min.   :0     Length:76         
+    ##  1st Qu.:-1.0000   1st Qu.: 0.00000   1st Qu.:0     Class :character  
+    ##  Median : 0.0000   Median : 0.00000   Median :0     Mode  :character  
+    ##  Mean   :-0.3582   Mean   :-0.02985   Mean   :0                       
+    ##  3rd Qu.: 0.0000   3rd Qu.: 0.00000   3rd Qu.:0                       
+    ##  Max.   : 0.0000   Max.   : 0.00000   Max.   :0                       
+    ##  NA's   :9         NA's   :9          NA's   :9                       
+    ##  FeedingType_ecology DietTroph_ecology DietSeTroph_ecology DietTLu_ecology
+    ##  Length:76           Min.   :2.000     Min.   :0.0000      Min.   :2.000  
+    ##  Class :character    1st Qu.:2.210     1st Qu.:0.0960      1st Qu.:2.930  
+    ##  Mode  :character    Median :3.385     Median :0.1790      Median :3.305  
+    ##                      Mean   :3.229     Mean   :0.2177      Mean   :3.337  
+    ##                      3rd Qu.:4.072     3rd Qu.:0.2770      3rd Qu.:4.043  
+    ##                      Max.   :4.500     Max.   :0.7600      Max.   :4.450  
+    ##                      NA's   :48        NA's   :55          NA's   :52     
+    ##  DietseTLu_ecology FoodTroph_ecology FoodSeTroph_ecology Parasitism_ecology
+    ##  Min.   :0.0000    Min.   :2.000     Min.   :0.0000      Min.   :0         
+    ##  1st Qu.:0.1575    1st Qu.:2.875     1st Qu.:0.3075      1st Qu.:0         
+    ##  Median :0.4400    Median :3.280     Median :0.4400      Median :0         
+    ##  Mean   :0.4042    Mean   :3.232     Mean   :0.4277      Mean   :0         
+    ##  3rd Qu.:0.6350    3rd Qu.:3.607     3rd Qu.:0.5459      3rd Qu.:0         
+    ##  Max.   :0.7700    Max.   :4.400     Max.   :1.0500      Max.   :0         
+    ##  NA's   :52        NA's   :16        NA's   :16          NA's   :9         
+    ##  Solitary_ecology   Symbiosis_ecology Symphorism_ecology Commensalism_ecology
+    ##  Min.   :-1.00000   Min.   :0         Min.   :0          Min.   :0           
+    ##  1st Qu.: 0.00000   1st Qu.:0         1st Qu.:0          1st Qu.:0           
+    ##  Median : 0.00000   Median :0         Median :0          Median :0           
+    ##  Mean   :-0.01493   Mean   :0         Mean   :0          Mean   :0           
+    ##  3rd Qu.: 0.00000   3rd Qu.:0         3rd Qu.:0          3rd Qu.:0           
+    ##  Max.   : 0.00000   Max.   :0         Max.   :0          Max.   :0           
+    ##  NA's   :9          NA's   :9         NA's   :9          NA's   :9           
+    ##  Mutualism_ecology Epiphytic_ecology Schooling_ecology 
+    ##  Min.   :0         Min.   :0         Min.   :-1.00000  
+    ##  1st Qu.:0         1st Qu.:0         1st Qu.: 0.00000  
+    ##  Median :0         Median :0         Median : 0.00000  
+    ##  Mean   :0         Mean   :0         Mean   :-0.04478  
+    ##  3rd Qu.:0         3rd Qu.:0         3rd Qu.: 0.00000  
+    ##  Max.   :0         Max.   :0         Max.   : 0.00000  
+    ##  NA's   :9         NA's   :9         NA's   :9         
+    ##  SchoolingFrequency_ecology SchoolingLifestage_ecology Shoaling_ecology  
+    ##  Length:76                  Length:76                  Min.   :-1.00000  
+    ##  Class :character           Class :character           1st Qu.: 0.00000  
+    ##  Mode  :character           Mode  :character           Median : 0.00000  
+    ##                                                        Mean   :-0.01493  
+    ##                                                        3rd Qu.: 0.00000  
+    ##                                                        Max.   : 0.00000  
+    ##                                                        NA's   :9         
+    ##  ShoalingFrequency_ecology ShoalingLifestage_ecology AssociationsWith_ecology
+    ##  Length:76                 Length:76                 Length:76               
+    ##  Class :character          Class :character          Class :character        
+    ##  Mode  :character          Mode  :character          Mode  :character        
+    ##                                                                              
+    ##                                                                              
+    ##                                                                              
+    ##                                                                              
+    ##  OutsideHost_ecology InsideHost_ecology Benthic_ecology    Sessile_ecology
+    ##  Min.   :0           Min.   :0          Min.   :-1.00000   Min.   :0      
+    ##  1st Qu.:0           1st Qu.:0          1st Qu.: 0.00000   1st Qu.:0      
+    ##  Median :0           Median :0          Median : 0.00000   Median :0      
+    ##  Mean   :0           Mean   :0          Mean   :-0.01493   Mean   :0      
+    ##  3rd Qu.:0           3rd Qu.:0          3rd Qu.: 0.00000   3rd Qu.:0      
+    ##  Max.   :0           Max.   :0          Max.   : 0.00000   Max.   :0      
+    ##  NA's   :9           NA's   :9          NA's   :9          NA's   :9      
+    ##  Mobile_ecology     Demersal_ecology Endofauna_ecology Pelagic_ecology
+    ##  Min.   :-1.00000   Min.   :0        Min.   :0         Min.   :0      
+    ##  1st Qu.: 0.00000   1st Qu.:0        1st Qu.:0         1st Qu.:0      
+    ##  Median : 0.00000   Median :0        Median :0         Median :0      
+    ##  Mean   :-0.01493   Mean   :0        Mean   :0         Mean   :0      
+    ##  3rd Qu.: 0.00000   3rd Qu.:0        3rd Qu.:0         3rd Qu.:0      
+    ##  Max.   : 0.00000   Max.   :0        Max.   :0         Max.   :0      
+    ##  NA's   :9          NA's   :9        NA's   :9         NA's   :9      
+    ##  Megabenthos_ecology Macrobenthos_ecology Meiobenthos_ecology
+    ##  Min.   :0           Min.   :0            Min.   :0          
+    ##  1st Qu.:0           1st Qu.:0            1st Qu.:0          
+    ##  Median :0           Median :0            Median :0          
+    ##  Mean   :0           Mean   :0            Mean   :0          
+    ##  3rd Qu.:0           3rd Qu.:0            3rd Qu.:0          
+    ##  Max.   :0           Max.   :0            Max.   :0          
+    ##  NA's   :9           NA's   :9            NA's   :9          
+    ##  SoftBottom_ecology  Sand_ecology     Coarse_ecology  Fine_ecology
+    ##  Min.   :-1.0000    Min.   :-1.0000   Min.   :0      Min.   :0    
+    ##  1st Qu.: 0.0000    1st Qu.: 0.0000   1st Qu.:0      1st Qu.:0    
+    ##  Median : 0.0000    Median : 0.0000   Median :0      Median :0    
+    ##  Mean   :-0.1642    Mean   :-0.0597   Mean   :0      Mean   :0    
+    ##  3rd Qu.: 0.0000    3rd Qu.: 0.0000   3rd Qu.:0      3rd Qu.:0    
+    ##  Max.   : 0.0000    Max.   : 0.0000   Max.   :0      Max.   :0    
+    ##  NA's   :9          NA's   :9         NA's   :9      NA's   :9    
+    ##  Level_ecology Sloping_ecology  Silt_ecology  Mud_ecology       Ooze_ecology
+    ##  Min.   :0     Min.   :0       Min.   :0     Min.   :-1.0000   Min.   :0    
+    ##  1st Qu.:0     1st Qu.:0       1st Qu.:0     1st Qu.: 0.0000   1st Qu.:0    
+    ##  Median :0     Median :0       Median :0     Median : 0.0000   Median :0    
+    ##  Mean   :0     Mean   :0       Mean   :0     Mean   :-0.0597   Mean   :0    
+    ##  3rd Qu.:0     3rd Qu.:0       3rd Qu.:0     3rd Qu.: 0.0000   3rd Qu.:0    
+    ##  Max.   :0     Max.   :0       Max.   :0     Max.   : 0.0000   Max.   :0    
+    ##  NA's   :9     NA's   :9       NA's   :9     NA's   :9         NA's   :9    
+    ##  Detritus_ecology Organic_ecology HardBottom_ecology Rocky_ecology    
+    ##  Min.   :0        Min.   :0       Min.   :-1.00000   Min.   :-1.0000  
+    ##  1st Qu.:0        1st Qu.:0       1st Qu.: 0.00000   1st Qu.: 0.0000  
+    ##  Median :0        Median :0       Median : 0.00000   Median : 0.0000  
+    ##  Mean   :0        Mean   :0       Mean   :-0.08955   Mean   :-0.1194  
+    ##  3rd Qu.:0        3rd Qu.:0       3rd Qu.: 0.00000   3rd Qu.: 0.0000  
+    ##  Max.   :0        Max.   :0       Max.   : 0.00000   Max.   : 0.0000  
+    ##  NA's   :9        NA's   :9       NA's   :9          NA's   :9        
+    ##  Rubble_ecology     Gravel_ecology Macrophyte_ecology BedsBivalve_ecology
+    ##  Min.   :-1.00000   Min.   :0      Min.   :-1.00000   Min.   :0          
+    ##  1st Qu.: 0.00000   1st Qu.:0      1st Qu.: 0.00000   1st Qu.:0          
+    ##  Median : 0.00000   Median :0      Median : 0.00000   Median :0          
+    ##  Mean   :-0.01493   Mean   :0      Mean   :-0.01493   Mean   :0          
+    ##  3rd Qu.: 0.00000   3rd Qu.:0      3rd Qu.: 0.00000   3rd Qu.:0          
+    ##  Max.   : 0.00000   Max.   :0      Max.   : 0.00000   Max.   :0          
+    ##  NA's   :9          NA's   :9      NA's   :9          NA's   :9          
+    ##  BedsRock_ecology SeaGrassBeds_ecology BedsOthers_ecology CoralReefs_ecology
+    ##  Min.   :0        Min.   :-1.00000     Min.   :0          Min.   :-1.0000   
+    ##  1st Qu.:0        1st Qu.: 0.00000     1st Qu.:0          1st Qu.: 0.0000   
+    ##  Median :0        Median : 0.00000     Median :0          Median : 0.0000   
+    ##  Mean   :0        Mean   :-0.08955     Mean   :0          Mean   :-0.1791   
+    ##  3rd Qu.:0        3rd Qu.: 0.00000     3rd Qu.:0          3rd Qu.: 0.0000   
+    ##  Max.   :0        Max.   : 0.00000     Max.   :0          Max.   : 0.0000   
+    ##  NA's   :9        NA's   :9            NA's   :9          NA's   :9         
+    ##  ReefExclusive_ecology DropOffs_ecology ReefFlats_ecology  Lagoons_ecology   
+    ##  Min.   :0             Min.   :0        Min.   :-1.00000   Min.   :-1.00000  
+    ##  1st Qu.:0             1st Qu.:0        1st Qu.: 0.00000   1st Qu.: 0.00000  
+    ##  Median :0             Median :0        Median : 0.00000   Median : 0.00000  
+    ##  Mean   :0             Mean   :0        Mean   :-0.01493   Mean   :-0.01493  
+    ##  3rd Qu.:0             3rd Qu.:0        3rd Qu.: 0.00000   3rd Qu.: 0.00000  
+    ##  Max.   :0             Max.   :0        Max.   : 0.00000   Max.   : 0.00000  
+    ##  NA's   :9             NA's   :9        NA's   :9          NA's   :9         
+    ##  Burrows_ecology    Tunnels_ecology Crevices_ecology Vents_ecology
+    ##  Min.   :-1.00000   Min.   :0       Min.   :0        Min.   :0    
+    ##  1st Qu.: 0.00000   1st Qu.:0       1st Qu.:0        1st Qu.:0    
+    ##  Median : 0.00000   Median :0       Median :0        Median :0    
+    ##  Mean   :-0.02985   Mean   :0       Mean   :0        Mean   :0    
+    ##  3rd Qu.: 0.00000   3rd Qu.:0       3rd Qu.:0        3rd Qu.:0    
+    ##  Max.   : 0.00000   Max.   :0       Max.   :0        Max.   :0    
+    ##  NA's   :9          NA's   :9       NA's   :9        NA's   :9    
+    ##  Seamounts_ecology DeepWaterCorals_ecology Vegetation_ecology Leaves_ecology
+    ##  Min.   :0         Min.   :0               Min.   :-1.00000   Min.   :0     
+    ##  1st Qu.:0         1st Qu.:0               1st Qu.: 0.00000   1st Qu.:0     
+    ##  Median :0         Median :0               Median : 0.00000   Median :0     
+    ##  Mean   :0         Mean   :0               Mean   :-0.04478   Mean   :0     
+    ##  3rd Qu.:0         3rd Qu.:0               3rd Qu.: 0.00000   3rd Qu.:0     
+    ##  Max.   :0         Max.   :0               Max.   : 0.00000   Max.   :0     
+    ##  NA's   :9         NA's   :9               NA's   :9          NA's   :9     
+    ##  Stems_ecology      Roots_ecology Driftwood_ecology OInverterbrates_ecology
+    ##  Min.   :-1.00000   Min.   :0     Min.   :0         Min.   :0              
+    ##  1st Qu.: 0.00000   1st Qu.:0     1st Qu.:0         1st Qu.:0              
+    ##  Median : 0.00000   Median :0     Median :0         Median :0              
+    ##  Mean   :-0.01493   Mean   :0     Mean   :0         Mean   :0              
+    ##  3rd Qu.: 0.00000   3rd Qu.:0     3rd Qu.:0         3rd Qu.:0              
+    ##  Max.   : 0.00000   Max.   :0     Max.   :0         Max.   :0              
+    ##  NA's   :9          NA's   :9     NA's   :9         NA's   :9              
+    ##  Verterbrates_ecology Pilings_ecology BoatHulls_ecology Corals_ecology
+    ##  Min.   :0            Min.   :0       Min.   :0         Min.   :0     
+    ##  1st Qu.:0            1st Qu.:0       1st Qu.:0         1st Qu.:0     
+    ##  Median :0            Median :0       Median :0         Median :0     
+    ##  Mean   :0            Mean   :0       Mean   :0         Mean   :0     
+    ##  3rd Qu.:0            3rd Qu.:0       3rd Qu.:0         3rd Qu.:0     
+    ##  Max.   :0            Max.   :0       Max.   :0         Max.   :0     
+    ##  NA's   :9            NA's   :9       NA's   :9         NA's   :9     
+    ##  SoftCorals_ecology OnPolyp_ecology BetweenPolyps_ecology HardCorals_ecology
+    ##  Min.   :0          Min.   :0       Min.   :0             Min.   :0         
+    ##  1st Qu.:0          1st Qu.:0       1st Qu.:0             1st Qu.:0         
+    ##  Median :0          Median :0       Median :0             Median :0         
+    ##  Mean   :0          Mean   :0       Mean   :0             Mean   :0         
+    ##  3rd Qu.:0          3rd Qu.:0       3rd Qu.:0             3rd Qu.:0         
+    ##  Max.   :0          Max.   :0       Max.   :0             Max.   :0         
+    ##  NA's   :9          NA's   :9       NA's   :9             NA's   :9         
+    ##  OnExoskeleton_ecology InterstitialSpaces_ecology MaxLengthTL_estimate
+    ##  Min.   :0             Min.   :0                  Min.   :  4.00      
+    ##  1st Qu.:0             1st Qu.:0                  1st Qu.: 11.62      
+    ##  Median :0             Median :0                  Median : 40.60      
+    ##  Mean   :0             Mean   :0                  Mean   : 62.96      
+    ##  3rd Qu.:0             3rd Qu.:0                  3rd Qu.: 82.50      
+    ##  Max.   :0             Max.   :0                  Max.   :305.00      
+    ##  NA's   :9             NA's   :9                                      
+    ##  TLObserved_estimate Troph_estimate  seTroph_estimate TrophObserved_estimate
+    ##  Min.   :0           Min.   :2.000   Min.   :0.0000   Min.   :0             
+    ##  1st Qu.:0           1st Qu.:2.855   1st Qu.:0.1703   1st Qu.:0             
+    ##  Median :0           Median :3.230   Median :0.3500   Median :0             
+    ##  Mean   :0           Mean   :3.207   Mean   :0.3251   Mean   :0             
+    ##  3rd Qu.:0           3rd Qu.:3.685   3rd Qu.:0.4425   3rd Qu.:0             
+    ##  Max.   :0           Max.   :4.660   Max.   :0.7800   Max.   :0             
+    ##                                                                             
+    ##    a_estimate        sd_log10a_estimate   b_estimate    sd_b_estimate    
+    ##  Min.   :0.0006457   Min.   :0.0247     Min.   :2.830   Min.   :0.01530  
+    ##  1st Qu.:0.0057544   1st Qu.:0.0617     1st Qu.:2.980   1st Qu.:0.04000  
+    ##  Median :0.0097724   Median :0.1250     Median :3.040   Median :0.08010  
+    ##  Mean   :0.0107931   Mean   :0.1230     Mean   :3.041   Mean   :0.07068  
+    ##  3rd Qu.:0.0151356   3rd Qu.:0.1730     3rd Qu.:3.100   3rd Qu.:0.09190  
+    ##  Max.   :0.0275423   Max.   :0.2160     Max.   :3.210   Max.   :0.11800  
+    ##  NA's   :3           NA's   :3          NA's   :3       NA's   :3        
+    ##  Method_ab_estimate prior_r_estimate lcl_r_estimate   ucl_r_estimate  
+    ##  Length:76          Min.   :0.2822   Min.   :0.1635   Min.   :0.4462  
+    ##  Class :character   1st Qu.:0.2974   1st Qu.:0.1963   1st Qu.:0.4874  
+    ##  Mode  :character   Median :0.4545   Median :0.3000   Median :0.6817  
+    ##                     Mean   :0.4476   Mean   :0.2903   Mean   :0.6856  
+    ##                     3rd Qu.:0.5655   3rd Qu.:0.3733   3rd Qu.:0.8483  
+    ##                     Max.   :0.5914   Max.   :0.3903   Max.   :0.8871  
+    ##                     NA's   :67       NA's   :67       NA's   :67      
+    ##   n_r_estimate     K_estimate     Winf_estimate     ComDepthMin_estimate
+    ##  Min.   : 1.00   Min.   :0.0600   Min.   :    0.7   Min.   :  0.00      
+    ##  1st Qu.: 4.00   1st Qu.:0.2300   1st Qu.:  609.0   1st Qu.:  2.00      
+    ##  Median : 7.00   Median :0.3850   Median : 1041.2   Median :  4.00      
+    ##  Mean   :17.89   Mean   :0.5870   Mean   : 8864.1   Mean   : 15.78      
+    ##  3rd Qu.:40.00   3rd Qu.:0.7375   3rd Qu.: 6403.1   3rd Qu.: 16.00      
+    ##  Max.   :48.00   Max.   :2.5700   Max.   :60447.4   Max.   :150.00      
+    ##  NA's   :67      NA's   :10       NA's   :46        NA's   :39          
+    ##  ComDepthMax_estimate ComDepMinObserved_estimate ComDepMaxObserved_estimate
+    ##  Min.   :  3.00       Min.   :0                  Min.   :0                 
+    ##  1st Qu.: 15.25       1st Qu.:0                  1st Qu.:0                 
+    ##  Median : 24.50       Median :0                  Median :0                 
+    ##  Mean   : 70.34       Mean   :0                  Mean   :0                 
+    ##  3rd Qu.: 89.25       3rd Qu.:0                  3rd Qu.:0                 
+    ##  Max.   :440.00       Max.   :0                  Max.   :0                 
+    ##  NA's   :38                                                                
+    ##  DepthMin_estimate DepthMax_estimate DepthMinEstimate_estimate
+    ##  Min.   : 0.00     Min.   :   4.0    Min.   :0                
+    ##  1st Qu.: 0.00     1st Qu.:  22.0    1st Qu.:0                
+    ##  Median : 0.00     Median :  50.0    Median :0                
+    ##  Mean   : 1.87     Mean   : 173.1    Mean   :0                
+    ##  3rd Qu.: 1.00     3rd Qu.: 200.0    3rd Qu.:0                
+    ##  Max.   :15.00     Max.   :1540.0    Max.   :0                
+    ##  NA's   :30        NA's   :38                                 
+    ##  DepthMaxEstimate_estimate PredPreyRatioMin_estimate PredPreyRatioMax_estimate
+    ##  Min.   :0                 Min.   :  1.920           Min.   :   3.819         
+    ##  1st Qu.:0                 1st Qu.:  4.721           1st Qu.: 110.159         
+    ##  Median :0                 Median :  7.102           Median : 534.994         
+    ##  Mean   :0                 Mean   : 21.932           Mean   :1442.571         
+    ##  3rd Qu.:0                 3rd Qu.: 12.260           3rd Qu.:1344.652         
+    ##  Max.   :0                 Max.   :143.670           Max.   :7174.060         
+    ##                                                                               
+    ##  AgeMin_estimate   AgeMax_estimate TempPrefMin_estimate TempPrefMean_estimate
+    ##  Min.   :0.01751   Min.   : 0.22   Min.   :-1.70        Min.   :-0.60        
+    ##  1st Qu.:0.50000   1st Qu.: 7.25   1st Qu.: 4.90        1st Qu.: 8.40        
+    ##  Median :1.00000   Median :12.40   Median :12.80        Median :18.90        
+    ##  Mean   :1.06227   Mean   :14.66   Mean   :13.11        Mean   :17.61        
+    ##  3rd Qu.:1.39662   3rd Qu.:25.00   3rd Qu.:21.65        3rd Qu.:27.35        
+    ##  Max.   :3.49000   Max.   :41.00   Max.   :28.30        Max.   :28.80        
+    ##  NA's   :40        NA's   :45      NA's   :48           NA's   :48           
+    ##  TempPrefMax_estimate nCells_estimate  MaxLengthSL_estimate KObserved_estimate
+    ##  Min.   : 2.40        Min.   :  54.0   Min.   :  3.280      Min.   :0         
+    ##  1st Qu.:12.78        1st Qu.: 261.0   1st Qu.:  9.252      1st Qu.:0         
+    ##  Median :23.35        Median : 474.5   Median : 32.960      Median :0         
+    ##  Mean   :20.91        Mean   : 841.3   Mean   : 52.429      Mean   :0         
+    ##  3rd Qu.:28.93        3rd Qu.: 912.0   3rd Qu.: 70.487      3rd Qu.:0         
+    ##  Max.   :29.30        Max.   :4182.0   Max.   :250.000      Max.   :0         
+    ##  NA's   :48           NA's   :48                                              
+    ##  introductions_count predator_mammals predator_count   ReproMode_reproduction
+    ##  Min.   :  1.00      Min.   :0.0000   Min.   : 1.000   Length:76             
+    ##  1st Qu.:  1.00      1st Qu.:0.0000   1st Qu.: 1.000   Class :character      
+    ##  Median :  1.00      Median :0.0000   Median : 1.000   Mode  :character      
+    ##  Mean   : 15.36      Mean   :0.5151   Mean   : 4.553                         
+    ##  3rd Qu.:  7.25      3rd Qu.:0.0000   3rd Qu.: 2.250                         
+    ##  Max.   :130.00      Max.   :6.0000   Max.   :48.000                         
+    ##                      NA's   :43                                              
+    ##  Fertilization_reproduction MatingSystem_reproduction MonogamyType_reproduction
+    ##  Length:76                  Length:76                 Length:76                
+    ##  Class :character           Class :character          Class :character         
+    ##  Mode  :character           Mode  :character          Mode  :character         
+    ##                                                                                
+    ##                                                                                
+    ##                                                                                
+    ##                                                                                
+    ##  MatingQuality_reproduction SpawnAgg_reproduction Spawning_reproduction
+    ##  Min.   :1.000              Min.   :-1.00000      Length:76            
+    ##  1st Qu.:1.000              1st Qu.: 0.00000      Class :character     
+    ##  Median :1.000              Median : 0.00000      Mode  :character     
+    ##  Mean   :1.231              Mean   :-0.04412                           
+    ##  3rd Qu.:1.000              3rd Qu.: 0.00000                           
+    ##  Max.   :2.000              Max.   : 0.00000                           
+    ##  NA's   :63                 NA's   :8                                  
+    ##  BatchSpawner_reproduction RepGuild1_reproduction RepGuild2_reproduction
+    ##  Min.   :-1.0000           Length:76              Length:76             
+    ##  1st Qu.: 0.0000           Class :character       Class :character      
+    ##  Median : 0.0000           Mode  :character       Mode  :character      
+    ##  Mean   :-0.2206                                                        
+    ##  3rd Qu.: 0.0000                                                        
+    ##  Max.   : 0.0000                                                        
+    ##  NA's   :8                                                              
+    ##  ParentalCare_reproduction ParentalCareQ_reproduction RepAquarium_reproduction
+    ##  Length:76                 Min.   :1.000              Length:76               
+    ##  Class :character          1st Qu.:1.000              Class :character        
+    ##  Mode  :character          Median :1.000              Mode  :character        
+    ##                            Mean   :1.837                                      
+    ##                            3rd Qu.:3.000                                      
+    ##                            Max.   :4.000                                      
+    ##                            NA's   :27
+
+``` r
+fishbase_HADDOCK_biological = DF
+write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv")
+```

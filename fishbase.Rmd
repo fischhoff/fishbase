@@ -696,4 +696,69 @@ DF_fields = DF_fields[i$ix,]
 DF_fields
 ```
 
+##remove fields with 0 coverage
+```{r}
+DF_fields_rm = subset(DF_fields, non_na_frac == 0)
+
+names_rm = DF_fields_rm$field
+
+keep = setdiff(names(DF_swim), names_rm)
+DF_swim = DF_swim[, keep]
+
+DF_cover = DF_swim
+save(DF_cover, file = "DF_cover.Rdata")
+```
+
+
+##remove non-biological fields
+```{r}
+load("DF_cover.Rdata")
+DF = DF_cover
+names = names(DF)
+
+stock_inds = str_which(names, "Stock")
+names[stock_inds]
+
+#ecology sometimes has multiple stocks per species
+ecology_all = ecology()  
+tab = table(ecology_all$Species)
+tab = data.frame(tab)
+unique(tab$Freq)
+table(tab$Freq)
+
+#reproduction only ever has one stock
+repro_all = reproduction()  
+tab = table(repro_all$Species)
+tab = data.frame(tab)
+unique(tab$Freq)
+
+#confirm all "Ref" are irrelevant
+non_biological = c( "Ref" )
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+unique(DF$DietRemark_ecology)
+non_biological = c("LastModified", "SpecCode", "autoctr", "StockCode", "Ref", "Remark", "AddRems", "Entered", "entered", "Expert", "Datechecked", "Comment", "Modified", "AddInfos", "DateChecked", "modified")
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+keep = setdiff(names, names[inds_rm])
+
+DF = DF[,keep]
+DF_biological = DF
+save(DF_biological, file = "DF_biological.Rdata")
+
+summary(DF)
+
+fishbase_HADDOCK_biological = DF
+write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv")
+```
+
+
 
