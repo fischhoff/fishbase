@@ -167,6 +167,144 @@ Ilya Fischhoff
     ## 
     ##     expand
 
+    ## Loaded gbm 2.1.5
+
+    ## 
+    ## Attaching package: 'Matrix'
+
+    ## The following objects are masked from 'package:tidyr':
+    ## 
+    ##     expand, pack, unpack
+
+    ## The following object is masked from 'package:S4Vectors':
+    ## 
+    ##     expand
+
+    ## 
+    ## Attaching package: 'caTools'
+
+    ## The following object is masked from 'package:IRanges':
+    ## 
+    ##     runmean
+
+    ## The following object is masked from 'package:S4Vectors':
+    ## 
+    ##     runmean
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:Hmisc':
+    ## 
+    ##     src, summarize
+
+    ## The following objects are masked from 'package:data.table':
+    ## 
+    ##     between, first, last
+
+    ## The following objects are masked from 'package:Biostrings':
+    ## 
+    ##     collapse, intersect, setdiff, setequal, union
+
+    ## The following object is masked from 'package:XVector':
+    ## 
+    ##     slice
+
+    ## The following objects are masked from 'package:IRanges':
+    ## 
+    ##     collapse, desc, intersect, setdiff, slice, union
+
+    ## The following objects are masked from 'package:S4Vectors':
+    ## 
+    ##     first, intersect, rename, setdiff, setequal, union
+
+    ## The following objects are masked from 'package:BiocGenerics':
+    ## 
+    ##     combine, intersect, setdiff, union
+
+    ## The following object is masked from 'package:seqinr':
+    ## 
+    ##     count
+
+    ## The following objects are masked from 'package:plyr':
+    ## 
+    ##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+    ##     summarize
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+    ## Loading required package: raster
+
+    ## Loading required package: sp
+
+    ## 
+    ## Attaching package: 'sp'
+
+    ## The following object is masked from 'package:IRanges':
+    ## 
+    ##     %over%
+
+    ## 
+    ## Attaching package: 'raster'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     select
+
+    ## The following object is masked from 'package:tidyr':
+    ## 
+    ##     extract
+
+    ## The following objects are masked from 'package:Hmisc':
+    ## 
+    ##     mask, zoom
+
+    ## The following object is masked from 'package:data.table':
+    ## 
+    ##     shift
+
+    ## The following objects are masked from 'package:ape':
+    ## 
+    ##     rotate, zoom
+
+    ## The following object is masked from 'package:Biostrings':
+    ## 
+    ##     mask
+
+    ## The following objects are masked from 'package:IRanges':
+    ## 
+    ##     distance, shift, trim, values, values<-
+
+    ## The following objects are masked from 'package:S4Vectors':
+    ## 
+    ##     metadata, metadata<-, values, values<-
+
+    ## Loading required package: iterators
+
+    ## Loading required package: snow
+
+    ## 
+    ## Attaching package: 'snow'
+
+    ## The following objects are masked from 'package:BiocGenerics':
+    ## 
+    ##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    ##     clusterExport, clusterMap, clusterSplit, parApply, parCapply,
+    ##     parLapply, parRapply, parSapply
+
+    ## The following objects are masked from 'package:parallel':
+    ## 
+    ##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    ##     clusterExport, clusterMap, clusterSplit, makeCluster, parApply,
+    ##     parCapply, parLapply, parRapply, parSapply, splitIndices,
+    ##     stopCluster
+
 \#\#settings
 
 ``` r
@@ -2109,7 +2247,7 @@ for (a in 1:length(species)){
   # names(tmp)[inds_new]= paste0(names(tmp)[inds_new],
   #                                    "_fecundity")
   # tmp = merge(DF[a,], tmp)
-  # out = rbind(out, tmp)
+  out = rbind(out, tmp)
 }
 ```
 
@@ -2190,6 +2328,123 @@ for (a in 1:length(species)){
     ## [1] 1
     ## [1] 1
 
+``` r
+summary(out)
+```
+
+    ##     SpecCode       Species             autoctr         StockCode    
+    ##  Min.   :    2   Length:291         Min.   :   7.0   Min.   :    1  
+    ##  1st Qu.:   24   Class :character   1st Qu.: 100.5   1st Qu.:   79  
+    ##  Median :   69   Mode  :character   Median :2268.0   Median :  374  
+    ##  Mean   : 2688                      Mean   :1705.7   Mean   :14899  
+    ##  3rd Qu.:  495                      3rd Qu.:2851.0   3rd Qu.:27394  
+    ##  Max.   :67194                      Max.   :3831.0   Max.   :56768  
+    ##                                     NA's   :36       NA's   :36     
+    ##    MainRefNo        SourceRef         C_Code              E_CODE     
+    ##  Min.   :     2   Min.   :    49   Length:291         Min.   :  8.0  
+    ##  1st Qu.: 35388   1st Qu.: 41550   Class :character   1st Qu.:104.0  
+    ##  Median : 74523   Median : 87580   Mode  :character   Median :104.0  
+    ##  Mean   : 60991   Mean   : 68191                      Mean   :152.6  
+    ##  3rd Qu.: 87584   3rd Qu.: 88182                      3rd Qu.:176.0  
+    ##  Max.   :119066   Max.   :119066                      Max.   :369.0  
+    ##  NA's   :36       NA's   :155                         NA's   :224    
+    ##    Locality          FecundityMin        WeightMin        LengthFecunMin  
+    ##  Length:291         Min.   :       7   Min.   :    33.9   Min.   :  9.90  
+    ##  Class :character   1st Qu.:    3035   1st Qu.:    54.6   1st Qu.: 16.45  
+    ##  Mode  :character   Median :   14697   Median :   200.0   Median : 34.00  
+    ##                     Mean   :  327105   Mean   : 11738.1   Mean   : 34.91  
+    ##                     3rd Qu.:   64000   3rd Qu.:  2200.0   3rd Qu.: 41.75  
+    ##                     Max.   :15300000   Max.   :300000.0   Max.   :110.00  
+    ##                     NA's   :142        NA's   :262        NA's   :225     
+    ##  LengthTypeFecMin    FecundityMax        WeightMax       LengthFecunMax  
+    ##  Length:291         Min.   :      20   Min.   :  119.0   Min.   : 12.40  
+    ##  Class :character   1st Qu.:   13598   1st Qu.:  201.0   1st Qu.: 28.00  
+    ##  Mode  :character   Median :   65452   Median :  556.4   Median : 60.00  
+    ##                     Mean   : 1751632   Mean   : 4538.0   Mean   : 53.26  
+    ##                     3rd Qu.:  631500   3rd Qu.: 3223.8   3rd Qu.: 74.50  
+    ##                     Max.   :47700000   Max.   :34000.0   Max.   :157.00  
+    ##                     NA's   :139        NA's   :263       NA's   :227     
+    ##  LengthTypeFecMax   FecundityMean   WeightMean  LengthFecunMean
+    ##  Length:291         Min.   :438   Min.   : NA   Min.   : NA    
+    ##  Class :character   1st Qu.:448   1st Qu.: NA   1st Qu.: NA    
+    ##  Mode  :character   Median :458   Median : NA   Median : NA    
+    ##                     Mean   :458   Mean   :NaN   Mean   :NaN    
+    ##                     3rd Qu.:468   3rd Qu.: NA   3rd Qu.: NA    
+    ##                     Max.   :478   Max.   : NA   Max.   : NA    
+    ##                     NA's   :289   NA's   :291   NA's   :291    
+    ##  LengthTypeFecMean  FecundityType       FecComment         FecundityRef   
+    ##  Length:291         Length:291         Length:291         Min.   :    49  
+    ##  Class :character   Class :character   Class :character   1st Qu.: 10266  
+    ##  Mode  :character   Mode  :character   Mode  :character   Median : 52054  
+    ##                                                           Mean   : 50939  
+    ##                                                           3rd Qu.: 88179  
+    ##                                                           Max.   :119066  
+    ##                                                           NA's   :165     
+    ##  RelFecundityMin    FecunMinRef     RelFecundityMean  FecunMeanRef   
+    ##  Min.   :    2.0   Min.   :   175   Min.   : 18.0    Min.   : 54822  
+    ##  1st Qu.:   37.5   1st Qu.: 40476   1st Qu.: 56.0    1st Qu.: 54822  
+    ##  Median :  157.0   Median : 88126   Median :283.5    Median : 88942  
+    ##  Mean   :  633.1   Mean   : 65037   Mean   :304.8    Mean   : 80052  
+    ##  3rd Qu.:  333.0   3rd Qu.: 89403   3rd Qu.:512.5    3rd Qu.: 89812  
+    ##  Max.   :15000.0   Max.   :119066   Max.   :727.0    Max.   :118437  
+    ##  NA's   :251       NA's   :257      NA's   :281      NA's   :283     
+    ##  RelFecundityMax    FecunMaxRef       LengthMin       LengthMax     
+    ##  Min.   :   13.0   Min.   : 37741   Min.   : 4.50   Min.   : 12.80  
+    ##  1st Qu.:  159.0   1st Qu.: 84872   1st Qu.:21.00   1st Qu.: 34.30  
+    ##  Median :  467.0   Median : 88180   Median :28.00   Median : 40.00  
+    ##  Mean   : 1771.3   Mean   : 83311   Mean   :29.24   Mean   : 60.96  
+    ##  3rd Qu.:  767.5   3rd Qu.: 89811   3rd Qu.:41.00   3rd Qu.: 88.50  
+    ##  Max.   :45000.0   Max.   :119066   Max.   :56.00   Max.   :135.00  
+    ##  NA's   :256       NA's   :267      NA's   :256     NA's   :256     
+    ##   LengthType            Number             a                 b        
+    ##  Length:291         Min.   : 18.00   Min.   :0.00001   Min.   :2.006  
+    ##  Class :character   1st Qu.: 49.75   1st Qu.:0.01500   1st Qu.:3.375  
+    ##  Mode  :character   Median : 73.50   Median :0.08230   Median :3.876  
+    ##                     Mean   :110.62   Mean   :0.98659   Mean   :3.956  
+    ##                     3rd Qu.:103.00   3rd Qu.:0.78000   3rd Qu.:4.329  
+    ##                     Max.   :475.00   Max.   :8.58000   Max.   :6.855  
+    ##                     NA's   :231      NA's   :215       NA's   :213    
+    ##        r2              SEa              SEb           SDa         
+    ##  Min.   :0.1900   Min.   :0.0021   Min.   :0.3550   Mode:logical  
+    ##  1st Qu.:0.6900   1st Qu.:0.2095   1st Qu.:0.3550   NA's:291      
+    ##  Median :0.8100   Median :0.4170   Median :0.3550                 
+    ##  Mean   :0.7581   Mean   :0.3554   Mean   :0.8227                 
+    ##  3rd Qu.:0.8700   3rd Qu.:0.5320   3rd Qu.:1.0565                 
+    ##  Max.   :0.9849   Max.   :0.6470   Max.   :1.7580                 
+    ##  NA's   :238      NA's   :288      NA's   :288                    
+    ##    SDb               LCLa            UCLa            LCLb           UCLb     
+    ##  Mode:logical   Min.   :0.041   Min.   :0.225   Min.   :3.76   Min.   :4.16  
+    ##  NA's:291       1st Qu.:0.041   1st Qu.:0.225   1st Qu.:3.76   1st Qu.:4.16  
+    ##                 Median :0.041   Median :0.225   Median :3.76   Median :4.16  
+    ##                 Mean   :0.041   Mean   :0.225   Mean   :3.76   Mean   :4.16  
+    ##                 3rd Qu.:0.041   3rd Qu.:0.225   3rd Qu.:3.76   3rd Qu.:4.16  
+    ##                 Max.   :0.041   Max.   :0.225   Max.   :3.76   Max.   :4.16  
+    ##                 NA's   :289     NA's   :289     NA's   :289    NA's   :289   
+    ##  SpawningCycles    SpCycleRef      AddInfos            Entered      
+    ##  Min.   :1.000   Min.   :   96   Length:291         Min.   :   1.0  
+    ##  1st Qu.:1.000   1st Qu.:54822   Class :character   1st Qu.:   2.0  
+    ##  Median :1.000   Median :85170   Mode  :character   Median :   2.0  
+    ##  Mean   :1.037   Mean   :67687                      Mean   : 482.1  
+    ##  3rd Qu.:1.000   3rd Qu.:88075                      3rd Qu.:1036.5  
+    ##  Max.   :4.000   Max.   :92302                      Max.   :2659.0  
+    ##  NA's   :182     NA's   :242                        NA's   :36      
+    ##   Dateentered                     Modified       Datemodified                
+    ##  Min.   :1990-10-19 00:00:00   Min.   :   1.0   Min.   :1994-10-03 00:00:00  
+    ##  1st Qu.:2005-01-16 07:46:17   1st Qu.:   2.0   1st Qu.:2008-03-04 21:56:28  
+    ##  Median :2010-09-28 00:00:00   Median :1790.0   Median :2011-10-25 00:00:00  
+    ##  Mean   :2008-02-24 03:56:28   Mean   : 997.6   Mean   :2009-11-12 20:23:31  
+    ##  3rd Qu.:2012-07-26 12:00:00   3rd Qu.:1790.0   3rd Qu.:2012-09-29 00:00:00  
+    ##  Max.   :2018-11-20 00:00:00   Max.   :1790.0   Max.   :2018-11-20 00:00:00  
+    ##  NA's   :36                    NA's   :185      NA's   :36                   
+    ##      Expert     Datechecked                  autoctr_spawn 
+    ##  Min.   :10    Min.   :1995-09-18 00:00:00   Min.   :   1  
+    ##  1st Qu.:10    1st Qu.:1995-09-18 00:00:00   1st Qu.:1229  
+    ##  Median :10    Median :1995-09-26 00:00:00   Median :5922  
+    ##  Mean   :10    Mean   :1995-11-10 04:48:00   Mean   :4223  
+    ##  3rd Qu.:10    3rd Qu.:1996-01-24 18:00:00   3rd Qu.:6140  
+    ##  Max.   :10    Max.   :1996-03-06 00:00:00   Max.   :6824  
+    ##  NA's   :281   NA's   :281                   NA's   :140
+
 \#\#fooditems
 \#\#<http://www.fishbase.org/manual/english/fishbasethe_food_items_table.htm>
 \#\#multiple rows per species, for different food types, life stages of
@@ -2199,10 +2454,12 @@ predator, locality, etc.
 load("DF_estimate.Rdata")
 DF= DF_estimate
 
+out= NULL
 species = DF$Species
 for (a in 1:length(species)){
   tmp = data.frame(fooditems(species_list = DF$Species[a]))
   print(dim(tmp)[1])#1 row per
+  out = rbind(out, tmp)
 }
 ```
 
@@ -2282,6 +2539,75 @@ for (a in 1:length(species)){
     ## [1] 1
     ## [1] 12
     ## [1] 4
+
+``` r
+summary(out)
+```
+
+    ##     SpecCode       Species             autoctr        StockCode    
+    ##  Min.   :    2   Length:2226        Min.   :   38   Min.   :    1  
+    ##  1st Qu.:   24   Class :character   1st Qu.:24116   1st Qu.:   79  
+    ##  Median :   69   Mode  :character   Median :39286   Median : 1492  
+    ##  Mean   : 1784                      Mean   :34902   Mean   :11793  
+    ##  3rd Qu.: 1164                      3rd Qu.:53235   3rd Qu.: 4923  
+    ##  Max.   :67194                      Max.   :60680   Max.   :56760  
+    ##                                     NA's   :12      NA's   :12     
+    ##    Locality            C_Code            FoodsRefNo        FoodI          
+    ##  Length:2226        Length:2226        Min.   :     2   Length:2226       
+    ##  Class :character   Class :character   1st Qu.: 28582   Class :character  
+    ##  Mode  :character   Mode  :character   Median : 42697   Mode  :character  
+    ##                                        Mean   : 47809                     
+    ##                                        3rd Qu.: 80755                     
+    ##                                        Max.   :118629                     
+    ##                                        NA's   :13                         
+    ##   PreyStage            FoodII            FoodIII            Commoness       
+    ##  Length:2226        Length:2226        Length:2226        Min.   :  0.0000  
+    ##  Class :character   Class :character   Class :character   1st Qu.:  0.0039  
+    ##  Mode  :character   Mode  :character   Mode  :character   Median :  0.3065  
+    ##                                                           Mean   : 11.3977  
+    ##                                                           3rd Qu.:  9.8000  
+    ##                                                           Max.   :100.0000  
+    ##                                                           NA's   :1298      
+    ##  CommonessII         Foodgroup           Foodname          PreySpecCode    
+    ##  Length:2226        Length:2226        Length:2226        Min.   :   21.0  
+    ##  Class :character   Class :character   Class :character   1st Qu.:  238.5  
+    ##  Mode  :character   Mode  :character   Mode  :character   Median : 1329.0  
+    ##                                                           Mean   : 3180.4  
+    ##                                                           3rd Qu.: 2514.5  
+    ##                                                           Max.   :53327.0  
+    ##                                                           NA's   :1963     
+    ##  PreySpecCodeSLB  AlphaCode      PreyTroph      PreySeTroph    TrophRefNo    
+    ##  Min.   :    57   Mode:logical   Mode:logical   Mode:logical   Mode:logical  
+    ##  1st Qu.: 24969   NA's:2226      NA's:2226      NA's:2226      NA's:2226     
+    ##  Median : 26932                                                              
+    ##  Mean   : 33153                                                              
+    ##  3rd Qu.: 47508                                                              
+    ##  Max.   :104846                                                              
+    ##  NA's   :2043                                                                
+    ##  PredatorStage       Locality2            Entered      
+    ##  Length:2226        Length:2226        Min.   :   1.0  
+    ##  Class :character   Class :character   1st Qu.:  34.0  
+    ##  Mode  :character   Mode  :character   Median : 309.0  
+    ##                                        Mean   : 900.4  
+    ##                                        3rd Qu.:2227.0  
+    ##                                        Max.   :2495.0  
+    ##                                        NA's   :12      
+    ##   Dateentered                     Modified     Datemodified                
+    ##  Min.   :1990-10-19 00:00:00   Min.   :   1   Min.   :1904-02-03 00:00:00  
+    ##  1st Qu.:2001-08-04 00:00:00   1st Qu.:  10   1st Qu.:2003-02-24 00:00:00  
+    ##  Median :2005-02-22 00:00:00   Median :  34   Median :2005-10-28 00:00:00  
+    ##  Mean   :2005-04-05 23:59:00   Mean   : 151   Mean   :2007-04-15 06:13:57  
+    ##  3rd Qu.:2013-01-23 00:00:00   3rd Qu.:  34   3rd Qu.:2013-01-23 00:00:00  
+    ##  Max.   :2018-10-15 00:00:00   Max.   :2304   Max.   :2018-10-15 00:00:00  
+    ##  NA's   :12                    NA's   :1449   NA's   :12                   
+    ##      Expert       Datechecked                     TS         
+    ##  Min.   :574.0   Min.   :2001-04-24 00:00:00   Mode:logical  
+    ##  1st Qu.:574.0   1st Qu.:2001-06-02 00:00:00   NA's:2226     
+    ##  Median :574.0   Median :2001-06-14 00:00:00                 
+    ##  Mean   :586.5   Mean   :2001-06-06 17:27:16                 
+    ##  3rd Qu.:574.0   3rd Qu.:2001-06-20 00:00:00                 
+    ##  Max.   :711.0   Max.   :2001-06-21 00:00:00                 
+    ##  NA's   :2215    NA's   :2215
 
 \#\#genetic – don’t think we want to use this, but including just to see
 what it shows
@@ -3214,6 +3540,11 @@ a = 2
 \#\#there are multiple records for some species
 
 ``` r
+# M <- morphology()
+# 
+# M_factor <- as.data.frame(unclass(DF))
+# 
+# M_factor <- Filter(is.factor, M)
 load("DF_intro.Rdata")
 DF= DF_intro
 species = DF$Species
@@ -6977,4 +7308,409 @@ p
 #   geom_point(aes(carat, price), alpha = 0.1) +
 #   facet_wrap_paginate(~ cut:clarity, ncol = 3, nrow = 3, page = 1)
 # n_pages(p)
+
+min = subset(DF, haddock_score_mean == min(DF$haddock_score_mean))
 ```
+
+\#\#try making linear model for each variable
+
+``` r
+DF = read.csv("fishbase_HADDOCK_biological.csv")
+rm = c("Species", "haddock_score_sd", "Species_ACE2")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+# dummify the data
+dmy <- dummyVars(" ~ .", data = DF)
+DF <- data.frame(predict(dmy, newdata = DF))
+
+df = DF
+# iris_vars <- c("Sepal.Width", "Petal.Length", "Petal.Width")
+# make_model <- function(nm) lm(iris[c("Sepal.Length", nm)])
+# fits <- Map(make_model, iris_vars)
+
+# df= DF[,sapply(DF, is.numeric) ]
+vars <- setdiff(names(df), c("haddock_score_mean", "haddock_score_sd"))
+
+make_model <- function(nm) lm(df[c("haddock_score_mean", nm)])
+fits <- Map(make_model, vars)
+
+glance_tidy <- function(x) c(unlist(glance(x)), unlist(tidy(x)[, -1]))
+out <- sapply(fits, glance_tidy)
+out = data.frame(out)
+
+out_sig_col_inds = which(out[5,]<0.05)
+
+out_sig = out[,out_sig_col_inds]
+out_sig
+```
+
+    ##               OrderChimaeriformes OrderOsteoglossiformes OrderPerciformes
+    ## r.squared            9.616009e-02           6.804550e-02     5.388637e-02
+    ## adj.r.squared        8.394604e-02           5.545152e-02     4.110105e-02
+    ## sigma                1.035329e+01           1.051308e+01     1.059264e+01
+    ## statistic            7.872906e+00           5.403018e+00     4.214707e+00
+    ## p.value              6.408583e-03           2.284876e-02     4.361051e-02
+    ## df                   2.000000e+00           2.000000e+00     2.000000e+00
+    ## logLik              -2.844611e+02          -2.856251e+02    -2.861981e+02
+    ## AIC                  5.749221e+02           5.772501e+02     5.783961e+02
+    ## BIC                  5.819143e+02           5.842423e+02     5.853883e+02
+    ## deviance             7.932105e+03           8.178839e+03     8.303099e+03
+    ## df.residual          7.400000e+01           7.400000e+01     7.400000e+01
+    ## estimate1           -1.377925e+02          -1.378686e+02    -1.352805e+02
+    ## estimate2            2.924301e+01           1.751153e+01    -5.052350e+00
+    ## std.error1           1.195495e+00           1.222121e+00     1.596901e+00
+    ## std.error2           1.042208e+01           7.533658e+00     2.460989e+00
+    ## statistic1          -1.152598e+02          -1.128109e+02    -8.471438e+01
+    ## statistic2           2.805870e+00           2.324439e+00    -2.052975e+00
+    ## p.value1             2.986592e-85           1.450439e-84     1.976636e-75
+    ## p.value2             6.408583e-03           2.284876e-02     4.361051e-02
+    ##               Estuaries_ecology Lakes_ecology    a_estimate
+    ## r.squared          5.900884e-02  6.668543e-02  7.033100e-02
+    ## adj.r.squared      4.453205e-02  5.232675e-02  5.723707e-02
+    ## sigma              1.073193e+01  1.068806e+01  1.044188e+01
+    ## statistic          4.076100e+00  4.644257e+00  5.371268e+00
+    ## p.value            4.762243e-02  3.486715e-02  2.335802e-02
+    ## df                 2.000000e+00  2.000000e+00  2.000000e+00
+    ## logLik            -2.530596e+02 -2.527852e+02 -2.738138e+02
+    ## AIC                5.121192e+02  5.115704e+02  5.536275e+02
+    ## BIC                5.187333e+02  5.181845e+02  5.604989e+02
+    ## deviance           7.486330e+03  7.425257e+03  7.741335e+03
+    ## df.residual        6.500000e+01  6.500000e+01  7.100000e+01
+    ## estimate1         -1.392713e+02 -1.351268e+02 -1.322466e+02
+    ## estimate2         -5.473221e+00  5.868874e+00 -4.768023e+02
+    ## std.error1         1.655973e+00  1.629915e+00  2.534591e+00
+    ## std.error2         2.710944e+00  2.723307e+00  2.057311e+02
+    ## statistic1        -8.410243e+01 -8.290422e+01 -5.217672e+01
+    ## statistic2        -2.018935e+00  2.155054e+00 -2.317600e+00
+    ## p.value1           4.717947e-68  1.188887e-67  2.302010e-58
+    ## p.value2           4.762243e-02  3.486715e-02  2.335802e-02
+    ##               MatingSystem_reproductionmonogamy
+    ## r.squared                          2.788892e-01
+    ## adj.r.squared                      2.338198e-01
+    ## sigma                              8.015266e+00
+    ## statistic                          6.187992e+00
+    ## p.value                            2.427346e-02
+    ## df                                 2.000000e+00
+    ## logLik                            -6.194511e+01
+    ## AIC                                1.298902e+02
+    ## BIC                                1.325613e+02
+    ## deviance                           1.027912e+03
+    ## df.residual                        1.600000e+01
+    ## estimate1                         -1.383918e+02
+    ## estimate2                          9.399106e+00
+    ## std.error1                         2.671755e+00
+    ## std.error2                         3.778433e+00
+    ## statistic1                        -5.179808e+01
+    ## statistic2                         2.487567e+00
+    ## p.value1                           3.002827e-19
+    ## p.value2                           2.427346e-02
+    ##               MatingSystem_reproductionpolygyny RepGuild1_reproductionbearers
+    ## r.squared                          3.685872e-01                  1.017249e-01
+    ## adj.r.squared                      3.291239e-01                  8.768934e-02
+    ## sigma                              7.500214e+00                  1.039566e+01
+    ## statistic                          9.339998e+00                  7.247660e+00
+    ## p.value                            7.541300e-03                  9.050164e-03
+    ## df                                 2.000000e+00                  2.000000e+00
+    ## logLik                            -6.074961e+01                 -2.471661e+02
+    ## AIC                                1.274992e+02                  5.003322e+02
+    ## BIC                                1.301703e+02                  5.069012e+02
+    ## deviance                           9.000513e+02                  6.916464e+03
+    ## df.residual                        1.600000e+01                  6.400000e+01
+    ## estimate1                         -1.303416e+02                 -1.357315e+02
+    ## estimate2                         -1.206220e+01                 -7.735103e+00
+    ## std.error1                         2.080185e+00                  1.500484e+00
+    ## std.error2                         3.946874e+00                  2.873209e+00
+    ## statistic1                        -6.265867e+01                 -9.045849e+01
+    ## statistic2                        -3.056141e+00                 -2.692148e+00
+    ## p.value1                           1.448821e-20                  2.988980e-69
+    ## p.value2                           7.541300e-03                  9.050164e-03
+    ##               RepGuild1_reproductionguarders RepGuild2_reproductionnesters
+    ## r.squared                       6.304862e-02                  1.348506e-01
+    ## adj.r.squared                   4.840875e-02                  1.204315e-01
+    ## sigma                           1.061710e+01                  1.049417e+01
+    ## statistic                       4.306639e+00                  9.352188e+00
+    ## p.value                         4.198840e-02                  3.325029e-03
+    ## df                              2.000000e+00                  2.000000e+00
+    ## logLik                         -2.485572e+02                 -2.327086e+02
+    ## AIC                             5.031145e+02                  4.714171e+02
+    ## BIC                             5.096834e+02                  4.777985e+02
+    ## deviance                        7.214260e+03                  6.607660e+03
+    ## df.residual                     6.400000e+01                  6.000000e+01
+    ## estimate1                      -1.393119e+02                 -1.396264e+02
+    ## estimate2                       6.471671e+00                  1.031633e+01
+    ## std.error1                      1.486691e+00                  1.484100e+00
+    ## std.error2                      3.118510e+00                  3.373405e+00
+    ## statistic1                     -9.370603e+01                 -9.408153e+01
+    ## statistic2                      2.075244e+00                  3.058135e+00
+    ## p.value1                        3.179758e-70                  7.223183e-67
+    ## p.value2                        4.198840e-02                  3.325029e-03
+    ##               ParentalCare_reproductionmaternal
+    ## r.squared                          1.217019e-01
+    ## adj.r.squared                      1.030147e-01
+    ## sigma                              1.022148e+01
+    ## statistic                          6.512584e+00
+    ## p.value                            1.402241e-02
+    ## df                                 2.000000e+00
+    ## logLik                            -1.824071e+02
+    ## AIC                                3.708142e+02
+    ## BIC                                3.764896e+02
+    ## deviance                           4.910495e+03
+    ## df.residual                        4.700000e+01
+    ## estimate1                         -1.351652e+02
+    ## estimate2                         -1.008211e+01
+    ## std.error1                         1.596327e+00
+    ## std.error2                         3.950707e+00
+    ## statistic1                        -8.467267e+01
+    ## statistic2                        -2.551976e+00
+    ## p.value1                           4.882277e-53
+    ## p.value2                           1.402241e-02
+    ##               ParentalCare_reproductionpaternal
+    ## r.squared                          8.805595e-02
+    ## adj.r.squared                      6.865289e-02
+    ## sigma                              1.041542e+01
+    ## statistic                          4.538250e+00
+    ## p.value                            3.840904e-02
+    ## df                                 2.000000e+00
+    ## logLik                            -1.833281e+02
+    ## AIC                                3.726562e+02
+    ## BIC                                3.783317e+02
+    ## deviance                           5.098607e+03
+    ## df.residual                        4.700000e+01
+    ## estimate1                         -1.383148e+02
+    ## estimate2                          8.185926e+00
+    ## std.error1                         1.646823e+00
+    ## std.error2                         3.842586e+00
+    ## statistic1                        -8.398890e+01
+    ## statistic2                         2.130317e+00
+    ## p.value1                           7.129510e-53
+    ## p.value2                           3.840904e-02
+
+\#\#test out foreach
+
+``` r
+k = 10
+  out_hyper_grid <- foreach(m = 1:k, .packages = c("gbm", "foreach", "caTools"), .combine = "rbind.data.frame") %dopar% {
+    cbind.data.frame(m = m)
+  }
+```
+
+    ## Warning: executing %dopar% sequentially: no parallel backend registered
+
+\#\#run function gridSearch\_v2.R
+
+``` r
+source("../../functions/gridSearch_v2.R")
+```
+
+``` r
+source("../../functions/bootstrapGBM_v2.R")
+```
+
+\#\#function to do grid search with
+gbm
+
+``` r
+source("../../functions/R_function_grid_search_bootstrap_null_gbm_foreach.R")
+```
+
+\#\#try out grid search using Pima dataset
+\#\#<https://www.kaggle.com/kumargh/pimaindiansdiabetescsv?select=pima-indians-diabetes.csv>
+\#\#label = “X1”
+
+``` r
+DF <- read.csv("../../functions/pima-indians-diabetes.csv")
+load("grid_search_bootstrap_null_gbm_foreach.Rdata")
+load("gridSearch.Rdata")
+load("bootstrapGBM.Rdata")
+cores = 4
+  cl <- makeCluster(cores, "SOCK", timeout = 60)
+  # stopCluster(cl)
+  registerDoSNOW(cl)
+
+  nrounds = 2000
+  buffer = 1000
+  min_trees = 0
+grid_search_bootstrap_null_gbm_foreach(DF, 
+                     label = "X1", 
+                     eta = c(0.1),
+                     max_depth = c(1),
+                     nrounds = nrounds,
+                     nrounds_null = 2000,
+                     runs = 1,
+                     output_name = "Pima_foreach_20200702_1515",
+                     do_observed = TRUE,#whether to do the bootstrapping for observed data
+                     do_null = TRUE,
+                     buffer = buffer,
+                     set_seed = c(0),
+                     seed = 1234,
+                     min_trees = 0,
+                     method = c("cv"),
+                     cv.folds = 10,
+                     distribution = "bernoulli",
+                     k = 5,
+                     cores = 4)
+```
+
+    ## [1] "start function"
+    ## [1] "2020-07-06 13:10:03 EDT"
+    ## [1] "2020-07-06 13:10:30 EDT"
+    ## [1] "done with grid search"
+    ## [1] "hyper_grid after subsetting"
+    ## # A tibble: 1 x 5
+    ## # Groups:   eta [1]
+    ##     eta max_depth optimal_trees auc_train auc_test
+    ##   <dbl>     <dbl>         <dbl>     <dbl>    <dbl>
+    ## 1   0.1         1            85     0.877    0.830
+    ## [1] "do_observed"
+    ## [1] "end function"
+    ## [1] "2020-07-06 13:11:20 EDT"
+
+\#\#do grid search using fishbase + HADDOCK data; predict whether
+haddock above median or not because haven’t sorted gaussian
+
+``` r
+# source("R_haddock_fishbase_binomial.R)
+```
+
+\#\#do grid search using fishbase + HADDOCK data; gaussian distribution
+
+``` r
+print("start chunk")
+```
+
+    ## [1] "start chunk"
+
+``` r
+print(Sys.time())
+```
+
+    ## [1] "2020-07-06 13:11:20 EDT"
+
+``` r
+DF = read.csv("fishbase_HADDOCK_biological.csv")
+
+rm = c("Species", "haddock_score_sd", "Species_ACE2")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+# dummify the data
+dmy <- dummyVars(" ~ .", data = DF)
+DF <- data.frame(predict(dmy, newdata = DF))
+
+load("grid_search_bootstrap_null_gbm_foreach.Rdata")
+load("gridSearch.Rdata")
+load("bootstrapGBM.Rdata")
+cores = 4
+  cl <- makeCluster(cores, "SOCK", timeout = 120)
+  # stopCluster(cl)
+  registerDoSNOW(cl)
+
+nrounds = 10000
+buffer = 1000
+min_trees = 1000
+output_name = "haddock_gaussian_20200706_1217"
+grid_search_bootstrap_null_gbm_foreach(DF, 
+                     label = "haddock_score_mean", 
+                     eta = c(0.001, 0.01, 0.1),
+                     max_depth = c(1,2,3),
+                     nrounds = nrounds,
+                     nrounds_null = nrounds,
+                     runs = 10,
+                     output_name = output_name,
+                     do_observed = TRUE,#whether to do the bootstrapping for observed data
+                     do_null = TRUE,
+                     buffer = buffer,
+                     set_seed = c(0),
+                     seed = 1234,
+                     min_trees = min_trees,
+                     method = c("cv"),
+                     cv.folds = 10,
+                     distribution = "gaussian",
+                     k = 5,
+                     cores = 4)
+```
+
+    ## [1] "start function"
+    ## [1] "2020-07-06 13:11:22 EDT"
+    ## [1] "2020-07-06 13:18:13 EDT"
+    ## [1] "done with grid search"
+    ## [1] "hyper_grid after subsetting"
+    ## # A tibble: 1 x 5
+    ## # Groups:   eta [1]
+    ##     eta max_depth optimal_trees r2.train r2.test
+    ##   <dbl>     <dbl>         <dbl>    <dbl>   <dbl>
+    ## 1 0.001         2          1522    0.138 -0.0324
+    ## [1] "do_observed"
+    ## [1] "end function"
+    ## [1] "2020-07-06 13:34:56 EDT"
+
+``` r
+  print("end chunk")
+```
+
+    ## [1] "end chunk"
+
+``` r
+  print(Sys.time())
+```
+
+    ## [1] "2020-07-06 13:34:56 EDT"
+
+``` r
+file = paste0("OUT2_observed_", output_name, ".Rdata")
+load(file)
+imp = OUT2[[1]]
+
+imp[,c(1:7)]
+```
+
+    ##      eta max_depth n.trees  r2.train    r2.test cluster bootstrap
+    ## 1  0.001         2    1069 0.1871265 -0.4442983       1         1
+    ## 2  0.001         2    4713 0.4482218 -0.7386660       2         1
+    ## 3  0.001         2    4238 0.4272454 -0.7094127       3         1
+    ## 4  0.001         2    9990 0.5948835 -0.9708864       4         1
+    ## 5  0.001         2    9937 0.5920670 -0.9636629       5         1
+    ## 6  0.001         2    3010 0.3621793 -0.6205111       1         2
+    ## 7  0.001         2    4940 0.4558627 -0.7598859       2         2
+    ## 8  0.001         2    7459 0.5352001 -0.8930355       3         2
+    ## 9  0.001         2    9936 0.5914266 -0.9342540       4         2
+    ## 10 0.001         2    2486 0.3278426 -0.5893255       5         2
+    ## 11 0.001         2    1759 0.2662463 -0.4971843       1         3
+    ## 12 0.001         2    9986 0.5931926 -0.9627346       2         3
+    ## 13 0.001         2    4350 0.4343413 -0.7347386       3         3
+    ## 14 0.001         2    7586 0.5381589 -0.8995710       4         3
+    ## 15 0.001         2    9152 0.5708666 -0.8922232       5         3
+    ## 16 0.001         2    3790 0.4046674 -0.6676029       1         4
+    ## 17 0.001         2    9563 0.5856788 -0.9449935       2         4
+    ## 18 0.001         2    9979 0.5934001 -0.9806381       3         4
+    ## 19 0.001         2    4096 0.4232457 -0.7209845       4         4
+    ## 20 0.001         2    9250 0.5794387 -0.9384057       5         4
+    ## 21 0.001         2    4260 0.4296767 -0.7327728       1         5
+    ## 22 0.001         2    7356 0.5349812 -0.9210741       2         5
+    ## 23 0.001         2    1198 0.2041343 -0.4439418       3         5
+    ## 24 0.001         2    5904 0.4922066 -0.8158364       4         5
+    ## 25 0.001         2    2168 0.3034564 -0.5490087       5         5
+    ## 26 0.001         2    2882 0.3499876 -0.5934253       1         6
+    ## 27 0.001         2    2337 0.3169918 -0.5946507       2         6
+    ## 28 0.001         2    9590 0.5851232 -0.9736420       3         6
+    ## 29 0.001         2    3316 0.3829584 -0.6507061       4         6
+    ## 30 0.001         2    4788 0.4506008 -0.7610557       5         6
+    ## 31 0.001         2    3816 0.4038625 -0.6815699       1         7
+    ## 32 0.001         2    5767 0.4893867 -0.8489224       2         7
+    ## 33 0.001         2    9993 0.5954510 -0.9588935       3         7
+    ## 34 0.001         2    3182 0.3697115 -0.6282832       4         7
+    ## 35 0.001         2    5640 0.4818694 -0.7984738       5         7
+    ## 36 0.001         2    1103 0.1958673 -0.4572742       1         8
+    ## 37 0.001         2    5303 0.4700134 -0.7990258       2         8
+    ## 38 0.001         2    1076 0.1905983 -0.4342885       3         8
+    ## 39 0.001         2    4533 0.4413423 -0.7244562       4         8
+    ## 40 0.001         2    9271 0.5791828 -0.9217405       5         8
+    ## 41 0.001         2    6129 0.5013033 -0.8252905       1         9
+    ## 42 0.001         2    8765 0.5698466 -0.9413202       2         9
+    ## 43 0.001         2    3977 0.4163263 -0.7099746       3         9
+    ## 44 0.001         2    6741 0.5181715 -0.8644531       4         9
+    ## 45 0.001         2    8447 0.5613949 -0.9167998       5         9
+    ## 46 0.001         2    6613 0.5140454 -0.8340891       1        10
+    ## 47 0.001         2     554 0.1127333 -0.3983357       2        10
+    ## 48 0.001         2    4678 0.4474466 -0.7717869       3        10
+    ## 49 0.001         2    4316 0.4299846 -0.7084409       4        10
+    ## 50 0.001         2    3954 0.4138118 -0.7154912       5        10

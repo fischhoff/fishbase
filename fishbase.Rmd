@@ -14,7 +14,7 @@ pkgTest <- function(x)
   }
   library(x, character.only = TRUE)
 }
-neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce")
+neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW")
 for (package in neededPackages){pkgTest(package)}
 
 ```
@@ -252,8 +252,9 @@ for (a in 1:length(species)){
   # names(tmp)[inds_new]= paste0(names(tmp)[inds_new],
   #                                    "_fecundity")
   # tmp = merge(DF[a,], tmp)
-  # out = rbind(out, tmp)
+  out = rbind(out, tmp)
 }
+summary(out)
 
 ```
 
@@ -264,11 +265,14 @@ for (a in 1:length(species)){
 load("DF_estimate.Rdata")
 DF= DF_estimate
 
+out= NULL
 species = DF$Species
 for (a in 1:length(species)){
   tmp = data.frame(fooditems(species_list = DF$Species[a]))
   print(dim(tmp)[1])#1 row per
+  out = rbind(out, tmp)
 }
+summary(out)
 ```
 
 ##genetic -- don't think we want to use this, but including just to see what it shows
@@ -395,6 +399,11 @@ a = 2
 ##https://www.fishbase.in/manual/fishbasethe_morphology_table.htm
 ##there are multiple records for some species
 ```{r}
+# M <- morphology()
+# 
+# M_factor <- as.data.frame(unclass(DF))
+# 
+# M_factor <- Filter(is.factor, M)
 load("DF_intro.Rdata")
 DF= DF_intro
 species = DF$Species
@@ -833,8 +842,163 @@ p
 #   facet_wrap_paginate(~ cut:clarity, ncol = 3, nrow = 3, page = 1)
 # n_pages(p)
 
+min = subset(DF, haddock_score_mean == min(DF$haddock_score_mean))
 
 
 ```
+
+##try making linear model for each variable
+```{r}
+DF = read.csv("fishbase_HADDOCK_biological.csv")
+rm = c("Species", "haddock_score_sd", "Species_ACE2")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+# dummify the data
+dmy <- dummyVars(" ~ .", data = DF)
+DF <- data.frame(predict(dmy, newdata = DF))
+
+df = DF
+# iris_vars <- c("Sepal.Width", "Petal.Length", "Petal.Width")
+# make_model <- function(nm) lm(iris[c("Sepal.Length", nm)])
+# fits <- Map(make_model, iris_vars)
+
+# df= DF[,sapply(DF, is.numeric) ]
+vars <- setdiff(names(df), c("haddock_score_mean", "haddock_score_sd"))
+
+make_model <- function(nm) lm(df[c("haddock_score_mean", nm)])
+fits <- Map(make_model, vars)
+
+glance_tidy <- function(x) c(unlist(glance(x)), unlist(tidy(x)[, -1]))
+out <- sapply(fits, glance_tidy)
+out = data.frame(out)
+
+out_sig_col_inds = which(out[5,]<0.05)
+
+out_sig = out[,out_sig_col_inds]
+out_sig
+```
+
+##test out foreach
+```{r}
+k = 10
+  out_hyper_grid <- foreach(m = 1:k, .packages = c("gbm", "foreach", "caTools"), .combine = "rbind.data.frame") %dopar% {
+    cbind.data.frame(m = m)
+  }
+```
+
+##run function gridSearch_v2.R
+```{r}
+source("../../functions/gridSearch_v2.R")
+```
+
+
+```{r}
+source("../../functions/bootstrapGBM_v2.R")
+```
+
+##function to do grid search with gbm
+```{r}
+source("../../functions/R_function_grid_search_bootstrap_null_gbm_foreach.R")
+```
+
+##try out grid search using Pima dataset
+##https://www.kaggle.com/kumargh/pimaindiansdiabetescsv?select=pima-indians-diabetes.csv
+##label = "X1"
+```{r}
+DF <- read.csv("../../functions/pima-indians-diabetes.csv")
+load("grid_search_bootstrap_null_gbm_foreach.Rdata")
+load("gridSearch.Rdata")
+load("bootstrapGBM.Rdata")
+cores = 4
+  cl <- makeCluster(cores, "SOCK", timeout = 60)
+  # stopCluster(cl)
+  registerDoSNOW(cl)
+
+  nrounds = 2000
+  buffer = 1000
+  min_trees = 0
+grid_search_bootstrap_null_gbm_foreach(DF, 
+                     label = "X1", 
+                     eta = c(0.1),
+                     max_depth = c(1),
+                     nrounds = nrounds,
+                     nrounds_null = 2000,
+                     runs = 1,
+                     output_name = "Pima_foreach_20200702_1515",
+                     do_observed = TRUE,#whether to do the bootstrapping for observed data
+                     do_null = TRUE,
+                     buffer = buffer,
+                     set_seed = c(0),
+                     seed = 1234,
+                     min_trees = 0,
+                     method = c("cv"),
+                     cv.folds = 10,
+                     distribution = "bernoulli",
+                     k = 5,
+                     cores = 4)
+
+```
+
+
+##do grid search using fishbase + HADDOCK data; predict whether haddock above median or not because haven't sorted gaussian
+```{r}
+# source("R_haddock_fishbase_binomial.R)
+```
+
+##do grid search using fishbase + HADDOCK data; gaussian distribution
+```{r haddock_gaussian}
+print("start chunk")
+print(Sys.time())
+
+DF = read.csv("fishbase_HADDOCK_biological.csv")
+
+rm = c("Species", "haddock_score_sd", "Species_ACE2")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+# dummify the data
+dmy <- dummyVars(" ~ .", data = DF)
+DF <- data.frame(predict(dmy, newdata = DF))
+
+load("grid_search_bootstrap_null_gbm_foreach.Rdata")
+load("gridSearch.Rdata")
+load("bootstrapGBM.Rdata")
+cores = 4
+  cl <- makeCluster(cores, "SOCK", timeout = 120)
+  # stopCluster(cl)
+  registerDoSNOW(cl)
+
+nrounds = 10000
+buffer = 1000
+min_trees = 1000#minimum number of trees
+output_name = "haddock_gaussian_20200706_1217"
+grid_search_bootstrap_null_gbm_foreach(DF, 
+                     label = "haddock_score_mean", 
+                     eta = c(0.001, 0.01, 0.1),
+                     max_depth = c(1,2,3),
+                     nrounds = nrounds,
+                     nrounds_null = nrounds,
+                     runs = 10,
+                     output_name = output_name,
+                     do_observed = TRUE,#whether to do the bootstrapping for observed data
+                     do_null = TRUE,
+                     buffer = buffer,
+                     set_seed = c(0),
+                     seed = 1234,
+                     min_trees = min_trees,
+                     method = c("cv"),
+                     cv.folds = 10,
+                     distribution = "gaussian",
+                     k = 5,
+                     cores = 4)
+  print("end chunk")
+  print(Sys.time())
+
+file = paste0("OUT2_observed_", output_name, ".Rdata")
+load(file)
+imp = OUT2[[1]]
+
+imp[,c(1:7)]
+```
+
 
 
