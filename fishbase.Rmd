@@ -14,7 +14,7 @@ pkgTest <- function(x)
   }
   library(x, character.only = TRUE)
 }
-neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW")
+neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW", "data.table")
 for (package in neededPackages){pkgTest(package)}
 
 ```
@@ -82,6 +82,14 @@ save(DF, file = "DF.Rdata")
 m <- lm(haddock_score_mean ~ brain_body_ratio, data = DF, na.action = na.omit)
 ```
 
+##
+```{r}
+non_biological = c("LastModified", "SpecCode", "autoctr", "StockCode", "Ref", "Remark", "AddRems", "Entered", "entered", "Expert", "Datechecked", "Comment", "Modified", "AddInfos", "DateChecked", "modified", "Code", "CODE")
+save(non_biological, file = "non_biological.Rdata")
+```
+
+
+
 ##country: multiple rows per species; for example:
 ```{r}
 load("DF.Rdata")
@@ -114,7 +122,7 @@ summary(out)
 unique(out$SampleStage)
 ```
 
-##diet_items -- multiple rows per species
+##diet_items -- multiple rows per species. seems to be linked with DietCode to diet table
 ##https://www.fishbase.se/manual/English/fishbasethe_food_items_table.htm
 ```{r}
 load("DF.Rdata")
@@ -156,7 +164,7 @@ DF_distribution = out
 save(DF_distribution, file = "DF_distribution.Rdata")
 summary(DF_distribution)
 names(DF_distribution)
-
+load("DF_distribution.Rdata")
 ```
 
 
@@ -165,21 +173,60 @@ names(DF_distribution)
 ##http://fishbase.us/manual/English/FishbaseThe_ECOLOGY_Table.htm
 ```{r}
 load("DF.Rdata")
+
+F<- ecology()
+ecology_tmp <-F
+
+F <- ecology_tmp
+F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
+                                     as.factor)
+  F<- data.frame(F)
+
+load("non_biological.Rdata")
+non_biological = c(non_biological, "Herbivory2", "Cave2", "Association", "TS")#can't tell what TS is
+names = names(F)
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+keep = setdiff(names, names[inds_rm])
+F = F[,keep]
+  
+  sp_ind = which(names(F)=="Species")
+dmy <- dummyVars(" ~ .", data = F[,-sp_ind])
+
+F_10 <- data.frame(predict(dmy, newdata = F))#multiple rows for some species
+F_10$Species = F$Species
+ecology_tmp<-F_10
+
+ind_species =which(names(ecology_tmp) == "Species")
+inds_new = setdiff(seq(1,dim(ecology_tmp)[2]), ind_species)
+
+  names(ecology_tmp)[inds_new]= paste0(names(ecology_tmp)[inds_new], 
+                                       "_ecology")
+  
 a = 1
+F<- ecology_tmp
 out = NULL
 for (a in 1:dim(DF)[1]){
 
-  ecology_tmp = ecology(species_list = DF$Species[a])
+  ecology_tmp = subset(F, Species = DF$Species[a])
   ind_species =which(names(ecology_tmp) == "Species")
   inds_new = setdiff(seq(1,dim(ecology_tmp)[2]), ind_species)
-  names(ecology_tmp)[inds_new]= paste0(names(ecology_tmp)[inds_new], 
-                                       "_ecology")
-  tmp = merge(DF[a,], ecology_tmp)
-  # dist_tmp = distribution(species_list = DF$Species[a])
-  # tmp = merge(tmp, dist_tmp)
-  out = rbind(out, tmp)
+  
+  tmp<-data.frame(ecology_tmp)
+  
+  sp_ind = which(names(tmp)=="Species")
+
+  col_names <- colnames(tmp[,-sp_ind])      # keep track of original column names
+  wc_2 <- colSums(tmp[,-sp_ind])           # compute the means
+  wc_2 <- transpose(as.data.frame(wc_2))              # this gives you generic column names
+  colnames(wc_2) <- col_names 
+  wc_2$Species = DF$Species[a]
+  tmp_sp = merge(DF[a,], wc_2)
+  out = rbind(out, tmp_sp)
 }
-# write.csv(out, file = "fish_HADDOCK_ecology.csv")
 ecology = out
 save(ecology, file = "ecology.Rdata")
 
@@ -226,6 +273,7 @@ for (a in 1:length(species)){
 summary(out)
 DF_estimate = out
 save(DF_estimate, file = "DF_estimate.Rdata")
+print(dim(out))
 ```
 
 ##faoareas, seems to be redundant to countrysub? 
@@ -239,45 +287,160 @@ test
 ##could not locate doc table about fecundity. spawning table seems to be something different (different fields): https://www.fishbase.in/manual/fishbasethe_spawning_table.htm
 ```{r}
 load("DF_estimate.Rdata")
-DF= DF_estimate
+DF = DF_estimate
+F <- fecundity()
+names = names(F)
+load("non_biological.Rdata")
+100*sum(table(F$FecundityType))/dim(F)[1]#for most records there is no information here, so seems reasonable to include fecundity data
 
-species = DF$Species
-out = NULL
-a = 2
-for (a in 1:length(species)){
-  tmp = data.frame(fecundity(species_list = DF$Species[a]))
-  print(dim(tmp)[1])#1 row per
-  # ind_species =which(names(tmp) == "Species")
-  # inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
-  # names(tmp)[inds_new]= paste0(names(tmp)[inds_new],
-  #                                    "_fecundity")
-  # tmp = merge(DF[a,], tmp)
-  out = rbind(out, tmp)
+#there aere different types of lengths, so remove those fields
+summary(F$LengthType)
+non_biological = c(non_biological, "Locality", "FecundityType", "Length")
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
 }
-summary(out)
 
+keep = setdiff(names, names[inds_rm])
+F = F[,keep]
+
+F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
+                                       as.factor)
+
+library(dplyr)
+F_f <- F %>%  select_if(is.factor) #okay, nothing left here
+
+F_n <- F %>%  select_if(is.numeric) #okay, nothing left here
+
+rm= c("r2")#can't find any documentation on this, guess it may be correlation coefficient
+rm = c(rm, "LCLa" , "UCLa","LCLb","UCLb", "Number")#assuming these are confidence intervals, remove because not central tendency; remove number because this is sample size
+non_biological = rm
+inds_rm = NULL
+names = names(F)
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+keep = setdiff(names, names[inds_rm])
+F = F[,keep]
+
+df = data.frame(F)
+summary(df)#confirmed none of these are -1/0 variables
+
+species = as.character(unique(df$Species))
+length(species)
+
+# options(warn = -1) 
+
+out = NULL
+df$Species = as.character(df$Species)
+for (a in 1:length(species)){
+  inds = which(df$Species == as.character(species[a]))
+  tmp = df[inds,]
+  tmp = unique(tmp)
+  sp_ind = which(names(tmp)=="Species")
+  tmp = colMeans(tmp[,-sp_ind], na.rm = TRUE)
+  names(tmp) = paste0(names(tmp), "_fecundity")
+  DF_tmp = subset(DF, Species == species[a])
+  # tmp = cbind(tmp, DF_tmp$Species)
+  suppressWarnings(tmp$Species <- species[a])
+  
+  tmp_1 = merge(tmp, DF_tmp)
+  out = rbind(out, tmp_1)
+}
+# options(warn=0)
+DF_fecundity = out
+save(DF_fecundity, file = "DF_fecundity.Rdata")
+print(dim(out))
 ```
 
 ##fooditems
 ##http://www.fishbase.org/manual/english/fishbasethe_food_items_table.htm
 ##multiple rows per species, for different food types, life stages of predator, locality, etc. 
 ```{r}
-load("DF_estimate.Rdata")
-DF= DF_estimate
 
-out= NULL
-species = DF$Species
+load("DF_fecundity.Rdata")
+DF= DF_fecundity
+
+F <- fooditems()
+
+F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
+                                       as.factor)
+F_f <- F %>%  select_if(is.factor) 
+
+F_f_sum <- F_f %>% group_by(Species) %>%
+  summarize_all(n_distinct, na.rm = TRUE)
+
+F_f_sum_df = data.frame(F_f_sum)
+
+#include: number of FoodI types per species, each Food1 type 
+#exclude data on larvae, as less relevant to SC2 being transmitted from fish to mammals?
+#exclude as non-biological: Locality
+#exclude as redundant / too granular: FoodII, FoodIII (subcategories of food), PreyStage
+#exclude because data include multiple types / levels: Foodgroup, Foodname
+
+F_n <- F %>%  select_if(is.numeric) 
+#exclude most of these as non-biological
+#exclude for now, consider including if presence of food group is an important factor: Commoness
+
+
+F_f1 = F_f[, c("Species", "FoodI")]
+
+# dummify the data
+dmy <- dummyVars(" ~ .", data = F_f1[,-1])
+F_f1_10 <- data.frame(predict(dmy, newdata = F_f1))#multiple rows for some species
+
+F_f1_10 = cbind(F_f1_10, F_f1$Species)
+names(F_f1_10)[names(F_f1_10)=="F_f1$Species"]="Species"
+
+#this gives weird results
+F_fi_sum <- F_f1_10 %>% group_by(Species) %>%
+  # summarize_all(sum, na.rm = TRUE)
+  summarise_all(funs(sum(!is.na(.))))
+test = subset(F_f, Species == "Aapticheilichthys websteri")
+test = subset(F_f1_10, Species == "Aapticheilichthys websteri")
+
+test = subset(F_f, Species == "Abalistes stellaris")
+
+test = subset(F_f1_10, Species == "Abalistes stellaris")
+
+df = F_f1_10
+
+df = subset(df, Species %in% DF$Species)
+
+df_missing = subset(df, !(Species %in% DF$Species))
+species = unique(df$Species)
+length(species)
+# species = species[c(1:100)]
+
+out = NULL
+
 for (a in 1:length(species)){
-  tmp = data.frame(fooditems(species_list = DF$Species[a]))
-  print(dim(tmp)[1])#1 row per
-  out = rbind(out, tmp)
+  tmp = subset(df, Species == species[a])
+  tmp = unique(tmp)
+  sp_ind = which(names(tmp)=="Species")
+  tmp = colSums(tmp[,-sp_ind])
+  names(tmp) = paste0(names(tmp), "_fooditems")
+  # tmp = data.frame(tmp)
+  tmp$Species = as.character(species[a])
+  DF_tmp = subset(DF, Species == species[a])
+  tmp_1 = merge(tmp, DF_tmp)
+  out = rbind(out, tmp_1)
 }
-summary(out)
+# out = data.frame(out)
+missing_species = setdiff(DF$Species, out$Species)
+dim(DF)[1]==dim(out)[1]
+DF_fooditems = out
+save(DF_fooditems, file = "DF_fooditems.Rdata")
+load("DF_fooditems.Rdata")
+dim(DF_fooditems)
+dim(out)
 ```
 
 ##genetic -- don't think we want to use this, but including just to see what it shows
 ```{r}
-load("DF_estimate.Rdata")
+load("DF_fooditems.Rdata")
 DF= DF_estimate
 
 test = data.frame(genetics(DF$Species[1]))
@@ -289,25 +452,96 @@ names(test)
 ##https://www.fishbase.in/manual/fishbasethe_introduction_table.htm
 ```{r}
 
+##removing because non-biological / non-ecological: year of introduction, reason for introduction, introducer SocioEff., EstabAqua (whether established in aquaculture)
+##removing because low coverage: Impacts
+##removing because too granular: EstabType (whether it is wild-reproducing, continuously released, etc.)
+
+
+##include: Estabwild
+
 load("DF_estimate.Rdata")
 DF= DF_estimate
 
+F <- introductions()
+
+F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
+                                       as.factor)
+F_f <- F %>%  select_if(is.factor) 
+
+F_f1 = F_f[, c("Species", "Estabwild")]
+F_f1$Estabwild = tolower(F_f1$Estabwild)
+
+#simplify into two categories: yes or no
+no = c("not established", "probably not established", "probably no", "probably no", "no")
+yes = c("established", "probably established", "yes", "probably yes")
+
+Estabwild_binary=rep(NA, dim(F_f1)[1])
+
+inds = which(F_f1$Estabwild %in% no)
+Estabwild_binary[inds] = 0
+
+inds = which(F_f1$Estabwild %in% yes)
+Estabwild_binary[inds] = 1
+
+F_f1$Estabwild_binary = Estabwild_binary
+# F_f1$Estabwild_binary = factor(F_f1$Estabwild_binary)
+
+F_f1 = F_f1[, c("Species", "Estabwild_binary")]
+# F_f1 = subset(F_f1, Species == "Cyprinus carpio")
+F_sum <- F_f1 %>% 
+  drop_na(Estabwild_binary) %>% 
+  # na.omit() %>%#didn't work 
+
+  group_by(Species) %>%
+  summarize(Estabwild_binary_mean = mean(Estabwild_binary))
+
+F_sum = data.frame(F_sum)
+
+missing_species = setdiff(F$Species, F_sum$Species)
+
+F_na = data.frame(Species = missing_species,
+                  Estabwild_binary_mean = NA)
+
+F_sum = rbind(F_sum, F_na)
+
+F_haddock = subset(F_sum, Species %in% DF$Species)
+
+DF = merge(DF, F_haddock)
+
+out = NULL
 species = DF$Species
 DF$introductions_count = NA
 for (a in 1:length(species)){
   tmp = data.frame(introductions(species_list = DF$Species[a]))
+  out = rbind(out, tmp)
   # print(dim(tmp)[1])#1 row per
   DF$introductions_count[a]= dim(tmp)[1]
 }
-#see what the other fields are
-names(tmp)
-head(tmp)
 
-m <- lm(haddock_score_mean ~ introductions_count, data = DF, na.action = na.omit)
-summary(m)
+summary(out)
+#see what the other fields are
+
+F_n <- F %>%  select_if(is.numeric) 
+
+F_n$Species = F$Species
+names(F_n)
+#the only one that's biological is Invasive
+F_n = F_n[,c("Species", "Invasive")]
+F_n$Invasive[F_n$Invasive == -1]=1#change from -1 to 1
+
+names(F_n)[names(F_n)=="Invasive"]="Invasive_introductions"
+
+F_n_h = subset(F_n, Species %in% DF$Species)
+#on second thought, invasive seems finer scaled info relative to whether it gets established in the wild. let's exclude.
+# F_n_h <- group_by(Species) %>%
+#   summarize(count = count())
+
+# DF_tmp = merge(DF, F_n_h)
 
 DF_intro = DF
 save(DF_intro, file = "DF_intro.Rdata")
+dim(DF)
+##removing year-related data, area_to, from, 
 ```
 
 ##larvae
@@ -381,6 +615,18 @@ head(tmp)
 ```{r}
 load("DF_intro.Rdata")
 DF= DF_intro
+
+F <- maturity()
+
+F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
+                                       as.factor)
+F_f <- F %>%  select_if(is.factor) 
+
+names(F_f)#none relevant
+
+F_n <- F %>%  select_if(is.numeric) 
+
+names(F_n)
 species = DF$Species
 for (a in 1:length(species)){
   tmp = data.frame(maturity(species_list = DF$Species[a]))
@@ -399,23 +645,169 @@ a = 2
 ##https://www.fishbase.in/manual/fishbasethe_morphology_table.htm
 ##there are multiple records for some species
 ```{r}
-# M <- morphology()
-# 
-# M_factor <- as.data.frame(unclass(DF))
-# 
-# M_factor <- Filter(is.factor, M)
 load("DF_intro.Rdata")
 DF= DF_intro
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(morphology(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
+
+F <- morphology()
+
+F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
+                                     as.factor)
+F_f <- F %>%  select_if(is.factor) 
+
+F_f_sum <- F_f %>% group_by(Species) %>%
+  summarize_all(n_distinct, na.rm = TRUE)
+
+#find fields that have more than one unique entry for a species
+names = names(F_f_sum)
+names = setdiff(names, "Species")
+names_unique_ct = rep(NA, length(names))
+for (a in 1:length(names)){
+  names_unique_ct[a]= max(F_f_sum[,names[a]])
 }
-a = 48
-  tmp = data.frame(morphology(species_list = DF$Species[a]))
-  head(tmp)
-  names(tmp)
+#remove all fields that have more than one unique entry for at least one species
+rm = names[names_unique_ct>1]
+keep = setdiff(names, rm)
+F_f = F_f[,c("Species", keep)]
+
+names = names(F_f)
+load("non_biological.Rdata")
+#remove fields that are too granular -- subcategories
+non_biological = c(non_biological, "AppearancePic", "VomerineTeethT1", "VomerineTeethT2", "PalatineTeethT1" ,  "PharyngealTeethT2",  "PalatineTeethT2", "HorStripesTTII", "VerStripesTTII"  ,    "VerStripesTTIII" , "DiaStripesTTII"   ,   "DiaStripesTTIII", "CurStripesTTII"   , "CurStripesTTIII" , "SpotsTTII" ,          "SpotsTTIII", "DorsalFinII", "CaudalFinII" ,
+                   "AnalFinII", "EaseofID"  )
+
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+keep = setdiff(names, names[inds_rm])
+
+F_f = F_f[,keep]
+
+summary(F_f)
+
+##find fields that are absent/present
+names = names(F_f)
+a = 13
+present_absent = rep(0, length(names))
+for (a in 1:length(names)){
+  unique_vals = unique(F_f[,names[a]])
+  unique_vals = unique_vals[!is.na(unique_vals)]
+  check = (unique_vals[1]=="absent" & unique_vals[2] =="present")
+  print(check)
+  if (check == TRUE){
+    present_absent[a]=1
+    one_zero = rep(NA, dim(F_f)[1])
+    inds_present = which(F_f[,names[a]]=="present")
+    inds_absent = which(F_f[,names[a]]=="absent")
+    one_zero[inds_present]=1
+    one_zero[inds_absent]=0
+    F_f[,names[a]]=one_zero
+  }
+}
+
+F_f_to_10 = F_f[,c("Species", names[present_absent==TRUE])]
+F_f_to_10 = unique(F_f_to_10)
+
+
+length(unique(F_f_to_10$Species)) == dim(F_f_to_10)[1]
+
+df = F_f_to_10
+df = subset(df, Species %in% DF$Species)#let's just do this for the ones we're interested in because it is going to take a long time to run otherwise
+names_fields = setdiff(names(df), "Species")
+
+species = unique(df$Species)
+out = NULL
+
+for (a in 1:length(species)){
+    tmp = subset(df, Species == species[a])
+  if (dim(tmp)[1]==1){
+    out = rbind(out, tmp)
+  } else {
+    for (b in 1:length(names_fields)){
+      print(a)
+      default_val = NA
+      vals = tmp[,names_fields[b]]
+      vals = vals[!is.na(vals)]
+      if (length(vals)==1){
+        default_val = vals[1]
+      }
+      tmp[,names_fields[b]]=default_val
+    }#end going through fields
+    tmp = unique(tmp)
+    print(dim(tmp)[1])
+    out = rbind(out, tmp)
+  }#end else
+}
+
+length(unique(out$Species)) == dim(out)[1]
+
+df_working = out#draft, now includes categorical variables that are presence-absence
+inds_sp = which(names(df_working) == "Species")
+fields = setdiff(seq(1:dim(df_working)[2]),inds_sp)
+names(df_working)[fields]=paste0(names(df_working)[fields],"_morphology")
+
+F_fc = F_f[,setdiff(names(F_f), names(df))]
+
+# dummify the data
+dmy <- dummyVars(" ~ .", data = F_fc)
+F_fc <- data.frame(predict(dmy, newdata = F_fc))
+names = names(F_fc)
+non_biological = c(non_biological, "remark", "diagnosis")
+
+inds_rm = NULL
+for (a in 1:length(non_biological)){
+  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
+}
+
+keep = setdiff(names, names[inds_rm])
+
+F_fc = F_fc[,keep]
+names(F_fc)= paste0(names(F_fc), "_morphology")
+F_fc$Species = F_f$Species#replace species field
+
+out = NULL
+df = F_fc
+
+setdiff(unique(df$Species), DF$Species)
+setdiff(DF$Species, unique(df$Species))
+
+##for now just get the species for which we have HADDOCK scores
+df = subset(df, Species %in% DF$Species)
+
+species = as.character(unique(df$Species))
+
+##this doesn't work because it changes NAs to zeros
+
+# test = subset(df, Species == "Acanthochromis polyacanthus")
+# 
+# sampleDF <- df %>% group_by(Species) %>% summarise_all(funs(sum), na.rm = TRUE)
+# sampleDF <- data.frame(sampleDF)
+# sample_test = subset(sampleDF, Species == "Acanthochromis polyacanthus")
+
+for (a in 1:length(species)){
+  tmp = subset(df, Species == species[a])
+  tmp = unique(tmp)
+  sp_ind = which(names(tmp)=="Species")
+  
+  col_names <- colnames(tmp[,-sp_ind])      # keep track of original column names
+  wc_2 <- colSums(tmp[,-sp_ind])           # compute the means
+  wc_2 <- transpose(as.data.frame(wc_2))              # this gives you generic column names
+  colnames(wc_2) <- col_names 
+    # 
+  suppressWarnings(tmp$Species <- species[a])
+  out = rbind(out, tmp)
+}
+
+dim(out)
+
+setdiff(as.character(DF$Species), as.character(out$Species))#not getting why this returns everything
+#for some reason a few dropped out -- 4
+test= merge(DF, out)
+#deal with numeric fields
+
+
 ```
 
 
@@ -576,22 +968,24 @@ load("DF_predator.Rdata")
 DF= DF_predator
 species = DF$Species
 out = NULL
+out_repro = NULL
 for (a in 1:length(species)){
   tmp = data.frame(reproduction(species_list = DF$Species[a]))
   # print(dim(tmp)[1])
-
-      ind_species =which(names(tmp) == "Species")
+  ind_species =which(names(tmp) == "Species")
   inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
   names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
                                        "_reproduction")
+  out_repro = rbind(out_repro, tmp)
   tmp = merge(DF[a,], tmp)
   out = rbind(out, tmp)
 }
 names(tmp)
 out[1:2,]
-
 DF_reproduction = out
 save(DF_reproduction, file = "DF_reproduction.Rdata")
+summary(out_repro)
+
 ```
 
 ##spawning
@@ -633,7 +1027,6 @@ names(tmp)
 head(tmp)
 
 ```
-
 
 ##stocks
 ##https://www.fishbase.in/manual/fishbasethe_stocks_table.htm
@@ -718,7 +1111,6 @@ DF_cover = DF_swim
 save(DF_cover, file = "DF_cover.Rdata")
 ```
 
-
 ##remove non-biological fields and fields with near-zero variation
 ```{r}
 load("DF_cover.Rdata")
@@ -750,6 +1142,7 @@ for (a in 1:length(non_biological)){
 }
 
 unique(DF$DietRemark_ecology)
+
 non_biological = c("LastModified", "SpecCode", "autoctr", "StockCode", "Ref", "Remark", "AddRems", "Entered", "entered", "Expert", "Datechecked", "Comment", "Modified", "AddInfos", "DateChecked", "modified")
 
 inds_rm = NULL
@@ -951,7 +1344,7 @@ print("start chunk")
 print(Sys.time())
 
 DF = read.csv("fishbase_HADDOCK_biological.csv")
-
+save(DF, file = "fishbase_HADDOCK_biological.Rdata")
 rm = c("Species", "haddock_score_sd", "Species_ACE2")
 keep = setdiff(names(DF), rm)
 DF = DF[,keep]
