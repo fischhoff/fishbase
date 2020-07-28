@@ -1,7 +1,7 @@
 ---
 title: "fishbase"
-author: "Ilya Fischhoff"
-date: "7/1/2020"
+author: "Ilya Fischhoff, Adrian Castellanos"
+date: "7/27/2020"
 output: github_document
 ---
 
@@ -14,25 +14,46 @@ pkgTest <- function(x)
   }
   library(x, character.only = TRUE)
 }
-neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW", "data.table")
+neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW", "data.table", "rsample", "tidyverse", "sf", "raster", "mapview", "rnaturalearth", "fasterize")
 for (package in neededPackages){pkgTest(package)}
 
 ```
-##settings
-```{r}
-cutoff = 0.2#cutoff of coverage required for inclusion
+
+##function to take the same across rows of categorical variables that have been 1/0 encoded, where a species may have 1 for more than one condition of a variable
+```{r sum_or_mean}
+source("R_function_sum_or_mean.R")
 ```
 
+##function to replace NAs with real values for binary fields
+```{r keep_real_binary}
+source("R_function_keep_real_binary.R")
+```
+
+```{r non_biological_list}
+source("non_biological.R")
+```
+
+
+```{r process_table}
+source("R_function_process_table.R")
+```
+
+
+##settings
+```{r cutoff}
+cutoff = 0.15#cutoff of coverage required for inclusion
+```
+
+
 ##look at docs about tables available from fishbase
-```{r}
+```{r tables}
 tables <- docs()
 tables
 ```
 
 
-
 ##read in data and fix species names
-```{r}
+```{r haddock_data}
 DF = read.csv("docking-results.csv")
 
 DF$species = str_replace(DF$species, pattern = "_", replacement = " ")
@@ -57,94 +78,10 @@ DF$Species = fish
 save(DF, file = "DF.Rdata")
 ```
 
-##check out some tables in fishbase
-##brains: one entry for each individual fish: BrainWeight, BodyWeight
-##https://www.fishbase.in/manual/fishbasethe_brains_table.htm
-```{r}
-load("DF.Rdata")
-species = DF$Species
-brain_weights = rep(0, length(species))
-body_weights = rep(0, length(species))
-brain_body_ratio = rep(NA, length(species))
-for (a in 1:length(species)){
-  test = data.frame(brains(species[a]))  
-  brain_weights[a] = length(which(!is.na(test$BrainWeight)))
-  body_weights[a] = length(which(!is.na(test$BodyWeight)))
-  brain_body_ratio[a] = mean(test$BrainWeight/ test$BodyWeight)
-}
-brain_body = brain_weights/body_weights
-frac_non_na = length(which(brain_body ==1))/ length(species)
-frac_non_na
-names(test)
-DF$brain_body_ratio = brain_body_ratio
-save(DF, file = "DF.Rdata")
-
-m <- lm(haddock_score_mean ~ brain_body_ratio, data = DF, na.action = na.omit)
-```
-
-##
-```{r}
-non_biological = c("LastModified", "SpecCode", "autoctr", "StockCode", "Ref", "Remark", "AddRems", "Entered", "entered", "Expert", "Datechecked", "Comment", "Modified", "AddInfos", "DateChecked", "modified", "Code", "CODE")
-save(non_biological, file = "non_biological.Rdata")
-```
-
-
-
-##country: multiple rows per species; for example:
-```{r}
-load("DF.Rdata")
-test = data.frame(country(DF$Species[1]))  
-head(test)
-```
-## countrysub -- multiple rows per species
-##https://www.fishbase.de/manual/english/FishBaseThe_Countries_Table.htm
-```{r}
-load("DF.Rdata")
-test = data.frame(countrysub(DF$Species[1]))  
-head(test)
-```
-
-##diet
-##https://www.fishbase.in/manual/fishbasethe_diet_table.htm
-##has multiple rows for different stages
-```{r}
-load("DF.Rdata")
-
-species = DF$Species
-out = NULL
-for (a in 1:length(species)){
-  test = data.frame(diet(species[a]))
-  print(dim(test)[1])
-  print(unique(test$SampleStage))
-  out = rbind(out, test)
-}
-summary(out)
-unique(out$SampleStage)
-```
-
-##diet_items -- multiple rows per species. seems to be linked with DietCode to diet table
-##https://www.fishbase.se/manual/English/fishbasethe_food_items_table.htm
-```{r}
-load("DF.Rdata")
-species = DF$Species
-#just check a few to save time
-species = species[1:5]
-out = NULL
-for (a in 1:length(species)){
-  test = data.frame(diet_items(species[a]))
-  print(dim(test)[1])
-  out = rbind(out, test)
-}
-summary(out)
-head(test)
-
-```
-
 ##distribution
 ##currently this is ~ FAO areas table (minus "note" field) e.g. http://www.fishbase.us/Country/FaoAreaList.php?ID=5537
 ##each species may have multiple bounding boxes
 ```{r}
-
 load("DF.Rdata")
 species = DF$Species
 out = NULL
@@ -161,80 +98,185 @@ for (a in 1:length(species)){
 }
 
 DF_distribution = out
-save(DF_distribution, file = "DF_distribution.Rdata")
-summary(DF_distribution)
-names(DF_distribution)
-load("DF_distribution.Rdata")
+save(DF_distribution, file = "DF_distribution_simple.Rdata")
 ```
 
+```{r}
+load("DF_distribution_simple.Rdata")
+DATA <- DF_distribution
+```
+
+Read in the FAO areas (from http://www.fao.org/geonetwork/srv/en/main.home?uuid=ac02a460-da52-11dc-9d70-0017f293bd28 as described by http://www.fishbase.us/manual/English/FishbaseThe_FAOAREAS_Table.htm). It looks like our data contain both the inland and marine FAOs, so I read in both and combined them according to a single column of FAO code.
+```{r}
+load("DF.Rdata")
+FAO <- st_read("FAO_AREAS/Marine/FAO_AREAS.shp")
+FAO$area <- st_area(FAO)
+
+FAO=data.frame(F_CODE = FAO$F_CODE,
+               area = FAO$area)
+
+test = FAO[1,]
+
+arctic_tmp = subset(DATA, AreaCode_distribution == test$F_CODE)#this checks out
+print(arctic_tmp$FAO_distribution)
+
+names(DATA)[names(DATA)=="AreaCode_distribution"]="F_CODE"
+DATA$F_CODE = as.character(DATA$F_CODE)
+
+#inland waters
+IFAO <- st_read("FAO_AREAS/Inland/FAO_AREAS_INLAND.shp")
+IFAO$F_AREA_INL <- gsub("0", "", IFAO$F_AREA_INL)
+names(IFAO)[names(IFAO)=="F_AREA_INL"]="F_CODE"
+IFAO$area = st_area(IFAO)
+
+IFAO = data.frame(F_CODE = IFAO$F_CODE,
+                  area = IFAO$area)
+
+FAO = rbind(FAO, IFAO)
+
+species = unique(DF$Species)
+a = 1
+area = rep(NA, length(species))
+for (a in 1:length(species)){
+  DATA_tmp = subset(DATA, Species == species[a])
+  FAO_tmp = subset(FAO, F_CODE %in% as.character(DATA_tmp$F_CODE))
+  area[a] = sum(FAO_tmp$area, na.rm = TRUE)
+}
+
+area = area * 0.000001#convert to sq km
+dist = data.frame(Species = species,
+                  range_area = area)
+save(dist, file = "dist.Rdata")
+#convert to km2
+
+```
+
+##check out some tables in fishbase
+##brains: one entry for each individual fish: BrainWeight, BodyWeight
+##https://www.fishbase.in/manual/fishbasethe_brains_table.htm
+```{r brains}
+load("DF.Rdata")
+load("dist.Rdata")
+T = brains()
+load("process_table.Rdata")
+load("non_biological.Rdata")
+part = "part"
+brains_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = "brains", part = "part")
+dim(brains_out)[1]==dim(DF)[1]
+
+brains_out = merge(brains_out, dist)
+save(brains_out,file =  "brains_out.Rdata")
+# T$brain_body_weight = T$BrainWeight/T$BodyWeight#don't need to do this because it already has EncCoeff
+# source("brains_scratch.R")=
+```
+
+##country: multiple rows per species; for example:
+```{r country}
+load("DF.Rdata")
+test = data.frame(country(DF$Species[1]))  
+head(test)
+```
+## countrysub -- multiple rows per species
+##https://www.fishbase.de/manual/english/FishBaseThe_Countries_Table.htm
+```{r}
+load("DF.Rdata")
+test = data.frame(countrysub(DF$Species[1]))  
+head(test)
+```
 
 
 ##get ecology data
 ##http://fishbase.us/manual/English/FishbaseThe_ECOLOGY_Table.htm
-```{r}
+```{r ecology}
+T<- ecology()
+
 load("DF.Rdata")
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
 
-F<- ecology()
-ecology_tmp <-F
-
-F <- ecology_tmp
-F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
-                                     as.factor)
-  F<- data.frame(F)
-
+# save(T, file="T_ecology.Rdata")
+# load("T_ecology.Rdata")
 load("non_biological.Rdata")
-non_biological = c(non_biological, "Herbivory2", "Cave2", "Association", "TS")#can't tell what TS is
-names = names(F)
-inds_rm = NULL
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
+# source("ecology_scratch.R")
+#part = part to just do the haddock scored species
+ecology = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = "ecology", part = "part")
 
-keep = setdiff(names, names[inds_rm])
-F = F[,keep]
-  
-  sp_ind = which(names(F)=="Species")
-dmy <- dummyVars(" ~ .", data = F[,-sp_ind])
+str_which(names(ecology),"Species")
 
-F_10 <- data.frame(predict(dmy, newdata = F))#multiple rows for some species
-F_10$Species = F$Species
-ecology_tmp<-F_10
+dim(ecology)[1]==dim(DF)[1]#check this is true
 
-ind_species =which(names(ecology_tmp) == "Species")
-inds_new = setdiff(seq(1,dim(ecology_tmp)[2]), ind_species)
-
-  names(ecology_tmp)[inds_new]= paste0(names(ecology_tmp)[inds_new], 
-                                       "_ecology")
-  
-a = 1
-F<- ecology_tmp
-out = NULL
-for (a in 1:dim(DF)[1]){
-
-  ecology_tmp = subset(F, Species = DF$Species[a])
-  ind_species =which(names(ecology_tmp) == "Species")
-  inds_new = setdiff(seq(1,dim(ecology_tmp)[2]), ind_species)
-  
-  tmp<-data.frame(ecology_tmp)
-  
-  sp_ind = which(names(tmp)=="Species")
-
-  col_names <- colnames(tmp[,-sp_ind])      # keep track of original column names
-  wc_2 <- colSums(tmp[,-sp_ind])           # compute the means
-  wc_2 <- transpose(as.data.frame(wc_2))              # this gives you generic column names
-  colnames(wc_2) <- col_names 
-  wc_2$Species = DF$Species[a]
-  tmp_sp = merge(DF[a,], wc_2)
-  out = rbind(out, tmp_sp)
-}
-ecology = out
 save(ecology, file = "ecology.Rdata")
+
+load("brains_out.Rdata")
+out = brains_out
+dim(ecology)[1]==dim(brains_out)[1]
+length(str_which(names(ecology),"Species"))
+length(str_which(names(brains_out),"Species"))
+
+table_out = ecology
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+
+# out = merge(ecology, brains_out) 
+save(out, file = "out.Rdata")
+
+length(str_which(names(out),"Species"))
 
 ```
 
+##distribution
+##currently this is ~ FAO areas table (minus "note" field) e.g. http://www.fishbase.us/Country/FaoAreaList.php?ID=5537
+##each species may have multiple bounding boxes
+```{r distribution}
+rm(table_out)
+table_name = "distribution"
+T<-distribution()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+T_n <- T %>%  select_if(is.numeric)
+summary(T_n)
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+```
+
+
+
 ##ecosystem -- couldn't find description of this online
 ##multiple rows per species, one for each ecosystem
-```{r}
+```{r ecosystem}
 load("ecology.Rdata")
 DF = ecology
 
@@ -254,26 +296,42 @@ head(tmp)
 
 ##estimate: a table of estimates from some models on trophic levels
 ##http://www.fishbase.us/manual/English/FishbaseThe_FOOD_ITEMS_table.htm
-```{r}
-load("ecology.Rdata")
-DF = ecology
+```{r estimate}
+rm(table_out)
+table_name = "estimate"
+T<- estimate()
 
-species = DF$Species
-out = NULL
-for (a in 1:length(species)){
-  tmp = data.frame(estimate(species_list = DF$Species[a]))
-  ind_species =which(names(tmp) == "Species")
-  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
-  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
-                                     "_estimate")
-  tmp = merge(DF[a,], tmp)
-  out = rbind(out, tmp)
-}
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+# source("ecology_scratch.R")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+
+# out = merge(table_out, out) 
+save(out, file = "out.Rdata")
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+length(str_which(names(out),"Species"))
+
 
 summary(out)
-DF_estimate = out
-save(DF_estimate, file = "DF_estimate.Rdata")
-print(dim(out))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
 ```
 
 ##faoareas, seems to be redundant to countrysub? 
@@ -285,263 +343,157 @@ test
 ##fecundity
 ##sometimes multiple rows per species. could not 
 ##could not locate doc table about fecundity. spawning table seems to be something different (different fields): https://www.fishbase.in/manual/fishbasethe_spawning_table.htm
-```{r}
-load("DF_estimate.Rdata")
-DF = DF_estimate
-F <- fecundity()
-names = names(F)
+```{r fecundity}
+rm(table_out)
+table_name = "fecundity"
+T<- fecundity()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
 load("non_biological.Rdata")
-100*sum(table(F$FecundityType))/dim(F)[1]#for most records there is no information here, so seems reasonable to include fecundity data
+# source("ecology_scratch.R")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
 
-#there aere different types of lengths, so remove those fields
-summary(F$LengthType)
-non_biological = c(non_biological, "Locality", "FecundityType", "Length")
+save(table_out, file =paste0(table_name, ".Rdata"))
 
-inds_rm = NULL
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
+str_which(names(table_out),"Species")
 
-keep = setdiff(names, names[inds_rm])
-F = F[,keep]
+load("out.Rdata")
 
-F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
-                                       as.factor)
+dim(table_out)[1]==dim(out)[1]
 
-library(dplyr)
-F_f <- F %>%  select_if(is.factor) #okay, nothing left here
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
 
-F_n <- F %>%  select_if(is.numeric) #okay, nothing left here
+# out = merge(table_out, out) 
+length(str_which(names(out),"Species"))
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
 
-rm= c("r2")#can't find any documentation on this, guess it may be correlation coefficient
-rm = c(rm, "LCLa" , "UCLa","LCLb","UCLb", "Number")#assuming these are confidence intervals, remove because not central tendency; remove number because this is sample size
-non_biological = rm
-inds_rm = NULL
-names = names(F)
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
+save(out, file = "out.Rdata")
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
-keep = setdiff(names, names[inds_rm])
-F = F[,keep]
-
-df = data.frame(F)
-summary(df)#confirmed none of these are -1/0 variables
-
-species = as.character(unique(df$Species))
-length(species)
-
-# options(warn = -1) 
-
-out = NULL
-df$Species = as.character(df$Species)
-for (a in 1:length(species)){
-  inds = which(df$Species == as.character(species[a]))
-  tmp = df[inds,]
-  tmp = unique(tmp)
-  sp_ind = which(names(tmp)=="Species")
-  tmp = colMeans(tmp[,-sp_ind], na.rm = TRUE)
-  names(tmp) = paste0(names(tmp), "_fecundity")
-  DF_tmp = subset(DF, Species == species[a])
-  # tmp = cbind(tmp, DF_tmp$Species)
-  suppressWarnings(tmp$Species <- species[a])
-  
-  tmp_1 = merge(tmp, DF_tmp)
-  out = rbind(out, tmp_1)
-}
-# options(warn=0)
-DF_fecundity = out
-save(DF_fecundity, file = "DF_fecundity.Rdata")
-print(dim(out))
 ```
 
-##fooditems
+##fooditems -- including this one
 ##http://www.fishbase.org/manual/english/fishbasethe_food_items_table.htm
 ##multiple rows per species, for different food types, life stages of predator, locality, etc. 
-```{r}
+```{r fooditems}
+rm(table_out)
+table_name = "fooditems"
+T<- fooditems()
 
-load("DF_fecundity.Rdata")
-DF= DF_fecundity
+load("DF.Rdata")
 
-F <- fooditems()
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+# source("ecology_scratch.R")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
 
-F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
-                                       as.factor)
-F_f <- F %>%  select_if(is.factor) 
+save(table_out, file =paste0(table_name, ".Rdata"))
 
-F_f_sum <- F_f %>% group_by(Species) %>%
-  summarize_all(n_distinct, na.rm = TRUE)
+str_which(names(table_out),"Species")
 
-F_f_sum_df = data.frame(F_f_sum)
+load("out.Rdata")
 
-#include: number of FoodI types per species, each Food1 type 
-#exclude data on larvae, as less relevant to SC2 being transmitted from fish to mammals?
-#exclude as non-biological: Locality
-#exclude as redundant / too granular: FoodII, FoodIII (subcategories of food), PreyStage
-#exclude because data include multiple types / levels: Foodgroup, Foodname
+dim(table_out)[1]==dim(out)[1]
 
-F_n <- F %>%  select_if(is.numeric) 
-#exclude most of these as non-biological
-#exclude for now, consider including if presence of food group is an important factor: Commoness
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
 
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
 
-F_f1 = F_f[, c("Species", "FoodI")]
+save(out, file = "out.Rdata")
 
-# dummify the data
-dmy <- dummyVars(" ~ .", data = F_f1[,-1])
-F_f1_10 <- data.frame(predict(dmy, newdata = F_f1))#multiple rows for some species
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
-F_f1_10 = cbind(F_f1_10, F_f1$Species)
-names(F_f1_10)[names(F_f1_10)=="F_f1$Species"]="Species"
-
-#this gives weird results
-F_fi_sum <- F_f1_10 %>% group_by(Species) %>%
-  # summarize_all(sum, na.rm = TRUE)
-  summarise_all(funs(sum(!is.na(.))))
-test = subset(F_f, Species == "Aapticheilichthys websteri")
-test = subset(F_f1_10, Species == "Aapticheilichthys websteri")
-
-test = subset(F_f, Species == "Abalistes stellaris")
-
-test = subset(F_f1_10, Species == "Abalistes stellaris")
-
-df = F_f1_10
-
-df = subset(df, Species %in% DF$Species)
-
-df_missing = subset(df, !(Species %in% DF$Species))
-species = unique(df$Species)
-length(species)
-# species = species[c(1:100)]
-
-out = NULL
-
-for (a in 1:length(species)){
-  tmp = subset(df, Species == species[a])
-  tmp = unique(tmp)
-  sp_ind = which(names(tmp)=="Species")
-  tmp = colSums(tmp[,-sp_ind])
-  names(tmp) = paste0(names(tmp), "_fooditems")
-  # tmp = data.frame(tmp)
-  tmp$Species = as.character(species[a])
-  DF_tmp = subset(DF, Species == species[a])
-  tmp_1 = merge(tmp, DF_tmp)
-  out = rbind(out, tmp_1)
-}
-# out = data.frame(out)
-missing_species = setdiff(DF$Species, out$Species)
-dim(DF)[1]==dim(out)[1]
-DF_fooditems = out
-save(DF_fooditems, file = "DF_fooditems.Rdata")
-load("DF_fooditems.Rdata")
-dim(DF_fooditems)
-dim(out)
+load("out_fooditems.Rdata")
 ```
 
 ##genetic -- don't think we want to use this, but including just to see what it shows
 ```{r}
-load("DF_fooditems.Rdata")
-DF= DF_estimate
+# load("DF_fooditems.Rdata")
+# DF= DF_estimate
+# 
+# test = data.frame(genetics(DF$Species[1]))
+# names(test)
 
-test = data.frame(genetics(DF$Species[1]))
-names(test)
 ```
 
 
 ##introductions -- species introductions data. for now making one new feature: the number of records about introductions; it seems that each row is a different place
 ##https://www.fishbase.in/manual/fishbasethe_introduction_table.htm
-```{r}
+```{r introdoctions}
 
-##removing because non-biological / non-ecological: year of introduction, reason for introduction, introducer SocioEff., EstabAqua (whether established in aquaculture)
-##removing because low coverage: Impacts
-##removing because too granular: EstabType (whether it is wild-reproducing, continuously released, etc.)
+rm(table_out)
+table_name = "introductions"
+T<- introductions()
+
+# T$Estabwild = tolower(T$Estabwild)#added tolower to function
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
 
-##include: Estabwild
+# #simplify into two categories: yes or no
+# no = c("not established", "probably not established", "probably no", "probably no", "no")
+# yes = c("established", "probably established", "yes", "probably yes")
+# 
+# Estabwild_binary=rep(NA, dim(F_f1)[1])
+# 
+# inds = which(F_f1$Estabwild %in% no)
+# Estabwild_binary[inds] = 0
+# 
+# inds = which(F_f1$Estabwild %in% yes)
+# Estabwild_binary[inds] = 1
+# 
+# F_f1$Estabwild_binary = Estabwild_binary
 
-load("DF_estimate.Rdata")
-DF= DF_estimate
-
-F <- introductions()
-
-F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
-                                       as.factor)
-F_f <- F %>%  select_if(is.factor) 
-
-F_f1 = F_f[, c("Species", "Estabwild")]
-F_f1$Estabwild = tolower(F_f1$Estabwild)
-
-#simplify into two categories: yes or no
-no = c("not established", "probably not established", "probably no", "probably no", "no")
-yes = c("established", "probably established", "yes", "probably yes")
-
-Estabwild_binary=rep(NA, dim(F_f1)[1])
-
-inds = which(F_f1$Estabwild %in% no)
-Estabwild_binary[inds] = 0
-
-inds = which(F_f1$Estabwild %in% yes)
-Estabwild_binary[inds] = 1
-
-F_f1$Estabwild_binary = Estabwild_binary
 # F_f1$Estabwild_binary = factor(F_f1$Estabwild_binary)
 
-F_f1 = F_f1[, c("Species", "Estabwild_binary")]
-# F_f1 = subset(F_f1, Species == "Cyprinus carpio")
-F_sum <- F_f1 %>% 
-  drop_na(Estabwild_binary) %>% 
-  # na.omit() %>%#didn't work 
+# F_f1 = F_f1[, c("Species", "Estabwild_binary")]
+# # F_f1 = subset(F_f1, Species == "Cyprinus carpio")
+# F_sum <- F_f1 %>% 
+#   drop_na(Estabwild_binary) %>% 
+#   # na.omit() %>%#didn't work 
+# 
+#   group_by(Species) %>%
+#   summarize(Estabwild_binary_mean = mean(Estabwild_binary))
 
-  group_by(Species) %>%
-  summarize(Estabwild_binary_mean = mean(Estabwild_binary))
-
-F_sum = data.frame(F_sum)
-
-missing_species = setdiff(F$Species, F_sum$Species)
-
-F_na = data.frame(Species = missing_species,
-                  Estabwild_binary_mean = NA)
-
-F_sum = rbind(F_sum, F_na)
-
-F_haddock = subset(F_sum, Species %in% DF$Species)
-
-DF = merge(DF, F_haddock)
-
-out = NULL
-species = DF$Species
-DF$introductions_count = NA
-for (a in 1:length(species)){
-  tmp = data.frame(introductions(species_list = DF$Species[a]))
-  out = rbind(out, tmp)
-  # print(dim(tmp)[1])#1 row per
-  DF$introductions_count[a]= dim(tmp)[1]
-}
-
-summary(out)
-#see what the other fields are
-
-F_n <- F %>%  select_if(is.numeric) 
-
-F_n$Species = F$Species
-names(F_n)
-#the only one that's biological is Invasive
-F_n = F_n[,c("Species", "Invasive")]
-F_n$Invasive[F_n$Invasive == -1]=1#change from -1 to 1
-
-names(F_n)[names(F_n)=="Invasive"]="Invasive_introductions"
-
-F_n_h = subset(F_n, Species %in% DF$Species)
-#on second thought, invasive seems finer scaled info relative to whether it gets established in the wild. let's exclude.
-# F_n_h <- group_by(Species) %>%
-#   summarize(count = count())
-
-# DF_tmp = merge(DF, F_n_h)
-
-DF_intro = DF
-save(DF_intro, file = "DF_intro.Rdata")
-dim(DF)
-##removing year-related data, area_to, from, 
 ```
 
 ##larvae
@@ -612,7 +564,7 @@ head(tmp)
 ##maturity
 ##multiple records for some species, would need to take averages if we wanted to use. there are multiple measures of maturity to choose from.
 ##https://www.fishbase.in/manual/fishbasethe_maturity_table.htm
-```{r}
+```{r maturity}
 load("DF_intro.Rdata")
 DF= DF_intro
 
@@ -643,273 +595,222 @@ a = 2
 
 ##morphology
 ##https://www.fishbase.in/manual/fishbasethe_morphology_table.htm
-##there are multiple records for some species
-```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
+##there are multiple records for some species. 
+```{r morphology}
+rm(table_out)
+table_name = "morphology"
+T<-morphology()
 
-F <- morphology()
 
-F[sapply(F, is.character)] <- lapply(F[sapply(F, is.character)], 
-                                     as.factor)
-F_f <- F %>%  select_if(is.factor) 
+load("DF.Rdata")
 
-F_f_sum <- F_f %>% group_by(Species) %>%
-  summarize_all(n_distinct, na.rm = TRUE)
-
-#find fields that have more than one unique entry for a species
-names = names(F_f_sum)
-names = setdiff(names, "Species")
-names_unique_ct = rep(NA, length(names))
-for (a in 1:length(names)){
-  names_unique_ct[a]= max(F_f_sum[,names[a]])
-}
-#remove all fields that have more than one unique entry for at least one species
-rm = names[names_unique_ct>1]
-keep = setdiff(names, rm)
-F_f = F_f[,c("Species", keep)]
-
-names = names(F_f)
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
 load("non_biological.Rdata")
-#remove fields that are too granular -- subcategories
-non_biological = c(non_biological, "AppearancePic", "VomerineTeethT1", "VomerineTeethT2", "PalatineTeethT1" ,  "PharyngealTeethT2",  "PalatineTeethT2", "HorStripesTTII", "VerStripesTTII"  ,    "VerStripesTTIII" , "DiaStripesTTII"   ,   "DiaStripesTTIII", "CurStripesTTII"   , "CurStripesTTIII" , "SpotsTTII" ,          "SpotsTTIII", "DorsalFinII", "CaudalFinII" ,
-                   "AnalFinII", "EaseofID"  )
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
 
+save(table_out, file =paste0(table_name, ".Rdata"))
 
-inds_rm = NULL
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
+str_which(names(table_out),"Species")
 
-keep = setdiff(names, names[inds_rm])
+load("out.Rdata")
 
-F_f = F_f[,keep]
+dim(table_out)[1]==dim(out)[1]
 
-summary(F_f)
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
 
-##find fields that are absent/present
-names = names(F_f)
-a = 13
-present_absent = rep(0, length(names))
-for (a in 1:length(names)){
-  unique_vals = unique(F_f[,names[a]])
-  unique_vals = unique_vals[!is.na(unique_vals)]
-  check = (unique_vals[1]=="absent" & unique_vals[2] =="present")
-  print(check)
-  if (check == TRUE){
-    present_absent[a]=1
-    one_zero = rep(NA, dim(F_f)[1])
-    inds_present = which(F_f[,names[a]]=="present")
-    inds_absent = which(F_f[,names[a]]=="absent")
-    one_zero[inds_present]=1
-    one_zero[inds_absent]=0
-    F_f[,names[a]]=one_zero
-  }
-}
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
 
-F_f_to_10 = F_f[,c("Species", names[present_absent==TRUE])]
-F_f_to_10 = unique(F_f_to_10)
+save(out, file = "out.Rdata")
 
-
-length(unique(F_f_to_10$Species)) == dim(F_f_to_10)[1]
-
-df = F_f_to_10
-df = subset(df, Species %in% DF$Species)#let's just do this for the ones we're interested in because it is going to take a long time to run otherwise
-names_fields = setdiff(names(df), "Species")
-
-species = unique(df$Species)
-out = NULL
-
-for (a in 1:length(species)){
-    tmp = subset(df, Species == species[a])
-  if (dim(tmp)[1]==1){
-    out = rbind(out, tmp)
-  } else {
-    for (b in 1:length(names_fields)){
-      print(a)
-      default_val = NA
-      vals = tmp[,names_fields[b]]
-      vals = vals[!is.na(vals)]
-      if (length(vals)==1){
-        default_val = vals[1]
-      }
-      tmp[,names_fields[b]]=default_val
-    }#end going through fields
-    tmp = unique(tmp)
-    print(dim(tmp)[1])
-    out = rbind(out, tmp)
-  }#end else
-}
-
-length(unique(out$Species)) == dim(out)[1]
-
-df_working = out#draft, now includes categorical variables that are presence-absence
-inds_sp = which(names(df_working) == "Species")
-fields = setdiff(seq(1:dim(df_working)[2]),inds_sp)
-names(df_working)[fields]=paste0(names(df_working)[fields],"_morphology")
-
-F_fc = F_f[,setdiff(names(F_f), names(df))]
-
-# dummify the data
-dmy <- dummyVars(" ~ .", data = F_fc)
-F_fc <- data.frame(predict(dmy, newdata = F_fc))
-names = names(F_fc)
-non_biological = c(non_biological, "remark", "diagnosis")
-
-inds_rm = NULL
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
-
-keep = setdiff(names, names[inds_rm])
-
-F_fc = F_fc[,keep]
-names(F_fc)= paste0(names(F_fc), "_morphology")
-F_fc$Species = F_f$Species#replace species field
-
-out = NULL
-df = F_fc
-
-setdiff(unique(df$Species), DF$Species)
-setdiff(DF$Species, unique(df$Species))
-
-##for now just get the species for which we have HADDOCK scores
-df = subset(df, Species %in% DF$Species)
-
-species = as.character(unique(df$Species))
-
-##this doesn't work because it changes NAs to zeros
-
-# test = subset(df, Species == "Acanthochromis polyacanthus")
-# 
-# sampleDF <- df %>% group_by(Species) %>% summarise_all(funs(sum), na.rm = TRUE)
-# sampleDF <- data.frame(sampleDF)
-# sample_test = subset(sampleDF, Species == "Acanthochromis polyacanthus")
-
-for (a in 1:length(species)){
-  tmp = subset(df, Species == species[a])
-  tmp = unique(tmp)
-  sp_ind = which(names(tmp)=="Species")
-  
-  col_names <- colnames(tmp[,-sp_ind])      # keep track of original column names
-  wc_2 <- colSums(tmp[,-sp_ind])           # compute the means
-  wc_2 <- transpose(as.data.frame(wc_2))              # this gives you generic column names
-  colnames(wc_2) <- col_names 
-    # 
-  suppressWarnings(tmp$Species <- species[a])
-  out = rbind(out, tmp)
-}
-
-dim(out)
-
-setdiff(as.character(DF$Species), as.character(out$Species))#not getting why this returns everything
-#for some reason a few dropped out -- 4
-test= merge(DF, out)
-#deal with numeric fields
-
-
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
 ```
 
 
 ##morphometrics
 ##there are multiple records for some species; to include we would need to take averages
+##exclude for now because couldn't find documentation
 ```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(morphometrics(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
-a = 48
-  tmp = data.frame(morphometrics(species_list = DF$Species[a]))
-  head(tmp)
-  names(tmp)
+rm(table_out)
+table_name = "morphometrics"
+T<-morphometrics()
+names(T)
+
 ```
 
 ##oxygen
 ##https://www.fishbase.in/manual/fishbasethe_oxygen_table.htm
 ##there are multiple records for some species (e.g. for different sexes); to include we would need to take averages
-```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(oxygen(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
-a = 48
-tmp = data.frame(oxygen(species_list = DF$Species[a]))
-head(tmp)
-names(tmp)
+##include along with potentially influencing variables -- e.g. salinity, temp, swimming speed, etc. 
+```{r oxygen}
+
+rm(table_out)
+table_name = "oxygen"
+T<-oxygen()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+load("out_oxygen.Rdata")
+
 ```
 
 ##popchar: Table of maximum length (Lmax), weight (Wmax) and age (tmax)
 ##https://www.fishbase.in/manual/fishbasethe_popchar_table.htm
 ##there are multiple records for some species; to include we would need to take averages
 ##
-```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(popchar(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
-a = 48
-tmp = data.frame(popchar(species_list = DF$Species[a]))
-head(tmp)
-names(tmp)
+```{r popchar}
+rm(table_out)
+table_name = "popchar"
+T<-popchar()
+unique(T$Type)#can't tell what this means
+keep = setdiff(names(T), "Type")
+T = T[,keep]
+unique(T$TypeWeight)
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
 ```
 
 ##popgrowth
 ##https://www.fishbase.in/manual/fishbasethe_popgrowth_table.htm
 ##multiple records for some species, e.g. for different sexes; 
-```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(popgrowth(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
-a = 48
-tmp = data.frame(popgrowth(species_list = DF$Species[a]))
-head(tmp)
-names(tmp)
+```{r popgrowth}
+rm(table_out)
+table_name = "popgrowth"
+T<-popgrowth()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+
 ```
 
 ##popqb
 ##https://www.fishbase.se/manual/english/fishbasethe_popqb_table.htm
 ##population-based estimates of food consumption (i.e., estimates that account for the age structure of populations)
 ##multiple responses for some species. here there are two measures, popqb and maintenance qb. 
-```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(popqb(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
-a = 48
-tmp = data.frame(popqb(species_list = DF$Species[a]))
-head(tmp)
-names(tmp)
+```{r popqb}
+rm(table_out)
+table_name = "popqb"
+T<-popqb()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
 ```
 
 ##predators
 ##https://www.fishbase.se/manual/English/fishbasethe_predators_table.htm
-```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
+```{r predators}
+load("DF.Rdata")
 species = DF$Species
-out = NULL
-out_mammal = NULL
 DF$predator_mammals = NA
 for (a in 1:length(species)){
   tmp = data.frame(predators(species_list = DF$Species[a]))
@@ -918,29 +819,47 @@ for (a in 1:length(species)){
       DF$predator_count[a] = dim(tmp)[1]
       tmp_mammal = subset(tmp, PredatorI == "mammals")
       DF$predator_mammals[a]= dim(tmp_mammal)[1]    
-      out_mammal = rbind(out_mammal, tmp_mammal)
   }
-  out = rbind(out, tmp)
+  # out = rbind(out, tmp)
 }
+# DF = out
+save(DF, file = "DF.Rdata")
 
-m <- lm(haddock_score_mean ~ predator_mammals, data = DF, na.action = na.omit)
-summary(m)
+rm(table_out)
+table_name = "predators"
+T<-predators()
 
-DF_predator = DF
-save(DF_predator, file = "DF_predator.Rdata")
-a = 2
-tmp = data.frame(predators(species_list = DF$Species[a]))
-head(tmp)
-names(tmp)
-table(out_mammal$PredatorName)
+#from this one removing PreyStage
+# ind_rm = which(names(T)=="PreyStage")
+load("DF.Rdata")
 
-plot <- ggplot(data = DF_predator, aes(x = predator_mammals, y = haddock_score_mean))+
-  geom_point()+
-  geom_smooth()
-plot
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
 
-m <- lm(haddock_score_mean ~ predator_count, data = DF_predator, na.action = na.omit)
-summary(m)
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+DF = DF[,c("Species", "predator_mammals")]
+out = merge(out, DF, by = "Species")
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
 ```
 
@@ -948,138 +867,412 @@ summary(m)
 ##�ration� (Rd) pertains to an estimate of daily food consumption by fish of a specific size
 ##https://www.fishbase.in/manual/fishbasethe_ration_table.htm
 ##multiple rows for some species
-```{r}
-load("DF_predator.Rdata")
-DF= DF_predator
-species = DF$Species
-out = NULL
-for (a in 1:length(species)){
-  tmp = data.frame(ration(species_list = DF$Species[a]))
-  print(dim(tmp)[1])
-}
-names(tmp)
+```{r ration}
+rm(table_out)
+table_name = "ration"
+T<-ration()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+T<-ration()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+
 ```
 
 ##reproduction
 ##https://www.fishbase.in/manual/fishbasethe_reproduction_table.htm
 ##only one row per species for these HADDOCK species; adding these fields
-```{r}
-load("DF_predator.Rdata")
-DF= DF_predator
-species = DF$Species
-out = NULL
-out_repro = NULL
-for (a in 1:length(species)){
-  tmp = data.frame(reproduction(species_list = DF$Species[a]))
-  # print(dim(tmp)[1])
-  ind_species =which(names(tmp) == "Species")
-  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
-  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
-                                       "_reproduction")
-  out_repro = rbind(out_repro, tmp)
-  tmp = merge(DF[a,], tmp)
-  out = rbind(out, tmp)
-}
-names(tmp)
-out[1:2,]
-DF_reproduction = out
-save(DF_reproduction, file = "DF_reproduction.Rdata")
-summary(out_repro)
+```{r reporoduction}
+rm(table_out)
+table_name = "reproduction"
+T<-reproduction()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+# T<-ration()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
 ```
 
 ##spawning
 ##https://www.fishbase.in/manual/fishbasethe_spawning_table.htm
 ##multiple rows per species, for different localities
-```{r}
-load("DF_reproduction.Rdata")
-DF= DF_reproduction
-species = DF$Species
-out = NULL
-for (a in 1:length(species)){
-  tmp = data.frame(spawning(species_list = DF$Species[a]))
-  print(dim(tmp)[1])
-  out = rbind(out, tmp)
-}
-names(tmp)
-a = 5#look at one species w multiple rows
-  tmp = data.frame(spawning(species_list = DF$Species[a]))
-  tmp
+```{r spawning}
+rm(table_out)
+table_name = "spawning"
+T<-spawning()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+# T<-ration()
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
 ```
 
 ##speed
 ##https://www.fishbase.se/manual/English/PDF/FB_Book_ATorres_Swimming_Speed_RF_JG.pdf
 ##https://www.fishbase.in/manual/fishbasethe_swimming_and_speed_tables.htm
 ##multiple records for some species
-```{r}
-load("DF_reproduction.Rdata")
-DF= DF_reproduction
-species = DF$Species
-out = NULL
-for (a in 1:length(species)){
-  tmp = data.frame(speed(species_list = DF$Species[a]))
-  print(dim(tmp)[1])
-  out = rbind(out, tmp)
-}
-a = 13
-  tmp = data.frame(speed(species_list = DF$Species[a]))
-names(tmp)
-head(tmp)
+```{r speed}
+
+rm(table_out)
+table_name = "speed"
+T<-speed()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+# T = subset(T, Reliable != "questionable")
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
 
 ```
 
 ##stocks
 ##https://www.fishbase.in/manual/fishbasethe_stocks_table.htm
 ##multiple records for some species, one for each stock
-```{r}
-load("DF_reproduction.Rdata")
-DF= DF_reproduction
-species = DF$Species
-out = NULL
-for (a in 1:length(species)){
-  tmp = data.frame(stocks(species_list = DF$Species[a]))
-  print(dim(tmp)[1])
-  out = rbind(out, tmp)
-}
-a = 13
-  tmp = data.frame(stocks(species_list = DF$Species[a]))
-names(tmp)
-head(tmp)
+```{r stocks}
+
+rm(table_out)
+table_name = "stocks"
+T<-stocks()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+# T = subset(T, Reliable != "questionable")
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+
+#separately add these fields that might show up in other tables:
+stocks_fields_exclude =c("Ecology" ,   "Abnorm", "Metabolism", "Predators" ,"Spawning",  "Fecundity",   "Speed",       "Diet"  , "Eggs"  , "EggDevel","Food",
+  
+  "Larvae",    "LarvDyn",    "LarvSpeed",  "PopDyn",    "Gillarea",   "Maturity",  "MatSizes",
+  
+  "Processing", "Reproduction" ,"Introductions" ,"Abundance" ,"Vision"  ,  "Genetics"  ,
+  
+  "CountryComp" ,"Allele",    "GeneticStudies" ,"Ration"    ,  "Foods",   "Ecotoxicology", "Brains",
+  
+  "Catches" ,  "FAOAqua")
+non_biological = c(non_biological, stocks_fields_exclude)
+
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
 
 ```
+
+
+##diet
+##https://www.fishbase.in/manual/fishbasethe_diet_table.htm
+##has multiple rows for different stages
+```{r diet_table}
+
+rm(table_out)
+table_name = "diet"
+T<-diet()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+
+non_biological = c(non_biological, stocks_fields_exclude)
+
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+```
+
+
+
+##diet_items -- multiple rows per species. seems to be linked with DietCode to diet table
+##https://www.fishbase.se/manual/English/fishbasethe_food_items_table.htm
+```{r diet_items}
+
+# rm(table_out)
+# table_name = "diet_items"
+# T<-diet_items()
+# 
+# #check out fields
+# T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+#                                        as.factor)
+# T_f <- T %>%  select_if(is.factor)
+# summary(T_f)
+# 
+# load("DF.Rdata")
+# 
+# load("process_table.Rdata")
+# load("sum_or_mean.Rdata")
+# load("keep_real_binary.Rdata")
+# load("non_biological.Rdata")
+# 
+# non_biological = c(non_biological, stocks_fields_exclude)
+# 
+# table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+# dim(table_out)[1]==dim(DF)[1]#check this is true
+# 
+# save(table_out, file =paste0(table_name, ".Rdata"))
+# 
+# str_which(names(table_out),"Species")
+# 
+# load("out.Rdata")
+# 
+# dim(table_out)[1]==dim(out)[1]
+# 
+# sp_ind = which(names(table_out)=="Species")
+# out = cbind(out, table_out[,-sp_ind])
+# length(str_which(names(out),"Species"))
+# 
+# names(out)[str_which(names(out),table_name)]
+# summary(out[,str_which(names(out),table_name)])
+# 
+# save(out, file = "out.Rdata")
+# 
+# save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+```
+
+
 
 ##swimming
 ##https://www.fishbase.in/manual/fishbasethe_swimming_and_speed_tables.htm
 ##one record per species
-```{r}
-load("DF_reproduction.Rdata")
-DF= DF_reproduction
-species = DF$Species
-out = NULL
-ct = rep(NA, length(species))
-for (a in 1:length(species)){
-  tmp = data.frame(swimming(species_list = DF$Species[a]))
-  ct[a] = dim(tmp)[1]
-  ind_species =which(names(tmp) == "Species")
-  inds_new = setdiff(seq(1,dim(tmp)[2]), ind_species)
-  names(tmp)[inds_new]= paste0(names(tmp)[inds_new], 
-                                       "_swimming")
-  tmp = merge(DF[a,], tmp)
-  out = rbind(out, tmp)
-}
-names(tmp)
-out[1:2,]
-unique(ct)
-DF_swim = DF
-save(DF_swim, file = "DF_swim.Rdata")
-fishbase_HADDOCK = DF_swim
+```{r swimming}
+rm(table_out)
+table_name = "swimming"
+T<-swimming()
+
+#check out fields
+T[sapply(T, is.character)] <- lapply(T[sapply(T, is.character)], 
+                                       as.factor)
+T_f <- T %>%  select_if(is.factor)
+summary(T_f)
+
+# T = subset(T, Reliable != "questionable")
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+non_biological = setdiff(non_biological, "Type")#put this one back in
+threshold_frac = 0
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
+
+fishbase_HADDOCK = out
 write.csv(fishbase_HADDOCK, file = "fishbase_HADDOCK.csv")
 ```
 
+
+
+
 ##see what coverage is
 ```{r}
-load("DF_swim.Rdata")
-df = DF_swim
+
+load("out.Rdata")
+save(out, file = "out_allfields.Rdata")
+df = out
 name_ct = length(names(df))
 row_ct = dim(df)[1]
 non_na_frac = rep(NA, name_ct)
@@ -1087,7 +1280,6 @@ for (a in 1:name_ct){
   non_na_frac[a]= length(which(!is.na(df[,a])))/ row_ct  
 }
   
-# non_na_frac = colSums(!is.na(df))/dim(df)[2]
 
 ok_cols = which(non_na_frac > cutoff)
 DF_fields = data.frame(field = names(df),
@@ -1096,302 +1288,79 @@ i = sort.int(DF_fields$non_na_frac,  index.return = TRUE, decreasing = TRUE)
 
 DF_fields = DF_fields[i$ix,]
 DF_fields
+
+plot <- ggplot(data = DF_fields, aes(x = non_na_frac))+
+  geom_histogram()+
+  xlab("coverage within field")
+plot
+ggsave(plot, filename = "coverage.jpg")
+
+h = hist(DF_fields$non_na_frac, plot = FALSE, breaks = 20)
+
 ```
 
 ##remove fields with 0 coverage
 ```{r}
-DF_fields_rm = subset(DF_fields, non_na_frac == 0)
+DF_fields_rm = subset(DF_fields, non_na_frac < cutoff)
 
 names_rm = DF_fields_rm$field
 names_rm#the fields to remove
-keep = setdiff(names(DF_swim), names_rm)
-DF_swim = DF_swim[, keep]
+print(DF_fields_rm[str_which(names_rm, "oxygen"),])
 
-DF_cover = DF_swim
-save(DF_cover, file = "DF_cover.Rdata")
+keep = setdiff(names(out), names_rm)
+out = out[, keep]
+dim(out)
+save(out, file = "out.Rdata")
 ```
 
-##remove non-biological fields and fields with near-zero variation
+##add back haddock fields
 ```{r}
-load("DF_cover.Rdata")
-DF = DF_cover
-names = names(DF)
+load("out.Rdata")
+save(out, file = "out_minus_haddock.Rdata")
+load("DF.Rdata")
+names_in_common = intersect(names(out), names(DF))
+names_in_common = setdiff(names_in_common, "Species")
+inds = which(names(DF) %in% names_in_common)
+DF = DF[, -inds]
+out = merge(out, DF, by = "Species")
 
-stock_inds = str_which(names, "Stock")
-names[stock_inds]
+rm = c("haddock_score_sd", "Species_ACE2")
+keep = setdiff(names(out), rm)
+out = out[, keep]
+# dummify the data
+Species = out$Species
+# sp_ind = which(names(out)=="Species")
+# dmy <- dummyVars(" ~ .", data = out[,-sp_ind])
+# out <- data.frame(predict(dmy, newdata = out))
+# out$Species = Species
 
-#ecology sometimes has multiple stocks per species
-ecology_all = ecology()  
-tab = table(ecology_all$Species)
-tab = data.frame(tab)
-unique(tab$Freq)
-table(tab$Freq)
 
-#reproduction only ever has one stock
-repro_all = reproduction()  
-tab = table(repro_all$Species)
-tab = data.frame(tab)
-unique(tab$Freq)
+save(out, file = "out.Rdata")
+```
 
-#confirm all "Ref" are irrelevant
-non_biological = c( "Ref" )
 
-inds_rm = NULL
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
-
-unique(DF$DietRemark_ecology)
-
-non_biological = c("LastModified", "SpecCode", "autoctr", "StockCode", "Ref", "Remark", "AddRems", "Entered", "entered", "Expert", "Datechecked", "Comment", "Modified", "AddInfos", "DateChecked", "modified")
-
-inds_rm = NULL
-for (a in 1:length(non_biological)){
-  inds_rm = c(inds_rm, str_which(names, non_biological[a]))
-}
-
-keep = setdiff(names, names[inds_rm])
-
-DF = DF[,keep]
-DF_biological = DF
-save(DF_biological, file = "DF_biological.Rdata")
-
-summary(DF)
+##remove fields with near-zero variation
+```{r}
+load("out.Rdata")
+DF = out
 
 ##remove variables with zero variation
+sp_ind = which(names(DF)=="Species")
 nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
 okay_inds = which(nzv$nzv == FALSE)
-
+# length(okay_inds)
+# okay_inds =c(okay_inds, sp_ind)
+length(okay_inds)
 DF = DF[,okay_inds]#include only the columns that have variation
-
-#this also has near-zero variation
-table(DF$SchoolingFrequency_ecology)
-rm = c("SchoolingFrequency_ecology")
-
-table(DF$Herbivory2_ecology)#this one has variation, and needs to be made into 1/0 variables
-
-table(DF$FeedingType_ecology)#this one has *some* variation, and needs to be made into 1/0 variables
-
-table(DF$Method_ab_estimate)#this is about methods, not biological. is it okay to include multiple methods? 
-rm = c(rm, "Method_ab_estimate")
-
-table(DF$Fertilization_reproduction)#this has some variation, needs to be made into 1/0 variables
-
-table(DF$MatingSystem_reproduction)#this has some variation, needs to be made into 1/0 variables
-
-table(DF$Spawning_reproduction)#has some variation, , needs to be made into 1/0 variables
-DF$Spawning_reproduction= tolower(DF$Spawning_reproduction)
-
-table(DF$RepGuild1_reproduction)#has variation, , needs to be made into 1/0 variables
-
-table(DF$RepGuild2_reproduction)#has variation, , needs to be made into 1/0 variables. this seems to be a separate classification scheme from RepGuild1
-
-table(DF$ParentalCare_reproduction)#has variation, , needs to be made into 1/0 variables.
-
-table(DF$RepAquarium_reproduction)#has variation, , needs to be made into 1/0 variables.
-keep = setdiff(names(DF), rm)
-DF = DF[,keep]
-
-summary(DF)
-
 
 fishbase_HADDOCK_biological = DF
 save(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.Rdata")
 write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv", row.names = FALSE)
 ```
 
+##look for fields in common with other taxa that are not fish and output to add to datasets from other verts
 ```{r}
-DF = read.csv("fishbase_HADDOCK_biological.csv")
-DF$predator_count=as.numeric(DF$predator_count)
-DF$n_r_estimate=as.numeric(DF$n_r_estimate)
-
-p<- DF %>%
-  gather(-Species, -haddock_score_mean, -haddock_score_sd, -Species_ACE2, key = "var", value = "value") %>%
-  ggplot(aes(x = value, y = haddock_score_mean, na.rm = TRUE)) +
-    geom_point(na.rm=TRUE) +
-    stat_smooth()+
-    facet_wrap(~ var, scales = "free") 
-  # theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave(plot = p, filename = "fishbase_HADDOCK.jpg", width = 20, height= 20, units = "in")
-p
-
-p<- DF %>%
-  gather(-Species, -haddock_score_mean, -haddock_score_sd, -Species_ACE2, key = "var", value = "value") %>%
-  ggplot(aes(x = value, y = haddock_score_mean, na.rm = TRUE)) +
-    geom_point(na.rm=TRUE) +
-    stat_smooth()+
-    facet_wrap(~ var, scales = "free")+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-ggsave(plot = p, filename = "fishbase_HADDOCK_vertical.jpg", width = 20, height= 20, units = "in")
-p
-
-
-
-# NOT RUN {
-# p <- ggplot(diamonds) +
-#   geom_point(aes(carat, price), alpha = 0.1) +
-#   facet_wrap_paginate(~ cut:clarity, ncol = 3, nrow = 3, page = 1)
-# n_pages(p)
-
-min = subset(DF, haddock_score_mean == min(DF$haddock_score_mean))
-
-
+source("compare_fields.R")
 ```
-
-##try making linear model for each variable
-```{r}
-DF = read.csv("fishbase_HADDOCK_biological.csv")
-rm = c("Species", "haddock_score_sd", "Species_ACE2")
-keep = setdiff(names(DF), rm)
-DF = DF[,keep]
-# dummify the data
-dmy <- dummyVars(" ~ .", data = DF)
-DF <- data.frame(predict(dmy, newdata = DF))
-
-df = DF
-# iris_vars <- c("Sepal.Width", "Petal.Length", "Petal.Width")
-# make_model <- function(nm) lm(iris[c("Sepal.Length", nm)])
-# fits <- Map(make_model, iris_vars)
-
-# df= DF[,sapply(DF, is.numeric) ]
-vars <- setdiff(names(df), c("haddock_score_mean", "haddock_score_sd"))
-
-make_model <- function(nm) lm(df[c("haddock_score_mean", nm)])
-fits <- Map(make_model, vars)
-
-glance_tidy <- function(x) c(unlist(glance(x)), unlist(tidy(x)[, -1]))
-out <- sapply(fits, glance_tidy)
-out = data.frame(out)
-
-out_sig_col_inds = which(out[5,]<0.05)
-
-out_sig = out[,out_sig_col_inds]
-out_sig
-```
-
-##test out foreach
-```{r}
-k = 10
-  out_hyper_grid <- foreach(m = 1:k, .packages = c("gbm", "foreach", "caTools"), .combine = "rbind.data.frame") %dopar% {
-    cbind.data.frame(m = m)
-  }
-```
-
-##run function gridSearch_v2.R
-```{r}
-source("../../functions/gridSearch_v2.R")
-```
-
-
-```{r}
-source("../../functions/bootstrapGBM_v2.R")
-```
-
-##function to do grid search with gbm
-```{r}
-source("../../functions/R_function_grid_search_bootstrap_null_gbm_foreach.R")
-```
-
-##try out grid search using Pima dataset
-##https://www.kaggle.com/kumargh/pimaindiansdiabetescsv?select=pima-indians-diabetes.csv
-##label = "X1"
-```{r}
-DF <- read.csv("../../functions/pima-indians-diabetes.csv")
-load("grid_search_bootstrap_null_gbm_foreach.Rdata")
-load("gridSearch.Rdata")
-load("bootstrapGBM.Rdata")
-cores = 4
-  cl <- makeCluster(cores, "SOCK", timeout = 60)
-  # stopCluster(cl)
-  registerDoSNOW(cl)
-
-  nrounds = 2000
-  buffer = 1000
-  min_trees = 0
-grid_search_bootstrap_null_gbm_foreach(DF, 
-                     label = "X1", 
-                     eta = c(0.1),
-                     max_depth = c(1),
-                     nrounds = nrounds,
-                     nrounds_null = 2000,
-                     runs = 1,
-                     output_name = "Pima_foreach_20200702_1515",
-                     do_observed = TRUE,#whether to do the bootstrapping for observed data
-                     do_null = TRUE,
-                     buffer = buffer,
-                     set_seed = c(0),
-                     seed = 1234,
-                     min_trees = 0,
-                     method = c("cv"),
-                     cv.folds = 10,
-                     distribution = "bernoulli",
-                     k = 5,
-                     cores = 4)
-
-```
-
-
-##do grid search using fishbase + HADDOCK data; predict whether haddock above median or not because haven't sorted gaussian
-```{r}
-# source("R_haddock_fishbase_binomial.R)
-```
-
-##do grid search using fishbase + HADDOCK data; gaussian distribution
-```{r haddock_gaussian}
-print("start chunk")
-print(Sys.time())
-
-DF = read.csv("fishbase_HADDOCK_biological.csv")
-save(DF, file = "fishbase_HADDOCK_biological.Rdata")
-rm = c("Species", "haddock_score_sd", "Species_ACE2")
-keep = setdiff(names(DF), rm)
-DF = DF[,keep]
-# dummify the data
-dmy <- dummyVars(" ~ .", data = DF)
-DF <- data.frame(predict(dmy, newdata = DF))
-
-load("grid_search_bootstrap_null_gbm_foreach.Rdata")
-load("gridSearch.Rdata")
-load("bootstrapGBM.Rdata")
-cores = 4
-  cl <- makeCluster(cores, "SOCK", timeout = 120)
-  # stopCluster(cl)
-  registerDoSNOW(cl)
-
-nrounds = 10000
-buffer = 1000
-min_trees = 1000#minimum number of trees
-output_name = "haddock_gaussian_20200706_1217"
-grid_search_bootstrap_null_gbm_foreach(DF, 
-                     label = "haddock_score_mean", 
-                     eta = c(0.001, 0.01, 0.1),
-                     max_depth = c(1,2,3),
-                     nrounds = nrounds,
-                     nrounds_null = nrounds,
-                     runs = 10,
-                     output_name = output_name,
-                     do_observed = TRUE,#whether to do the bootstrapping for observed data
-                     do_null = TRUE,
-                     buffer = buffer,
-                     set_seed = c(0),
-                     seed = 1234,
-                     min_trees = min_trees,
-                     method = c("cv"),
-                     cv.folds = 10,
-                     distribution = "gaussian",
-                     k = 5,
-                     cores = 4)
-  print("end chunk")
-  print(Sys.time())
-
-file = paste0("OUT2_observed_", output_name, ".Rdata")
-load(file)
-imp = OUT2[[1]]
-
-imp[,c(1:7)]
-```
-
 
 
