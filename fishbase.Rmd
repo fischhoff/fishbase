@@ -1363,4 +1363,73 @@ write.csv(fishbase_HADDOCK_biological, file = "fishbase_HADDOCK_biological.csv",
 source("compare_fields.R")
 ```
 
+##add field with AA position 30
+```{r}
+A <- read.csv("promal3d_30_83.csv")
+
+AA_30_positive = rep(0, dim(A)[1])
+i_blank = str_which(A$X, "-")
+AA_30_positive[i_blank]=NA
+
+i_pos = which(A$X %in% c("d", "e"))
+AA_30_positive[i_pos] = 1
+A$AA_30_positive = AA_30_positive
+
+ACE2 = read.csv("ACE2_sequences_fixed.csv")
+
+intersect(A$Parsed.325.sequences,ACE2$AccessionNumProtein)
+
+names(A)[names(A) == "Parsed.325.sequences"]= "AccessionNumProtein"
+A = merge(A, ACE2)
+
+names(A)[names(A)=="X"]="AA30"
+
+names(A)[names(A)=="X.1"]="AA83"
+
+DF = read.csv("docking-results.csv")
+
+DF$species = str_replace(DF$species, pattern = "_", replacement = " ")
+
+DF$species=capitalize(DF$species)
+
+names(DF)[names(DF)=="species"]="Species"
+A = merge(A, DF)
+#rename field to merge
+
+write.csv(A, file = "docking_results_AA_30_83.csv")
+# glm(haddock_score_mean ~ AA_30_positive, family=binomial, data=A)
+```
+
+
+
+##try to source from github
+```{r}
+# devtools::source_url("https://github.com/HanLabDiseaseEcology/gbm/blob/master/code/gridSearch.R")
+# devtools::source_url("https://raw.github.com/HanLabDiseaseEcology/gbm/blob/master/code/gridSearch.R")
+##?raw=TRUE
+# 
+# devtools::source_url("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R")
+# 
+# devtools::source_url("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R?raw=TRUE")
+
+source_https <- function(u, unlink.tmp.certs = FALSE) {
+  # load package
+  require(RCurl)
+
+  # read script lines from website using a security certificate
+  if(!file.exists("cacert.pem")) download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile = "cacert.pem")
+  script <- getURL(u, followlocation = TRUE, cainfo = "cacert.pem")
+  if(unlink.tmp.certs) unlink("cacert.pem")
+
+  # parase lines and evealuate in the global environement
+  eval(parse(text = script), envir= .GlobalEnv)
+}
+
+# source_https("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R")
+# source_https("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R")
+# source_https("https://raw.github.com/fischhoff/gbm/tree/master/code/gridSearch.R")
+# source_https("https://raw.github.com/tonybreyal/Blog-Reference-Functions/master/R/htmlToText/htmlToText.R", unlink.tmp.certs = TRUE)
+
+```
+
 
