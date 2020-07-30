@@ -320,12 +320,12 @@ Ilya Fischhoff, Adrian Castellanos
 
     ## Warning: package 'tidyverse' was built under R version 4.0.2
 
-    ## ── Attaching packages ────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ tibble  3.0.1     ✓ purrr   0.3.4
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ───────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x purrr::accumulate()      masks foreach::accumulate()
     ## x dplyr::arrange()         masks plyr::arrange()
     ## x dplyr::between()         masks data.table::between()
@@ -759,10 +759,10 @@ brains_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fr
     ##  [6] "Entered"      "DateEntered"  "Expert"       "Modified"     "DateModified"
     ## [11] "DateChecked"  "SpecCode"     "StockCode"    "Syncode"      "Doubtful"    
     ## [16] "Name"         "Genus"        "Sex"          "Locality"     "Year"        
-    ## [21] "TS"           "Locality"     "TS"          
+    ## [21] "BrainWeight"  "Number"       "TS"           "Locality"     "TS"          
     ## [1] "kept fields"
-    ## [1] "Species"     "LifeStage"   "Number"      "BodyWeight"  "BrainWeight"
-    ## [6] "EncCoeff"    "EncIndex"    "SL"          "TL"         
+    ## [1] "Species"    "LifeStage"  "BodyWeight" "EncCoeff"   "EncIndex"  
+    ## [6] "SL"         "TL"        
     ## # A tibble: 3 x 1
     ##   LifeStage
     ##   <fct>    
@@ -2115,23 +2115,22 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
 ```
 
     ## [1] "removed fields"
-    ##  [1] "LastModified" "SpecCode"     "Comment_r"    "LastModified" "SpecCode"    
-    ##  [6] "MaxLengthTL"  "LengthType"   "MaxLengthSL"  "Method_ab"    "nCells"      
-    ## [11] "LengthType"   "MaxLengthTL"  "LengthType"   "MaxLengthSL"  "MaxLengthTL" 
-    ## [16] "LengthType"   "MaxLengthSL" 
+    ## [1] "LastModified" "SpecCode"     "Comment_r"    "LastModified" "SpecCode"    
+    ## [6] "Method_ab"    "nCells"       "LengthType"  
     ## [1] "kept fields"
-    ##  [1] "Species"           "TLObserved"        "Troph"            
-    ##  [4] "seTroph"           "TrophObserved"     "TrophPredicted"   
-    ##  [7] "seTrophPredicted"  "a"                 "sd_log10a"        
-    ## [10] "b"                 "sd_b"              "prior_r"          
-    ## [13] "lcl_r"             "ucl_r"             "n_r"              
-    ## [16] "K"                 "SD_logK"           "Linf"             
-    ## [19] "SD_logLinf"        "Winf"              "ComDepthMin"      
-    ## [22] "ComDepthMax"       "ComDepMinObserved" "ComDepMaxObserved"
-    ## [25] "DepthMin"          "DepthMax"          "DepthMinEstimate" 
-    ## [28] "DepthMaxEstimate"  "PredPreyRatioMin"  "PredPreyRatioMax" 
-    ## [31] "AgeMin"            "AgeMax"            "TempPrefMin"      
-    ## [34] "TempPrefMean"      "TempPrefMax"       "KObserved"        
+    ##  [1] "Species"           "MaxLengthTL"       "TLObserved"       
+    ##  [4] "Troph"             "seTroph"           "TrophObserved"    
+    ##  [7] "TrophPredicted"    "seTrophPredicted"  "a"                
+    ## [10] "sd_log10a"         "b"                 "sd_b"             
+    ## [13] "prior_r"           "lcl_r"             "ucl_r"            
+    ## [16] "n_r"               "K"                 "SD_logK"          
+    ## [19] "Linf"              "SD_logLinf"        "Winf"             
+    ## [22] "ComDepthMin"       "ComDepthMax"       "ComDepMinObserved"
+    ## [25] "ComDepMaxObserved" "DepthMin"          "DepthMax"         
+    ## [28] "DepthMinEstimate"  "DepthMaxEstimate"  "PredPreyRatioMin" 
+    ## [31] "PredPreyRatioMax"  "AgeMin"            "AgeMax"           
+    ## [34] "TempPrefMin"       "TempPrefMean"      "TempPrefMax"      
+    ## [37] "MaxLengthSL"       "KObserved"        
     ## [1] "T_n_sum, Species field count"
     ## [1] 1
     ## [1] "finished T_n"
@@ -2176,110 +2175,102 @@ length(str_which(names(out),"Species"))
 summary(out)
 ```
 
-    ##                         Species   Number_brains    BodyWeight_brains 
-    ##  Acanthochromis polyacanthus: 1   Min.   : 1.000   Min.   :   0.167  
-    ##  Amblyraja radiata          : 1   1st Qu.: 1.000   1st Qu.:   8.719  
-    ##  Amphiprion ocellaris       : 1   Median : 1.900   Median :  95.750  
-    ##  Anabas testudineus         : 1   Mean   : 7.557   Mean   : 662.366  
-    ##  Anarrhichthys ocellatus    : 1   3rd Qu.: 2.750   3rd Qu.: 601.768  
-    ##  Archocentrus centrarchus   : 1   Max.   :75.500   Max.   :4353.598  
-    ##  (Other)                    :66   NA's   :58       NA's   :50        
-    ##  BrainWeight_brains EncCoeff_brains  EncIndex_brains    SL_brains     
-    ##  Min.   :   4.183   Min.   : 0.771   Min.   : 18.50   Min.   : 3.212  
-    ##  1st Qu.:  56.875   1st Qu.: 1.734   1st Qu.: 30.75   1st Qu.: 7.796  
-    ##  Median : 280.400   Median : 2.447   Median : 40.50   Median :17.568  
-    ##  Mean   : 532.398   Mean   : 6.650   Mean   : 56.26   Mean   :20.233  
-    ##  3rd Qu.: 459.081   3rd Qu.: 7.425   3rd Qu.: 73.66   3rd Qu.:21.208  
-    ##  Max.   :3120.000   Max.   :27.139   Max.   :126.00   Max.   :63.500  
-    ##  NA's   :50         NA's   :50       NA's   :65       NA's   :64      
-    ##    TL_brains     record_count_species_brains   range_area       
-    ##  Min.   : 9.70   Min.   :  1.000             Min.   :  2995431  
-    ##  1st Qu.:18.68   1st Qu.:  1.000             1st Qu.: 29715144  
-    ##  Median :22.60   Median :  1.000             Median : 53640249  
-    ##  Mean   :28.20   Mean   :  7.569             Mean   : 81545386  
-    ##  3rd Qu.:27.13   3rd Qu.:  2.000             3rd Qu.:117983522  
-    ##  Max.   :73.50   Max.   :323.000             Max.   :379087532  
-    ##  NA's   :65                                                     
-    ##  SupraLittoralZone_ecology Saltmarshes_ecology LittoralZone_ecology
-    ##  Min.   :0.00000           Min.   :0.00000     Min.   :0.00000     
-    ##  1st Qu.:0.00000           1st Qu.:0.00000     1st Qu.:0.00000     
-    ##  Median :0.00000           Median :0.00000     Median :0.00000     
-    ##  Mean   :0.01639           Mean   :0.01639     Mean   :0.01639     
-    ##  3rd Qu.:0.00000           3rd Qu.:0.00000     3rd Qu.:0.00000     
-    ##  Max.   :1.00000           Max.   :1.00000     Max.   :1.00000     
-    ##  NA's   :11                NA's   :11          NA's   :11          
-    ##  Caves_ecology     Oceanic_ecology  Epipelagic_ecology Mesopelagic_ecology
-    ##  Min.   :0.00000   Min.   :0.0000   Min.   :0.00000    Min.   :0.00000    
-    ##  1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.00000    1st Qu.:0.00000    
-    ##  Median :0.00000   Median :0.0000   Median :0.00000    Median :0.00000    
-    ##  Mean   :0.01639   Mean   :0.3443   Mean   :0.09836    Mean   :0.01639    
-    ##  3rd Qu.:0.00000   3rd Qu.:1.0000   3rd Qu.:0.00000    3rd Qu.:0.00000    
-    ##  Max.   :1.00000   Max.   :1.0000   Max.   :1.00000    Max.   :1.00000    
-    ##  NA's   :11        NA's   :11       NA's   :11         NA's   :11         
-    ##  Mangroves_ecology MarshesSwamps_ecology  Cave_ecology     Solitary_ecology 
-    ##  Min.   :0.00000   Min.   :0.00000       Min.   :0.00000   Min.   :0.00000  
-    ##  1st Qu.:0.00000   1st Qu.:0.00000       1st Qu.:0.00000   1st Qu.:0.00000  
-    ##  Median :0.00000   Median :0.00000       Median :0.00000   Median :0.00000  
-    ##  Mean   :0.08197   Mean   :0.08197       Mean   :0.03279   Mean   :0.01639  
-    ##  3rd Qu.:0.00000   3rd Qu.:0.00000       3rd Qu.:0.00000   3rd Qu.:0.00000  
-    ##  Max.   :1.00000   Max.   :1.00000       Max.   :1.00000   Max.   :1.00000  
-    ##  NA's   :11        NA's   :11            NA's   :11        NA's   :11       
-    ##  Shoaling_ecology  Benthic_ecology   Mobile_ecology    SoftBottom_ecology
-    ##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.0000    
-    ##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000    
-    ##  Median :0.00000   Median :0.00000   Median :0.00000   Median :0.0000    
-    ##  Mean   :0.01639   Mean   :0.01639   Mean   :0.01639   Mean   :0.1803    
-    ##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000    
-    ##  Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.0000    
-    ##  NA's   :11        NA's   :11        NA's   :11        NA's   :11        
-    ##   Sand_ecology      Mud_ecology      HardBottom_ecology Rocky_ecology   
-    ##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00000    Min.   :0.0000  
-    ##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000    1st Qu.:0.0000  
-    ##  Median :0.00000   Median :0.00000   Median :0.00000    Median :0.0000  
-    ##  Mean   :0.06557   Mean   :0.06557   Mean   :0.09836    Mean   :0.1311  
-    ##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000    3rd Qu.:0.0000  
-    ##  Max.   :1.00000   Max.   :1.00000   Max.   :1.00000    Max.   :1.0000  
-    ##  NA's   :11        NA's   :11        NA's   :11         NA's   :11      
-    ##  Rubble_ecology    Macrophyte_ecology SeaGrassBeds_ecology CoralReefs_ecology
-    ##  Min.   :0.00000   Min.   :0.00000    Min.   :0.00000      Min.   :0.0000    
-    ##  1st Qu.:0.00000   1st Qu.:0.00000    1st Qu.:0.00000      1st Qu.:0.0000    
-    ##  Median :0.00000   Median :0.00000    Median :0.00000      Median :0.0000    
-    ##  Mean   :0.01639   Mean   :0.01639    Mean   :0.09836      Mean   :0.1967    
-    ##  3rd Qu.:0.00000   3rd Qu.:0.00000    3rd Qu.:0.00000      3rd Qu.:0.0000    
-    ##  Max.   :1.00000   Max.   :1.00000    Max.   :1.00000      Max.   :1.0000    
-    ##  NA's   :11        NA's   :11         NA's   :11           NA's   :11        
-    ##  ReefFlats_ecology Lagoons_ecology   Burrows_ecology   Vegetation_ecology
-    ##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   
-    ##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   
-    ##  Median :0.00000   Median :0.00000   Median :0.00000   Median :0.00000   
-    ##  Mean   :0.01639   Mean   :0.01639   Mean   :0.03279   Mean   :0.04918   
-    ##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   
-    ##  Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   
-    ##  NA's   :11        NA's   :11        NA's   :11        NA's   :11        
-    ##  Stems_ecology     Neritic_ecology  Intertidal_ecology Hadopelagic_ecology
-    ##  Min.   :0.00000   Min.   :0.0000   Min.   :0.0000     Min.   :0.00000    
-    ##  1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.0000     1st Qu.:0.00000    
-    ##  Median :0.00000   Median :0.0000   Median :0.0000     Median :0.00000    
-    ##  Mean   :0.01639   Mean   :0.1905   Mean   :0.1587     Mean   :0.01587    
-    ##  3rd Qu.:0.00000   3rd Qu.:0.0000   3rd Qu.:0.0000     3rd Qu.:0.00000    
-    ##  Max.   :1.00000   Max.   :1.0000   Max.   :1.0000     Max.   :1.00000    
-    ##  NA's   :11        NA's   :9        NA's   :9          NA's   :9          
-    ##  Estuaries_ecology Stream_ecology   Lakes_ecology   Schooling_ecology
-    ##  Min.   :0.0000    Min.   :0.0000   Min.   :0.000   Min.   :0.00000  
-    ##  1st Qu.:0.0000    1st Qu.:0.0000   1st Qu.:0.000   1st Qu.:0.00000  
-    ##  Median :0.0000    Median :0.0000   Median :0.000   Median :0.00000  
-    ##  Mean   :0.3968    Mean   :0.4921   Mean   :0.381   Mean   :0.04762  
-    ##  3rd Qu.:1.0000    3rd Qu.:1.0000   3rd Qu.:1.000   3rd Qu.:0.00000  
-    ##  Max.   :1.0000    Max.   :1.0000   Max.   :1.000   Max.   :1.00000  
-    ##  NA's   :9         NA's   :9        NA's   :9       NA's   :9        
-    ##  TidePools_ecology SubLittoral_ecology Bathypelagic_ecology
-    ##  Min.   :0         Min.   :0           Min.   :0           
-    ##  1st Qu.:0         1st Qu.:0           1st Qu.:0           
-    ##  Median :0         Median :0           Median :0           
-    ##  Mean   :0         Mean   :0           Mean   :0           
-    ##  3rd Qu.:0         3rd Qu.:0           3rd Qu.:0           
-    ##  Max.   :0         Max.   :0           Max.   :0           
-    ##  NA's   :9         NA's   :9           NA's   :9           
+    ##                         Species   BodyWeight_brains  EncCoeff_brains 
+    ##  Acanthochromis polyacanthus: 1   Min.   :   0.167   Min.   : 0.771  
+    ##  Amblyraja radiata          : 1   1st Qu.:   8.719   1st Qu.: 1.734  
+    ##  Amphiprion ocellaris       : 1   Median :  95.750   Median : 2.447  
+    ##  Anabas testudineus         : 1   Mean   : 662.366   Mean   : 6.650  
+    ##  Anarrhichthys ocellatus    : 1   3rd Qu.: 601.768   3rd Qu.: 7.425  
+    ##  Archocentrus centrarchus   : 1   Max.   :4353.598   Max.   :27.139  
+    ##  (Other)                    :66   NA's   :50         NA's   :50      
+    ##  EncIndex_brains    SL_brains        TL_brains     record_count_species_brains
+    ##  Min.   : 18.50   Min.   : 3.212   Min.   : 9.70   Min.   :  1.000            
+    ##  1st Qu.: 30.75   1st Qu.: 7.796   1st Qu.:18.68   1st Qu.:  1.000            
+    ##  Median : 40.50   Median :17.568   Median :22.60   Median :  1.000            
+    ##  Mean   : 56.26   Mean   :20.233   Mean   :28.20   Mean   :  7.569            
+    ##  3rd Qu.: 73.66   3rd Qu.:21.208   3rd Qu.:27.13   3rd Qu.:  2.000            
+    ##  Max.   :126.00   Max.   :63.500   Max.   :73.50   Max.   :323.000            
+    ##  NA's   :65       NA's   :64       NA's   :65                                 
+    ##    range_area        SupraLittoralZone_ecology Saltmarshes_ecology
+    ##  Min.   :  2995431   Min.   :0.00000           Min.   :0.00000    
+    ##  1st Qu.: 29715144   1st Qu.:0.00000           1st Qu.:0.00000    
+    ##  Median : 53640249   Median :0.00000           Median :0.00000    
+    ##  Mean   : 81545386   Mean   :0.01639           Mean   :0.01639    
+    ##  3rd Qu.:117983522   3rd Qu.:0.00000           3rd Qu.:0.00000    
+    ##  Max.   :379087532   Max.   :1.00000           Max.   :1.00000    
+    ##                      NA's   :11                NA's   :11         
+    ##  LittoralZone_ecology Caves_ecology     Oceanic_ecology  Epipelagic_ecology
+    ##  Min.   :0.00000      Min.   :0.00000   Min.   :0.0000   Min.   :0.00000   
+    ##  1st Qu.:0.00000      1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.00000   
+    ##  Median :0.00000      Median :0.00000   Median :0.0000   Median :0.00000   
+    ##  Mean   :0.01639      Mean   :0.01639   Mean   :0.3443   Mean   :0.09836   
+    ##  3rd Qu.:0.00000      3rd Qu.:0.00000   3rd Qu.:1.0000   3rd Qu.:0.00000   
+    ##  Max.   :1.00000      Max.   :1.00000   Max.   :1.0000   Max.   :1.00000   
+    ##  NA's   :11           NA's   :11        NA's   :11       NA's   :11        
+    ##  Mesopelagic_ecology Mangroves_ecology MarshesSwamps_ecology  Cave_ecology    
+    ##  Min.   :0.00000     Min.   :0.00000   Min.   :0.00000       Min.   :0.00000  
+    ##  1st Qu.:0.00000     1st Qu.:0.00000   1st Qu.:0.00000       1st Qu.:0.00000  
+    ##  Median :0.00000     Median :0.00000   Median :0.00000       Median :0.00000  
+    ##  Mean   :0.01639     Mean   :0.08197   Mean   :0.08197       Mean   :0.03279  
+    ##  3rd Qu.:0.00000     3rd Qu.:0.00000   3rd Qu.:0.00000       3rd Qu.:0.00000  
+    ##  Max.   :1.00000     Max.   :1.00000   Max.   :1.00000       Max.   :1.00000  
+    ##  NA's   :11          NA's   :11        NA's   :11            NA's   :11       
+    ##  Solitary_ecology  Shoaling_ecology  Benthic_ecology   Mobile_ecology   
+    ##  Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   Min.   :0.00000  
+    ##  1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000  
+    ##  Median :0.00000   Median :0.00000   Median :0.00000   Median :0.00000  
+    ##  Mean   :0.01639   Mean   :0.01639   Mean   :0.01639   Mean   :0.01639  
+    ##  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+    ##  Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   Max.   :1.00000  
+    ##  NA's   :11        NA's   :11        NA's   :11        NA's   :11       
+    ##  SoftBottom_ecology  Sand_ecology      Mud_ecology      HardBottom_ecology
+    ##  Min.   :0.0000     Min.   :0.00000   Min.   :0.00000   Min.   :0.00000   
+    ##  1st Qu.:0.0000     1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000   
+    ##  Median :0.0000     Median :0.00000   Median :0.00000   Median :0.00000   
+    ##  Mean   :0.1803     Mean   :0.06557   Mean   :0.06557   Mean   :0.09836   
+    ##  3rd Qu.:0.0000     3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000   
+    ##  Max.   :1.0000     Max.   :1.00000   Max.   :1.00000   Max.   :1.00000   
+    ##  NA's   :11         NA's   :11        NA's   :11        NA's   :11        
+    ##  Rocky_ecology    Rubble_ecology    Macrophyte_ecology SeaGrassBeds_ecology
+    ##  Min.   :0.0000   Min.   :0.00000   Min.   :0.00000    Min.   :0.00000     
+    ##  1st Qu.:0.0000   1st Qu.:0.00000   1st Qu.:0.00000    1st Qu.:0.00000     
+    ##  Median :0.0000   Median :0.00000   Median :0.00000    Median :0.00000     
+    ##  Mean   :0.1311   Mean   :0.01639   Mean   :0.01639    Mean   :0.09836     
+    ##  3rd Qu.:0.0000   3rd Qu.:0.00000   3rd Qu.:0.00000    3rd Qu.:0.00000     
+    ##  Max.   :1.0000   Max.   :1.00000   Max.   :1.00000    Max.   :1.00000     
+    ##  NA's   :11       NA's   :11        NA's   :11         NA's   :11          
+    ##  CoralReefs_ecology ReefFlats_ecology Lagoons_ecology   Burrows_ecology  
+    ##  Min.   :0.0000     Min.   :0.00000   Min.   :0.00000   Min.   :0.00000  
+    ##  1st Qu.:0.0000     1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.00000  
+    ##  Median :0.0000     Median :0.00000   Median :0.00000   Median :0.00000  
+    ##  Mean   :0.1967     Mean   :0.01639   Mean   :0.01639   Mean   :0.03279  
+    ##  3rd Qu.:0.0000     3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.00000  
+    ##  Max.   :1.0000     Max.   :1.00000   Max.   :1.00000   Max.   :1.00000  
+    ##  NA's   :11         NA's   :11        NA's   :11        NA's   :11       
+    ##  Vegetation_ecology Stems_ecology     Neritic_ecology  Intertidal_ecology
+    ##  Min.   :0.00000    Min.   :0.00000   Min.   :0.0000   Min.   :0.0000    
+    ##  1st Qu.:0.00000    1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.0000    
+    ##  Median :0.00000    Median :0.00000   Median :0.0000   Median :0.0000    
+    ##  Mean   :0.04918    Mean   :0.01639   Mean   :0.1905   Mean   :0.1587    
+    ##  3rd Qu.:0.00000    3rd Qu.:0.00000   3rd Qu.:0.0000   3rd Qu.:0.0000    
+    ##  Max.   :1.00000    Max.   :1.00000   Max.   :1.0000   Max.   :1.0000    
+    ##  NA's   :11         NA's   :11        NA's   :9        NA's   :9         
+    ##  Hadopelagic_ecology Estuaries_ecology Stream_ecology   Lakes_ecology  
+    ##  Min.   :0.00000     Min.   :0.0000    Min.   :0.0000   Min.   :0.000  
+    ##  1st Qu.:0.00000     1st Qu.:0.0000    1st Qu.:0.0000   1st Qu.:0.000  
+    ##  Median :0.00000     Median :0.0000    Median :0.0000   Median :0.000  
+    ##  Mean   :0.01587     Mean   :0.3968    Mean   :0.4921   Mean   :0.381  
+    ##  3rd Qu.:0.00000     3rd Qu.:1.0000    3rd Qu.:1.0000   3rd Qu.:1.000  
+    ##  Max.   :1.00000     Max.   :1.0000    Max.   :1.0000   Max.   :1.000  
+    ##  NA's   :9           NA's   :9         NA's   :9        NA's   :9      
+    ##  Schooling_ecology TidePools_ecology SubLittoral_ecology Bathypelagic_ecology
+    ##  Min.   :0.00000   Min.   :0         Min.   :0           Min.   :0           
+    ##  1st Qu.:0.00000   1st Qu.:0         1st Qu.:0           1st Qu.:0           
+    ##  Median :0.00000   Median :0         Median :0           Median :0           
+    ##  Mean   :0.04762   Mean   :0         Mean   :0           Mean   :0           
+    ##  3rd Qu.:0.00000   3rd Qu.:0         3rd Qu.:0           3rd Qu.:0           
+    ##  Max.   :1.00000   Max.   :0         Max.   :0           Max.   :0           
+    ##  NA's   :9         NA's   :9         NA's   :9           NA's   :9           
     ##  Abyssopelagic_ecology CaveAnchialine_ecology DietTroph_ecology
     ##  Min.   :0             Min.   :0              Min.   :2.000    
     ##  1st Qu.:0             1st Qu.:0              1st Qu.:2.882    
@@ -2472,144 +2463,46 @@ summary(out)
     ##                                                                               
     ##                                                                               
     ##                                                                               
-    ##  record_count_species_distribution TLObserved_estimate Troph_estimate 
-    ##  Min.   : 1.00                     Min.   :0           Min.   :2.000  
-    ##  1st Qu.: 1.00                     1st Qu.:0           1st Qu.:2.890  
-    ##  Median : 2.00                     Median :0           Median :3.240  
-    ##  Mean   : 4.75                     Mean   :0           Mean   :3.255  
-    ##  3rd Qu.: 5.00                     3rd Qu.:0           3rd Qu.:3.705  
-    ##  Max.   :42.00                     Max.   :0           Max.   :4.660  
-    ##                                                                       
-    ##  seTroph_estimate TrophObserved_estimate   a_estimate        sd_log10a_estimate
-    ##  Min.   :0.0000   Min.   :0              Min.   :0.0006457   Min.   :0.0247    
-    ##  1st Qu.:0.2097   1st Qu.:0              1st Qu.:0.0057544   1st Qu.:0.0929    
-    ##  Median :0.3550   Median :0              Median :0.0093325   Median :0.1260    
-    ##  Mean   :0.3413   Mean   :0              Mean   :0.0104698   Mean   :0.1280    
-    ##  3rd Qu.:0.4500   3rd Qu.:0              3rd Qu.:0.0144544   3rd Qu.:0.1730    
-    ##  Max.   :0.7800   Max.   :0              Max.   :0.0275423   Max.   :0.2160    
-    ##                                          NA's   :3           NA's   :3         
-    ##    b_estimate    sd_b_estimate     prior_r_estimate lcl_r_estimate  
-    ##  Min.   :2.830   Min.   :0.01530   Min.   :0.2822   Min.   :0.1635  
-    ##  1st Qu.:2.990   1st Qu.:0.06270   1st Qu.:0.2937   1st Qu.:0.1881  
-    ##  Median :3.040   Median :0.08140   Median :0.4869   Median :0.3213  
-    ##  Mean   :3.043   Mean   :0.07364   Mean   :0.4467   Mean   :0.2891  
-    ##  3rd Qu.:3.100   3rd Qu.:0.09310   3rd Qu.:0.5695   3rd Qu.:0.3759  
-    ##  Max.   :3.210   Max.   :0.11800   Max.   :0.5914   Max.   :0.3903  
-    ##  NA's   :3       NA's   :3         NA's   :64       NA's   :64      
-    ##  ucl_r_estimate    n_r_estimate     K_estimate     Winf_estimate    
-    ##  Min.   :0.4462   Min.   : 1.00   Min.   :0.0600   Min.   :    0.7  
-    ##  1st Qu.:0.4874   1st Qu.: 3.75   1st Qu.:0.1850   1st Qu.:  609.0  
-    ##  Median :0.7303   Median : 6.00   Median :0.4450   Median : 2242.5  
-    ##  Mean   :0.6861   Mean   :15.12   Mean   :0.6026   Mean   :10136.1  
-    ##  3rd Qu.:0.8542   3rd Qu.:19.75   3rd Qu.:0.7400   3rd Qu.: 8416.5  
-    ##  Max.   :0.8871   Max.   :48.00   Max.   :2.5700   Max.   :60447.4  
-    ##  NA's   :64       NA's   :64      NA's   :10       NA's   :46       
-    ##  ComDepthMin_estimate ComDepthMax_estimate ComDepMinObserved_estimate
-    ##  Min.   :  0.00       Min.   :  3.00       Min.   :0                 
-    ##  1st Qu.:  2.00       1st Qu.: 15.00       1st Qu.:0                 
-    ##  Median :  6.00       Median : 26.00       Median :0                 
-    ##  Mean   : 17.52       Mean   : 70.97       Mean   :0                 
-    ##  3rd Qu.: 18.00       3rd Qu.: 89.25       3rd Qu.:0                 
-    ##  Max.   :150.00       Max.   :440.00       Max.   :0                 
-    ##  NA's   :39           NA's   :38                                     
-    ##  ComDepMaxObserved_estimate DepthMin_estimate DepthMax_estimate
-    ##  Min.   :0                  Min.   : 0.000    Min.   :   4     
-    ##  1st Qu.:0                  1st Qu.: 0.000    1st Qu.:  30     
-    ##  Median :0                  Median : 1.000    Median :  50     
-    ##  Mean   :0                  Mean   : 2.048    Mean   : 181     
-    ##  3rd Qu.:0                  3rd Qu.: 1.000    3rd Qu.: 200     
-    ##  Max.   :0                  Max.   :15.000    Max.   :1540     
-    ##                             NA's   :30        NA's   :38       
-    ##  DepthMinEstimate_estimate DepthMaxEstimate_estimate PredPreyRatioMin_estimate
-    ##  Min.   :0                 Min.   :0                 Min.   :  1.920          
-    ##  1st Qu.:0                 1st Qu.:0                 1st Qu.:  4.602          
-    ##  Median :0                 Median :0                 Median :  7.065          
-    ##  Mean   :0                 Mean   :0                 Mean   : 18.581          
-    ##  3rd Qu.:0                 3rd Qu.:0                 3rd Qu.: 11.004          
-    ##  Max.   :0                 Max.   :0                 Max.   :143.670          
-    ##                                                                               
-    ##  PredPreyRatioMax_estimate AgeMin_estimate   AgeMax_estimate 
-    ##  Min.   :   3.819          Min.   :0.01751   Min.   : 0.220  
-    ##  1st Qu.: 106.813          1st Qu.:0.46518   1st Qu.: 4.985  
-    ##  Median : 430.254          Median :1.03007   Median :12.400  
-    ##  Mean   :1210.586          Mean   :1.08635   Mean   :14.534  
-    ##  3rd Qu.:1000.514          3rd Qu.:1.39662   3rd Qu.:25.000  
-    ##  Max.   :7174.060          Max.   :3.49000   Max.   :41.000  
-    ##                            NA's   :40        NA's   :45      
-    ##  TempPrefMin_estimate TempPrefMean_estimate TempPrefMax_estimate
-    ##  Min.   :-1.70        Min.   :-0.60         Min.   : 2.40       
-    ##  1st Qu.: 6.45        1st Qu.: 9.15         1st Qu.:13.50       
-    ##  Median :13.50        Median :19.00         Median :23.70       
-    ##  Mean   :13.58        Mean   :18.02         Mean   :21.27       
-    ##  3rd Qu.:22.50        3rd Qu.:27.50         3rd Qu.:28.95       
-    ##  Max.   :28.30        Max.   :28.80         Max.   :29.30       
-    ##  NA's   :45           NA's   :45            NA's   :45          
-    ##  KObserved_estimate record_count_species_estimate
-    ##  Min.   :0          Min.   :1                    
-    ##  1st Qu.:0          1st Qu.:1                    
-    ##  Median :0          Median :1                    
-    ##  Mean   :0          Mean   :1                    
-    ##  3rd Qu.:0          3rd Qu.:1                    
-    ##  Max.   :0          Max.   :1                    
-    ## 
-
-``` r
-names(out)[str_which(names(out),table_name)]
-```
-
-    ##  [1] "TLObserved_estimate"           "Troph_estimate"               
-    ##  [3] "seTroph_estimate"              "TrophObserved_estimate"       
-    ##  [5] "a_estimate"                    "sd_log10a_estimate"           
-    ##  [7] "b_estimate"                    "sd_b_estimate"                
-    ##  [9] "prior_r_estimate"              "lcl_r_estimate"               
-    ## [11] "ucl_r_estimate"                "n_r_estimate"                 
-    ## [13] "K_estimate"                    "Winf_estimate"                
-    ## [15] "ComDepthMin_estimate"          "ComDepthMax_estimate"         
-    ## [17] "ComDepMinObserved_estimate"    "ComDepMaxObserved_estimate"   
-    ## [19] "DepthMin_estimate"             "DepthMax_estimate"            
-    ## [21] "DepthMinEstimate_estimate"     "DepthMaxEstimate_estimate"    
-    ## [23] "PredPreyRatioMin_estimate"     "PredPreyRatioMax_estimate"    
-    ## [25] "AgeMin_estimate"               "AgeMax_estimate"              
-    ## [27] "TempPrefMin_estimate"          "TempPrefMean_estimate"        
-    ## [29] "TempPrefMax_estimate"          "KObserved_estimate"           
-    ## [31] "record_count_species_estimate"
-
-``` r
-summary(out[,str_which(names(out),table_name)])
-```
-
-    ##  TLObserved_estimate Troph_estimate  seTroph_estimate TrophObserved_estimate
-    ##  Min.   :0           Min.   :2.000   Min.   :0.0000   Min.   :0             
-    ##  1st Qu.:0           1st Qu.:2.890   1st Qu.:0.2097   1st Qu.:0             
-    ##  Median :0           Median :3.240   Median :0.3550   Median :0             
-    ##  Mean   :0           Mean   :3.255   Mean   :0.3413   Mean   :0             
-    ##  3rd Qu.:0           3rd Qu.:3.705   3rd Qu.:0.4500   3rd Qu.:0             
-    ##  Max.   :0           Max.   :4.660   Max.   :0.7800   Max.   :0             
-    ##                                                                             
-    ##    a_estimate        sd_log10a_estimate   b_estimate    sd_b_estimate    
-    ##  Min.   :0.0006457   Min.   :0.0247     Min.   :2.830   Min.   :0.01530  
-    ##  1st Qu.:0.0057544   1st Qu.:0.0929     1st Qu.:2.990   1st Qu.:0.06270  
-    ##  Median :0.0093325   Median :0.1260     Median :3.040   Median :0.08140  
-    ##  Mean   :0.0104698   Mean   :0.1280     Mean   :3.043   Mean   :0.07364  
-    ##  3rd Qu.:0.0144544   3rd Qu.:0.1730     3rd Qu.:3.100   3rd Qu.:0.09310  
-    ##  Max.   :0.0275423   Max.   :0.2160     Max.   :3.210   Max.   :0.11800  
-    ##  NA's   :3           NA's   :3          NA's   :3       NA's   :3        
-    ##  prior_r_estimate lcl_r_estimate   ucl_r_estimate    n_r_estimate  
-    ##  Min.   :0.2822   Min.   :0.1635   Min.   :0.4462   Min.   : 1.00  
-    ##  1st Qu.:0.2937   1st Qu.:0.1881   1st Qu.:0.4874   1st Qu.: 3.75  
-    ##  Median :0.4869   Median :0.3213   Median :0.7303   Median : 6.00  
-    ##  Mean   :0.4467   Mean   :0.2891   Mean   :0.6861   Mean   :15.12  
-    ##  3rd Qu.:0.5695   3rd Qu.:0.3759   3rd Qu.:0.8542   3rd Qu.:19.75  
-    ##  Max.   :0.5914   Max.   :0.3903   Max.   :0.8871   Max.   :48.00  
-    ##  NA's   :64       NA's   :64       NA's   :64       NA's   :64     
-    ##    K_estimate     Winf_estimate     ComDepthMin_estimate ComDepthMax_estimate
-    ##  Min.   :0.0600   Min.   :    0.7   Min.   :  0.00       Min.   :  3.00      
-    ##  1st Qu.:0.1850   1st Qu.:  609.0   1st Qu.:  2.00       1st Qu.: 15.00      
-    ##  Median :0.4450   Median : 2242.5   Median :  6.00       Median : 26.00      
-    ##  Mean   :0.6026   Mean   :10136.1   Mean   : 17.52       Mean   : 70.97      
-    ##  3rd Qu.:0.7400   3rd Qu.: 8416.5   3rd Qu.: 18.00       3rd Qu.: 89.25      
-    ##  Max.   :2.5700   Max.   :60447.4   Max.   :150.00       Max.   :440.00      
-    ##  NA's   :10       NA's   :46        NA's   :39           NA's   :38          
+    ##  record_count_species_distribution MaxLengthTL_estimate TLObserved_estimate
+    ##  Min.   : 1.00                     Min.   :  4.00       Min.   :0          
+    ##  1st Qu.: 1.00                     1st Qu.: 11.00       1st Qu.:0          
+    ##  Median : 2.00                     Median : 29.75       Median :0          
+    ##  Mean   : 4.75                     Mean   : 62.65       Mean   :0          
+    ##  3rd Qu.: 5.00                     3rd Qu.: 93.25       3rd Qu.:0          
+    ##  Max.   :42.00                     Max.   :305.00       Max.   :0          
+    ##                                                                            
+    ##  Troph_estimate  seTroph_estimate TrophObserved_estimate   a_estimate       
+    ##  Min.   :2.000   Min.   :0.0000   Min.   :0              Min.   :0.0006457  
+    ##  1st Qu.:2.890   1st Qu.:0.2097   1st Qu.:0              1st Qu.:0.0057544  
+    ##  Median :3.240   Median :0.3550   Median :0              Median :0.0093325  
+    ##  Mean   :3.255   Mean   :0.3413   Mean   :0              Mean   :0.0104698  
+    ##  3rd Qu.:3.705   3rd Qu.:0.4500   3rd Qu.:0              3rd Qu.:0.0144544  
+    ##  Max.   :4.660   Max.   :0.7800   Max.   :0              Max.   :0.0275423  
+    ##                                                          NA's   :3          
+    ##  sd_log10a_estimate   b_estimate    sd_b_estimate     prior_r_estimate
+    ##  Min.   :0.0247     Min.   :2.830   Min.   :0.01530   Min.   :0.2822  
+    ##  1st Qu.:0.0929     1st Qu.:2.990   1st Qu.:0.06270   1st Qu.:0.2937  
+    ##  Median :0.1260     Median :3.040   Median :0.08140   Median :0.4869  
+    ##  Mean   :0.1280     Mean   :3.043   Mean   :0.07364   Mean   :0.4467  
+    ##  3rd Qu.:0.1730     3rd Qu.:3.100   3rd Qu.:0.09310   3rd Qu.:0.5695  
+    ##  Max.   :0.2160     Max.   :3.210   Max.   :0.11800   Max.   :0.5914  
+    ##  NA's   :3          NA's   :3       NA's   :3         NA's   :64      
+    ##  lcl_r_estimate   ucl_r_estimate    n_r_estimate     K_estimate    
+    ##  Min.   :0.1635   Min.   :0.4462   Min.   : 1.00   Min.   :0.0600  
+    ##  1st Qu.:0.1881   1st Qu.:0.4874   1st Qu.: 3.75   1st Qu.:0.1850  
+    ##  Median :0.3213   Median :0.7303   Median : 6.00   Median :0.4450  
+    ##  Mean   :0.2891   Mean   :0.6861   Mean   :15.12   Mean   :0.6026  
+    ##  3rd Qu.:0.3759   3rd Qu.:0.8542   3rd Qu.:19.75   3rd Qu.:0.7400  
+    ##  Max.   :0.3903   Max.   :0.8871   Max.   :48.00   Max.   :2.5700  
+    ##  NA's   :64       NA's   :64       NA's   :64      NA's   :10      
+    ##  Winf_estimate     ComDepthMin_estimate ComDepthMax_estimate
+    ##  Min.   :    0.7   Min.   :  0.00       Min.   :  3.00      
+    ##  1st Qu.:  609.0   1st Qu.:  2.00       1st Qu.: 15.00      
+    ##  Median : 2242.5   Median :  6.00       Median : 26.00      
+    ##  Mean   :10136.1   Mean   : 17.52       Mean   : 70.97      
+    ##  3rd Qu.: 8416.5   3rd Qu.: 18.00       3rd Qu.: 89.25      
+    ##  Max.   :60447.4   Max.   :150.00       Max.   :440.00      
+    ##  NA's   :46        NA's   :39           NA's   :38          
     ##  ComDepMinObserved_estimate ComDepMaxObserved_estimate DepthMin_estimate
     ##  Min.   :0                  Min.   :0                  Min.   : 0.000   
     ##  1st Qu.:0                  1st Qu.:0                  1st Qu.: 0.000   
@@ -2642,14 +2535,129 @@ summary(out[,str_which(names(out),table_name)])
     ##  3rd Qu.:25.000   3rd Qu.:22.50        3rd Qu.:27.50        
     ##  Max.   :41.000   Max.   :28.30        Max.   :28.80        
     ##  NA's   :45       NA's   :45           NA's   :45           
-    ##  TempPrefMax_estimate KObserved_estimate record_count_species_estimate
-    ##  Min.   : 2.40        Min.   :0          Min.   :1                    
-    ##  1st Qu.:13.50        1st Qu.:0          1st Qu.:1                    
-    ##  Median :23.70        Median :0          Median :1                    
-    ##  Mean   :21.27        Mean   :0          Mean   :1                    
-    ##  3rd Qu.:28.95        3rd Qu.:0          3rd Qu.:1                    
-    ##  Max.   :29.30        Max.   :0          Max.   :1                    
-    ##  NA's   :45
+    ##  TempPrefMax_estimate MaxLengthSL_estimate KObserved_estimate
+    ##  Min.   : 2.40        Min.   :  3.280      Min.   :0         
+    ##  1st Qu.:13.50        1st Qu.:  8.815      1st Qu.:0         
+    ##  Median :23.70        Median : 24.135      Median :0         
+    ##  Mean   :21.27        Mean   : 52.217      Mean   :0         
+    ##  3rd Qu.:28.95        3rd Qu.: 78.885      3rd Qu.:0         
+    ##  Max.   :29.30        Max.   :250.000      Max.   :0         
+    ##  NA's   :45                                                  
+    ##  record_count_species_estimate
+    ##  Min.   :1                    
+    ##  1st Qu.:1                    
+    ##  Median :1                    
+    ##  Mean   :1                    
+    ##  3rd Qu.:1                    
+    ##  Max.   :1                    
+    ## 
+
+``` r
+names(out)[str_which(names(out),table_name)]
+```
+
+    ##  [1] "MaxLengthTL_estimate"          "TLObserved_estimate"          
+    ##  [3] "Troph_estimate"                "seTroph_estimate"             
+    ##  [5] "TrophObserved_estimate"        "a_estimate"                   
+    ##  [7] "sd_log10a_estimate"            "b_estimate"                   
+    ##  [9] "sd_b_estimate"                 "prior_r_estimate"             
+    ## [11] "lcl_r_estimate"                "ucl_r_estimate"               
+    ## [13] "n_r_estimate"                  "K_estimate"                   
+    ## [15] "Winf_estimate"                 "ComDepthMin_estimate"         
+    ## [17] "ComDepthMax_estimate"          "ComDepMinObserved_estimate"   
+    ## [19] "ComDepMaxObserved_estimate"    "DepthMin_estimate"            
+    ## [21] "DepthMax_estimate"             "DepthMinEstimate_estimate"    
+    ## [23] "DepthMaxEstimate_estimate"     "PredPreyRatioMin_estimate"    
+    ## [25] "PredPreyRatioMax_estimate"     "AgeMin_estimate"              
+    ## [27] "AgeMax_estimate"               "TempPrefMin_estimate"         
+    ## [29] "TempPrefMean_estimate"         "TempPrefMax_estimate"         
+    ## [31] "MaxLengthSL_estimate"          "KObserved_estimate"           
+    ## [33] "record_count_species_estimate"
+
+``` r
+summary(out[,str_which(names(out),table_name)])
+```
+
+    ##  MaxLengthTL_estimate TLObserved_estimate Troph_estimate  seTroph_estimate
+    ##  Min.   :  4.00       Min.   :0           Min.   :2.000   Min.   :0.0000  
+    ##  1st Qu.: 11.00       1st Qu.:0           1st Qu.:2.890   1st Qu.:0.2097  
+    ##  Median : 29.75       Median :0           Median :3.240   Median :0.3550  
+    ##  Mean   : 62.65       Mean   :0           Mean   :3.255   Mean   :0.3413  
+    ##  3rd Qu.: 93.25       3rd Qu.:0           3rd Qu.:3.705   3rd Qu.:0.4500  
+    ##  Max.   :305.00       Max.   :0           Max.   :4.660   Max.   :0.7800  
+    ##                                                                           
+    ##  TrophObserved_estimate   a_estimate        sd_log10a_estimate   b_estimate   
+    ##  Min.   :0              Min.   :0.0006457   Min.   :0.0247     Min.   :2.830  
+    ##  1st Qu.:0              1st Qu.:0.0057544   1st Qu.:0.0929     1st Qu.:2.990  
+    ##  Median :0              Median :0.0093325   Median :0.1260     Median :3.040  
+    ##  Mean   :0              Mean   :0.0104698   Mean   :0.1280     Mean   :3.043  
+    ##  3rd Qu.:0              3rd Qu.:0.0144544   3rd Qu.:0.1730     3rd Qu.:3.100  
+    ##  Max.   :0              Max.   :0.0275423   Max.   :0.2160     Max.   :3.210  
+    ##                         NA's   :3           NA's   :3          NA's   :3      
+    ##  sd_b_estimate     prior_r_estimate lcl_r_estimate   ucl_r_estimate  
+    ##  Min.   :0.01530   Min.   :0.2822   Min.   :0.1635   Min.   :0.4462  
+    ##  1st Qu.:0.06270   1st Qu.:0.2937   1st Qu.:0.1881   1st Qu.:0.4874  
+    ##  Median :0.08140   Median :0.4869   Median :0.3213   Median :0.7303  
+    ##  Mean   :0.07364   Mean   :0.4467   Mean   :0.2891   Mean   :0.6861  
+    ##  3rd Qu.:0.09310   3rd Qu.:0.5695   3rd Qu.:0.3759   3rd Qu.:0.8542  
+    ##  Max.   :0.11800   Max.   :0.5914   Max.   :0.3903   Max.   :0.8871  
+    ##  NA's   :3         NA's   :64       NA's   :64       NA's   :64      
+    ##   n_r_estimate     K_estimate     Winf_estimate     ComDepthMin_estimate
+    ##  Min.   : 1.00   Min.   :0.0600   Min.   :    0.7   Min.   :  0.00      
+    ##  1st Qu.: 3.75   1st Qu.:0.1850   1st Qu.:  609.0   1st Qu.:  2.00      
+    ##  Median : 6.00   Median :0.4450   Median : 2242.5   Median :  6.00      
+    ##  Mean   :15.12   Mean   :0.6026   Mean   :10136.1   Mean   : 17.52      
+    ##  3rd Qu.:19.75   3rd Qu.:0.7400   3rd Qu.: 8416.5   3rd Qu.: 18.00      
+    ##  Max.   :48.00   Max.   :2.5700   Max.   :60447.4   Max.   :150.00      
+    ##  NA's   :64      NA's   :10       NA's   :46        NA's   :39          
+    ##  ComDepthMax_estimate ComDepMinObserved_estimate ComDepMaxObserved_estimate
+    ##  Min.   :  3.00       Min.   :0                  Min.   :0                 
+    ##  1st Qu.: 15.00       1st Qu.:0                  1st Qu.:0                 
+    ##  Median : 26.00       Median :0                  Median :0                 
+    ##  Mean   : 70.97       Mean   :0                  Mean   :0                 
+    ##  3rd Qu.: 89.25       3rd Qu.:0                  3rd Qu.:0                 
+    ##  Max.   :440.00       Max.   :0                  Max.   :0                 
+    ##  NA's   :38                                                                
+    ##  DepthMin_estimate DepthMax_estimate DepthMinEstimate_estimate
+    ##  Min.   : 0.000    Min.   :   4      Min.   :0                
+    ##  1st Qu.: 0.000    1st Qu.:  30      1st Qu.:0                
+    ##  Median : 1.000    Median :  50      Median :0                
+    ##  Mean   : 2.048    Mean   : 181      Mean   :0                
+    ##  3rd Qu.: 1.000    3rd Qu.: 200      3rd Qu.:0                
+    ##  Max.   :15.000    Max.   :1540      Max.   :0                
+    ##  NA's   :30        NA's   :38                                 
+    ##  DepthMaxEstimate_estimate PredPreyRatioMin_estimate PredPreyRatioMax_estimate
+    ##  Min.   :0                 Min.   :  1.920           Min.   :   3.819         
+    ##  1st Qu.:0                 1st Qu.:  4.602           1st Qu.: 106.813         
+    ##  Median :0                 Median :  7.065           Median : 430.254         
+    ##  Mean   :0                 Mean   : 18.581           Mean   :1210.586         
+    ##  3rd Qu.:0                 3rd Qu.: 11.004           3rd Qu.:1000.514         
+    ##  Max.   :0                 Max.   :143.670           Max.   :7174.060         
+    ##                                                                               
+    ##  AgeMin_estimate   AgeMax_estimate  TempPrefMin_estimate TempPrefMean_estimate
+    ##  Min.   :0.01751   Min.   : 0.220   Min.   :-1.70        Min.   :-0.60        
+    ##  1st Qu.:0.46518   1st Qu.: 4.985   1st Qu.: 6.45        1st Qu.: 9.15        
+    ##  Median :1.03007   Median :12.400   Median :13.50        Median :19.00        
+    ##  Mean   :1.08635   Mean   :14.534   Mean   :13.58        Mean   :18.02        
+    ##  3rd Qu.:1.39662   3rd Qu.:25.000   3rd Qu.:22.50        3rd Qu.:27.50        
+    ##  Max.   :3.49000   Max.   :41.000   Max.   :28.30        Max.   :28.80        
+    ##  NA's   :40        NA's   :45       NA's   :45           NA's   :45           
+    ##  TempPrefMax_estimate MaxLengthSL_estimate KObserved_estimate
+    ##  Min.   : 2.40        Min.   :  3.280      Min.   :0         
+    ##  1st Qu.:13.50        1st Qu.:  8.815      1st Qu.:0         
+    ##  Median :23.70        Median : 24.135      Median :0         
+    ##  Mean   :21.27        Mean   : 52.217      Mean   :0         
+    ##  3rd Qu.:28.95        3rd Qu.: 78.885      3rd Qu.:0         
+    ##  Max.   :29.30        Max.   :250.000      Max.   :0         
+    ##  NA's   :45                                                  
+    ##  record_count_species_estimate
+    ##  Min.   :1                    
+    ##  1st Qu.:1                    
+    ##  Median :1                    
+    ##  Mean   :1                    
+    ##  3rd Qu.:1                    
+    ##  Max.   :1                    
+    ## 
 
 \#\#faoareas, seems to be redundant to
     countrysub?
@@ -2718,25 +2726,17 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ## [16] "FecComment"        "Modified"          "AddInfos"         
     ## [19] "Datemodified"      "SpecCode"          "StockCode"        
     ## [22] "C_Code"            "E_CODE"            "Locality"         
-    ## [25] "r2"                "Locality"          "FecundityType"    
-    ## [28] "LengthFecunMin"    "LengthTypeFecMin"  "LengthFecunMax"   
-    ## [31] "LengthTypeFecMax"  "LengthFecunMean"   "LengthTypeFecMean"
-    ## [34] "LengthMin"         "LengthMax"         "LengthType"       
-    ## [37] "LengthTypeFecMin"  "LengthTypeFecMax"  "LengthTypeFecMean"
-    ## [40] "FecundityType"     "LengthType"        "LengthFecunMin"   
-    ## [43] "LengthTypeFecMin"  "LengthFecunMax"    "LengthTypeFecMax" 
-    ## [46] "LengthFecunMean"   "LengthTypeFecMean" "LengthMin"        
-    ## [49] "LengthMax"         "LengthType"        "LengthFecunMin"   
-    ## [52] "LengthTypeFecMin"  "LengthFecunMax"    "LengthTypeFecMax" 
-    ## [55] "LengthFecunMean"   "LengthTypeFecMean" "LengthMin"        
-    ## [58] "LengthMax"         "LengthType"       
+    ## [25] "r2"                "Number"            "Locality"         
+    ## [28] "FecundityType"     "LengthTypeFecMin"  "LengthTypeFecMax" 
+    ## [31] "LengthTypeFecMean" "FecundityType"     "LengthType"       
     ## [1] "kept fields"
-    ##  [1] "Species"          "FecundityMin"     "WeightMin"        "FecundityMax"    
-    ##  [5] "WeightMax"        "FecundityMean"    "WeightMean"       "RelFecundityMin" 
-    ##  [9] "RelFecundityMean" "RelFecundityMax"  "Number"           "a"               
-    ## [13] "b"                "SEa"              "SEb"              "SDa"             
-    ## [17] "SDb"              "LCLa"             "UCLa"             "LCLb"            
-    ## [21] "UCLb"             "SpawningCycles"  
+    ##  [1] "Species"          "FecundityMin"     "WeightMin"        "LengthFecunMin"  
+    ##  [5] "FecundityMax"     "WeightMax"        "LengthFecunMax"   "FecundityMean"   
+    ##  [9] "WeightMean"       "LengthFecunMean"  "RelFecundityMin"  "RelFecundityMean"
+    ## [13] "RelFecundityMax"  "LengthMin"        "LengthMax"        "a"               
+    ## [17] "b"                "SEa"              "SEb"              "SDa"             
+    ## [21] "SDb"              "LCLa"             "UCLa"             "LCLb"            
+    ## [25] "UCLb"             "SpawningCycles"  
     ## [1] "T_n_sum, Species field count"
     ## [1] 1
     ## [1] "finished T_n"
@@ -2780,44 +2780,53 @@ names(out)[str_which(names(out),table_name)]
 ```
 
     ##  [1] "FecundityMin_fecundity"         "WeightMin_fecundity"           
-    ##  [3] "FecundityMax_fecundity"         "WeightMax_fecundity"           
-    ##  [5] "FecundityMean_fecundity"        "RelFecundityMin_fecundity"     
-    ##  [7] "RelFecundityMean_fecundity"     "RelFecundityMax_fecundity"     
-    ##  [9] "Number_fecundity"               "a_fecundity"                   
-    ## [11] "b_fecundity"                    "SEa_fecundity"                 
-    ## [13] "SEb_fecundity"                  "LCLa_fecundity"                
-    ## [15] "UCLa_fecundity"                 "LCLb_fecundity"                
-    ## [17] "UCLb_fecundity"                 "SpawningCycles_fecundity"      
-    ## [19] "record_count_species_fecundity"
+    ##  [3] "LengthFecunMin_fecundity"       "FecundityMax_fecundity"        
+    ##  [5] "WeightMax_fecundity"            "LengthFecunMax_fecundity"      
+    ##  [7] "FecundityMean_fecundity"        "RelFecundityMin_fecundity"     
+    ##  [9] "RelFecundityMean_fecundity"     "RelFecundityMax_fecundity"     
+    ## [11] "LengthMin_fecundity"            "LengthMax_fecundity"           
+    ## [13] "a_fecundity"                    "b_fecundity"                   
+    ## [15] "SEa_fecundity"                  "SEb_fecundity"                 
+    ## [17] "LCLa_fecundity"                 "UCLa_fecundity"                
+    ## [19] "LCLb_fecundity"                 "UCLb_fecundity"                
+    ## [21] "SpawningCycles_fecundity"       "record_count_species_fecundity"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
 ```
 
-    ##  FecundityMin_fecundity WeightMin_fecundity FecundityMax_fecundity
-    ##  Min.   :       7       Min.   :    42.38   Min.   :      20      
-    ##  1st Qu.:     200       1st Qu.:   575.46   1st Qu.:     360      
-    ##  Median :     600       Median :  2350.91   Median :    2673      
-    ##  Mean   :  842575       Mean   : 18320.44   Mean   : 3134143      
-    ##  3rd Qu.:   17000       3rd Qu.:  3933.85   3rd Qu.:   81251      
-    ##  Max.   :15300000       Max.   :100733.33   Max.   :47700000      
-    ##  NA's   :39             NA's   :66          NA's   :42            
-    ##  WeightMax_fecundity FecundityMean_fecundity RelFecundityMin_fecundity
-    ##  Min.   :  165       Min.   :458             Min.   :   2.00          
-    ##  1st Qu.:  500       1st Qu.:458             1st Qu.:  17.75          
-    ##  Median : 3548       Median :458             Median : 229.68          
-    ##  Mean   : 4720       Mean   :458             Mean   : 454.12          
-    ##  3rd Qu.: 4383       3rd Qu.:458             3rd Qu.: 591.81          
-    ##  Max.   :15003       Max.   :458             Max.   :1690.89          
-    ##  NA's   :67          NA's   :71              NA's   :64               
-    ##  RelFecundityMean_fecundity RelFecundityMax_fecundity Number_fecundity
-    ##  Min.   : 23.0              Min.   :  13.0            Min.   : 27.67  
-    ##  1st Qu.:193.1              1st Qu.: 412.2            1st Qu.: 30.75  
-    ##  Median :415.9              Median : 793.7            Median : 42.50  
-    ##  Mean   :388.4              Mean   :1424.5            Mean   : 64.55  
-    ##  3rd Qu.:611.2              3rd Qu.:1408.1            3rd Qu.: 72.77  
-    ##  Max.   :699.0              Max.   :5048.7            Max.   :158.38  
-    ##  NA's   :68                 NA's   :66                NA's   :62      
+    ##  FecundityMin_fecundity WeightMin_fecundity LengthFecunMin_fecundity
+    ##  Min.   :       7       Min.   :    42.38   Min.   : 10.50          
+    ##  1st Qu.:     200       1st Qu.:   575.46   1st Qu.: 15.27          
+    ##  Median :     600       Median :  2350.91   Median : 28.00          
+    ##  Mean   :  842575       Mean   : 18320.44   Mean   : 35.68          
+    ##  3rd Qu.:   17000       3rd Qu.:  3933.85   3rd Qu.: 45.36          
+    ##  Max.   :15300000       Max.   :100733.33   Max.   :102.00          
+    ##  NA's   :39             NA's   :66          NA's   :62              
+    ##  FecundityMax_fecundity WeightMax_fecundity LengthFecunMax_fecundity
+    ##  Min.   :      20       Min.   :  165       Min.   : 12.40          
+    ##  1st Qu.:     360       1st Qu.:  500       1st Qu.: 25.14          
+    ##  Median :    2673       Median : 3548       Median : 41.59          
+    ##  Mean   : 3134143       Mean   : 4720       Mean   : 54.05          
+    ##  3rd Qu.:   81251       3rd Qu.: 4383       3rd Qu.: 69.99          
+    ##  Max.   :47700000       Max.   :15003       Max.   :157.00          
+    ##  NA's   :42             NA's   :67          NA's   :62              
+    ##  FecundityMean_fecundity RelFecundityMin_fecundity RelFecundityMean_fecundity
+    ##  Min.   :458             Min.   :   2.00           Min.   : 23.0             
+    ##  1st Qu.:458             1st Qu.:  17.75           1st Qu.:193.1             
+    ##  Median :458             Median : 229.68           Median :415.9             
+    ##  Mean   :458             Mean   : 454.12           Mean   :388.4             
+    ##  3rd Qu.:458             3rd Qu.: 591.81           3rd Qu.:611.2             
+    ##  Max.   :458             Max.   :1690.89           Max.   :699.0             
+    ##  NA's   :71              NA's   :64                NA's   :68                
+    ##  RelFecundityMax_fecundity LengthMin_fecundity LengthMax_fecundity
+    ##  Min.   :  13.0            Min.   : 4.50       Min.   : 12.80     
+    ##  1st Qu.: 412.2            1st Qu.:10.60       1st Qu.: 18.20     
+    ##  Median : 793.7            Median :16.70       Median : 37.80     
+    ##  Mean   :1424.5            Mean   :21.74       Mean   : 45.47     
+    ##  3rd Qu.:1408.1            3rd Qu.:31.40       3rd Qu.: 60.40     
+    ##  Max.   :5048.7            Max.   :44.55       Max.   :105.36     
+    ##  NA's   :66                NA's   :63          NA's   :63         
     ##   a_fecundity      b_fecundity    SEa_fecundity    SEb_fecundity   
     ##  Min.   :0.2767   Min.   :2.010   Min.   :0.0021   Min.   :0.3550  
     ##  1st Qu.:1.1056   1st Qu.:3.143   1st Qu.:0.1346   1st Qu.:0.7057  
@@ -3973,130 +3982,196 @@ length\_length
 \#\#<https://www.fishbase.de/manual/FishbaseThe_LENGTH_WEIGHT_Table.htm>
 
 ``` r
-load("DF_intro.Rdata")
-DF= DF_intro
-a = 1
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(length_weight(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
+#"Length1"
+T = length_weight()
+
+length(which(is.na(T$Type)))#mostly this is empty
 ```
 
-    ## [1] 2
-    ## [1] 6
+    ## [1] 30179
+
+``` r
+table(T$LmaxCompare)
+```
+
+    ## 
+    ##  no  No yes Yes 
+    ## 163  32 196 137
+
+``` r
+table(T$Type)
+```
+
+    ## 
+    ##    AF    CM    CO    FL    LP    ND    NG    OT    PC    SL    TL    WD 
+    ##     2     1     2  2484     1     6    11   100     1  2733 10500    62
+
+``` r
+#see what's in this table
+T = length_length()
+table(T$Length1)#different types of length measures
+```
+
+    ## 
+    ##    FL Other    SL    TL    WD 
+    ##  3013   128  7656 14134     3
+
+``` r
+table(T$Length2)#different types of length measures
+```
+
+    ## 
+    ##    FL Other    SL    TL    WD 
+    ##  9127    37  7953  7803    14
+
+``` r
+#can't tell which length type is being measured
+
+table(T$Type)#mostly this is empty
+```
+
+    ## 
+    ##    FL other Other    SL    TL 
+    ##    41     6     3   176  2421
+
+``` r
+rm(table_out)
+T = length_weight()
+
+#can't take out these rows because it will remove species we need
+# ok = NULL
+# ok = c(ok, which(is.na(T$Type)))#assume if it's empty it's standard
+# ok = c(ok, which(T$Type == "SL"))
+# T = T[ok,]
+
+ok = NULL
+ok = c(ok, which(is.na(T$Type)))#assume if it's empty it's standard
+ok = c(ok, which(T$Type == "SL"))
+T$LengthMax[-ok]=NA
+T$LengthMin[-ok]=NA
+
+table_name = "length_weight"
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+```
+
+    ## [1] "removed fields"
+    ##  [1] "SpecCode"     "StockCode"    "PopLWRef"     "DataRef"      "Entered"     
+    ##  [6] "DateEntered"  "Expert"       "Comment"      "Modified"     "DateModified"
+    ## [11] "DateChecked"  "SpecCode"     "StockCode"    "FamCode"      "C_Code"      
+    ## [16] "Sex"          "Locality"     "AutoCtr"      "LmaxCompare"  "EsQ"         
+    ## [21] "Number"       "FamCode"      "TS"           "Locality"     "Method"      
+    ## [26] "DataRef"      "Type"         "SpecimenType" "TS"          
+    ## [1] "kept fields"
+    ##  [1] "Species"            "LengthMin"          "LengthMax"         
+    ##  [4] "a"                  "aTL"                "b"                 
+    ##  [7] "CoeffDetermination" "SEa"                "SEb"               
+    ## [10] "SDa"                "SDb"                "LCLa"              
+    ## [13] "UCLa"               "LCLb"               "UCLb"              
+    ## [1] "T_n_sum, Species field count"
     ## [1] 1
-    ## [1] 6
-    ## [1] 1
-    ## [1] 1
-    ## [1] 1
-    ## [1] 1
-    ## [1] 2
-    ## [1] 1
-    ## [1] 1
-    ## [1] 4
-    ## [1] 1
-    ## [1] 20
-    ## [1] 19
-    ## [1] 113
-    ## [1] 1
-    ## [1] 2
-    ## [1] 1
-    ## [1] 1
-    ## [1] 1
-    ## [1] 3
-    ## [1] 1
-    ## [1] 4
-    ## [1] 80
-    ## [1] 1
-    ## [1] 1
-    ## [1] 41
-    ## [1] 1
-    ## [1] 1
-    ## [1] 1
-    ## [1] 16
-    ## [1] 1
-    ## [1] 3
-    ## [1] 1
-    ## [1] 3
-    ## [1] 3
-    ## [1] 4
-    ## [1] 1
-    ## [1] 2
-    ## [1] 5
-    ## [1] 1
-    ## [1] 1
-    ## [1] 7
-    ## [1] 15
-    ## [1] 7
-    ## [1] 31
-    ## [1] 1
-    ## [1] 2
-    ## [1] 4
-    ## [1] 2
-    ## [1] 1
-    ## [1] 9
-    ## [1] 1
-    ## [1] 3
-    ## [1] 4
-    ## [1] 2
-    ## [1] 5
-    ## [1] 3
-    ## [1] 41
-    ## [1] 1
-    ## [1] 12
-    ## [1] 4
-    ## [1] 1
-    ## [1] 1
-    ## [1] 18
-    ## [1] 1
-    ## [1] 11
-    ## [1] 1
-    ## [1] 1
-    ## [1] 4
+    ## [1] "finished T_n"
+    ## [1] "remove due to lack of coverage"
+    ## character(0)
+
+``` r
+dim(table_out)[1]==dim(DF)[1]#check this is true
+```
+
+    ## [1] TRUE
+
+``` r
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+```
+
     ## [1] 1
 
 ``` r
-#see what the other fields are
-names(tmp)
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
 ```
 
-    ##  [1] "SpecCode"           "Species"            "AutoCtr"           
-    ##  [4] "StockCode"          "FamCode"            "PopLWRef"          
-    ##  [7] "LengthMin"          "LengthMax"          "Type"              
-    ## [10] "LmaxCompare"        "EsQ"                "Number"            
-    ## [13] "Sex"                "a"                  "aTL"               
-    ## [16] "b"                  "CoeffDetermination" "SEa"               
-    ## [19] "SEb"                "SDa"                "SDb"               
-    ## [22] "LCLa"               "UCLa"               "LCLb"              
-    ## [25] "UCLb"               "Method"             "SpecimenType"      
-    ## [28] "Locality"           "DataRef"            "C_Code"            
-    ## [31] "Comment"            "Entered"            "DateEntered"       
-    ## [34] "Modified"           "DateModified"       "Expert"            
-    ## [37] "DateChecked"        "TS"
+    ## [1] TRUE
 
 ``` r
-a = 1
-tmp = data.frame(length_weight(species_list = DF$Species[a]))
-head(tmp)
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
 ```
 
-    ##   SpecCode                     Species AutoCtr StockCode FamCode PopLWRef
-    ## 1     6655 Acanthochromis polyacanthus    8112      6975     350    52323
-    ## 2     6655 Acanthochromis polyacanthus   38494      6975      NA   108462
-    ##   LengthMin LengthMax Type LmaxCompare  EsQ Number     Sex      a    aTL     b
-    ## 1        NA        NA   TL        <NA> <NA>     NA   mixed 0.0135 0.0135 3.312
-    ## 2       7.5        10   SL        <NA> <NA>     15 unsexed 0.0429     NA 3.045
-    ##   CoeffDetermination SEa SEb SDa SDb   LCLa   UCLa  LCLb  UCLb
-    ## 1                 NA  NA  NA  NA  NA     NA     NA    NA    NA
-    ## 2              0.944  NA  NA  NA  NA 0.0161 0.1142 2.601 3.489
-    ##                     Method SpecimenType                Locality DataRef C_Code
-    ## 1 type I linear regression        fresh Presumably Philippines.      NA    608
-    ## 2 Type I linear regression        fresh  Davao Gulf / 2009-2012      NA    608
-    ##   Comment Entered DateEntered Modified DateModified Expert DateChecked TS
-    ## 1    <NA>       1  2005-12-12       NA   2005-12-12     NA        <NA> NA
-    ## 2    <NA>      65  2016-11-03       NA   2016-11-03     NA        <NA> NA
+    ## [1] 1
+
+``` r
+names(out)[str_which(names(out),table_name)]
+```
+
+    ##  [1] "LengthMin_length_weight"            "LengthMax_length_weight"           
+    ##  [3] "a_length_weight"                    "aTL_length_weight"                 
+    ##  [5] "b_length_weight"                    "CoeffDetermination_length_weight"  
+    ##  [7] "SEa_length_weight"                  "SEb_length_weight"                 
+    ##  [9] "SDa_length_weight"                  "LCLa_length_weight"                
+    ## [11] "UCLa_length_weight"                 "LCLb_length_weight"                
+    ## [13] "UCLb_length_weight"                 "record_count_species_length_weight"
+
+``` r
+summary(out[,str_which(names(out),table_name)])
+```
+
+    ##  LengthMin_length_weight LengthMax_length_weight a_length_weight   
+    ##  Min.   : 0.900          Min.   :  3.500         Min.   :0.000425  
+    ##  1st Qu.: 3.450          1st Qu.:  9.275         1st Qu.:0.008837  
+    ##  Median : 6.917          Median : 17.673         Median :0.018150  
+    ##  Mean   :10.078          Mean   : 26.537         Mean   :0.018959  
+    ##  3rd Qu.:14.583          3rd Qu.: 26.750         3rd Qu.:0.026135  
+    ##  Max.   :43.500          Max.   :121.000         Max.   :0.053933  
+    ##  NA's   :52              NA's   :52              NA's   :24        
+    ##  aTL_length_weight b_length_weight CoeffDetermination_length_weight
+    ##  Min.   :0.00025   Min.   :2.530   Min.   :0.8100                  
+    ##  1st Qu.:0.00632   1st Qu.:2.890   1st Qu.:0.9287                  
+    ##  Median :0.01350   Median :3.010   Median :0.9559                  
+    ##  Mean   :0.01552   Mean   :3.006   Mean   :0.9431                  
+    ##  3rd Qu.:0.02380   3rd Qu.:3.090   3rd Qu.:0.9747                  
+    ##  Max.   :0.04055   Max.   :3.388   Max.   :0.9960                  
+    ##  NA's   :45        NA's   :24      NA's   :30                      
+    ##  SEa_length_weight SEb_length_weight SDa_length_weight LCLa_length_weight
+    ##  Min.   :0.00100   Min.   :0.0110    Min.   :0.04400   Min.   :0.00100   
+    ##  1st Qu.:0.00500   1st Qu.:0.0540    1st Qu.:0.04658   1st Qu.:0.00653   
+    ##  Median :0.03533   Median :0.0920    Median :0.04917   Median :0.01070   
+    ##  Mean   :0.08190   Mean   :0.1141    Mean   :0.04917   Mean   :0.01346   
+    ##  3rd Qu.:0.13300   3rd Qu.:0.1650    3rd Qu.:0.05175   3rd Qu.:0.01617   
+    ##  Max.   :0.26100   Max.   :0.2600    Max.   :0.05433   Max.   :0.05090   
+    ##  NA's   :65        NA's   :59        NA's   :70        NA's   :42        
+    ##  UCLa_length_weight LCLb_length_weight UCLb_length_weight
+    ##  Min.   :0.00279    Min.   :2.344      Min.   :2.855     
+    ##  1st Qu.:0.01834    1st Qu.:2.714      1st Qu.:3.107     
+    ##  Median :0.02747    Median :2.835      Median :3.152     
+    ##  Mean   :0.03543    Mean   :2.856      Mean   :3.208     
+    ##  3rd Qu.:0.03530    3rd Qu.:2.969      3rd Qu.:3.292     
+    ##  Max.   :0.16600    Max.   :3.326      Max.   :3.760     
+    ##  NA's   :42         NA's   :42         NA's   :42        
+    ##  record_count_species_length_weight
+    ##  Min.   :  1.000                   
+    ##  1st Qu.:  1.000                   
+    ##  Median :  2.000                   
+    ##  Mean   :  7.708                   
+    ##  3rd Qu.:  5.000                   
+    ##  Max.   :113.000                   
+    ## 
+
+``` r
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+```
 
 \#\#maturity \#\#multiple records for some species, would need to take
 averages if we wanted to use. there are multiple measures of maturity to
@@ -4305,47 +4380,39 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
 ```
 
     ## [1] "removed fields"
-    ##   [1] "SpecCode"            "autoctr"             "StockCode"          
-    ##   [4] "MorphDatRefNo"       "OtherRef1"           "OtherRef2"          
-    ##   [7] "RemarkSex"           "SimilarSpec1Remarks" "SimilarSpec2Remarks"
-    ##  [10] "Entered"             "DateEntered"         "Expert"             
-    ##  [13] "CommentonTeeth"      "Modified"            "DateModified"       
-    ##  [16] "DateChecked"         "SpecCode"            "StockCode"          
-    ##  [19] "SexualAttributes"    "SexMorphology"       "SexColors"          
-    ##  [22] "RemarkSex"           "MandibleTeethT2"     "MaxillaTeethT2"     
-    ##  [25] "VomerineTeethT2"     "PalatineTeethT2"     "PharyngealTeethT2"  
-    ##  [28] "Pspines2"            "VPosition2"          "SimilarSpecies2"    
-    ##  [31] "SimilarSpec2Remarks" "OtherRef2"           "BodyShapeII"        
-    ##  [34] "HorStripesTTII"      "VerStripesTTII"      "VerStripesTTIII"    
-    ##  [37] "DiaStripesTTII"      "DiaStripesTTIII"     "CurStripesTTII"     
-    ##  [40] "CurStripesTTIII"     "SpotsTTII"           "SpotsTTIII"         
-    ##  [43] "DorsalFinII"         "CaudalFinII"         "AnalFinII"          
-    ##  [46] "VerStripesTTIII"     "DiaStripesTTIII"     "CurStripesTTIII"    
-    ##  [49] "SpotsTTIII"          "LateralLinesNo"      "ScalesLateralmin"   
-    ##  [52] "ScalesLateralmax"    "LatSeriesMin"        "LatSeriesMax"       
-    ##  [55] "TS"                  "StandardLengthCm"    "HeadLength"         
-    ##  [58] "PreDorsalLength"     "PrePelvicsLength"    "PreAnalLength"      
-    ##  [61] "PeduncleLength"      "PreorbitalLength"    "EyeLength"          
-    ##  [64] "AppearancePic"       "VomerineTeethT1"     "VomerineTeethT2"    
-    ##  [67] "PalatineTeethT1"     "PharyngealTeethT2"   "PalatineTeethT2"    
-    ##  [70] "HorStripesTTII"      "VerStripesTTII"      "VerStripesTTIII"    
-    ##  [73] "VerStripesTTIII"     "DiaStripesTTII"      "DiaStripesTTIII"    
-    ##  [76] "DiaStripesTTIII"     "CurStripesTTII"      "CurStripesTTIII"    
-    ##  [79] "CurStripesTTIII"     "SpotsTTII"           "SpotsTTIII"         
-    ##  [82] "SpotsTTIII"          "DorsalFinII"         "CaudalFinII"        
-    ##  [85] "AnalFinII"           "EaseofID"            "AddChars"           
-    ##  [88] "TypeofMouth"         "PharyngealTeethT1"   "Lipsteeth"          
-    ##  [91] "DermalTeeth"         "MandibleTeethT2"     "MaxillaTeethT2"     
-    ##  [94] "DermalTeeth"         "BarbelsType"         "Vertebrae"          
-    ##  [97] "VertebraePreanMin"   "VertebraePreanMax"   "VertebraeTotalMin"  
-    ## [100] "VertebraeTotalMax"   "SimilarSpecies1"     "SimilarSpecies2"    
-    ## [103] "TypeofEyes"          "TypeofMouth"         "TypeofScales"       
-    ## [106] "BarbelsType"         "StandardLengthCm"    "HeadLength"         
-    ## [109] "PreDorsalLength"     "PrePelvicsLength"    "PreAnalLength"      
-    ## [112] "PeduncleLength"      "PreorbitalLength"    "EyeLength"          
-    ## [115] "StandardLengthCm"    "HeadLength"          "PreDorsalLength"    
-    ## [118] "PrePelvicsLength"    "PreAnalLength"       "PeduncleLength"     
-    ## [121] "PreorbitalLength"    "EyeLength"           "TS"                 
+    ##  [1] "SpecCode"            "autoctr"             "StockCode"          
+    ##  [4] "MorphDatRefNo"       "OtherRef1"           "OtherRef2"          
+    ##  [7] "RemarkSex"           "SimilarSpec1Remarks" "SimilarSpec2Remarks"
+    ## [10] "Entered"             "DateEntered"         "Expert"             
+    ## [13] "CommentonTeeth"      "Modified"            "DateModified"       
+    ## [16] "DateChecked"         "SpecCode"            "StockCode"          
+    ## [19] "SexualAttributes"    "SexMorphology"       "SexColors"          
+    ## [22] "RemarkSex"           "MandibleTeethT2"     "MaxillaTeethT2"     
+    ## [25] "VomerineTeethT2"     "PalatineTeethT2"     "PharyngealTeethT2"  
+    ## [28] "Pspines2"            "VPosition2"          "SimilarSpecies2"    
+    ## [31] "SimilarSpec2Remarks" "OtherRef2"           "BodyShapeII"        
+    ## [34] "HorStripesTTII"      "VerStripesTTII"      "VerStripesTTIII"    
+    ## [37] "DiaStripesTTII"      "DiaStripesTTIII"     "CurStripesTTII"     
+    ## [40] "CurStripesTTIII"     "SpotsTTII"           "SpotsTTIII"         
+    ## [43] "DorsalFinII"         "CaudalFinII"         "AnalFinII"          
+    ## [46] "VerStripesTTIII"     "DiaStripesTTIII"     "CurStripesTTIII"    
+    ## [49] "SpotsTTIII"          "LateralLinesNo"      "ScalesLateralmin"   
+    ## [52] "ScalesLateralmax"    "LatSeriesMin"        "LatSeriesMax"       
+    ## [55] "TS"                  "AppearancePic"       "VomerineTeethT1"    
+    ## [58] "VomerineTeethT2"     "PalatineTeethT1"     "PharyngealTeethT2"  
+    ## [61] "PalatineTeethT2"     "HorStripesTTII"      "VerStripesTTII"     
+    ## [64] "VerStripesTTIII"     "VerStripesTTIII"     "DiaStripesTTII"     
+    ## [67] "DiaStripesTTIII"     "DiaStripesTTIII"     "CurStripesTTII"     
+    ## [70] "CurStripesTTIII"     "CurStripesTTIII"     "SpotsTTII"          
+    ## [73] "SpotsTTIII"          "SpotsTTIII"          "DorsalFinII"        
+    ## [76] "CaudalFinII"         "AnalFinII"           "EaseofID"           
+    ## [79] "AddChars"            "TypeofMouth"         "PharyngealTeethT1"  
+    ## [82] "Lipsteeth"           "DermalTeeth"         "MandibleTeethT2"    
+    ## [85] "MaxillaTeethT2"      "DermalTeeth"         "BarbelsType"        
+    ## [88] "Vertebrae"           "VertebraePreanMin"   "VertebraePreanMax"  
+    ## [91] "VertebraeTotalMin"   "VertebraeTotalMax"   "SimilarSpecies1"    
+    ## [94] "SimilarSpecies2"     "TypeofEyes"          "TypeofMouth"        
+    ## [97] "TypeofScales"        "BarbelsType"         "TS"                 
     ## [1] "kept fields"
     ##  [1] "Species"            "Females"            "Males"             
     ##  [4] "StrikingFeatures"   "BodyShapeI"         "Forehead"          
@@ -4374,9 +4441,11 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ## [73] "Araymax"            "PectoralAttributes" "Praymin"           
     ## [76] "Praymax"            "PelvicsAttributes"  "VPosition"         
     ## [79] "Vspines"            "Vraymin"            "Vraymax"           
-    ## [82] "Forklength"         "Totallength"        "PostHeadDepth"     
-    ## [85] "PostTrunkDepth"     "MaximumDepth"       "PeduncleDepth"     
-    ## [88] "CaudalHeight"      
+    ## [82] "StandardLengthCm"   "Forklength"         "Totallength"       
+    ## [85] "HeadLength"         "PreDorsalLength"    "PrePelvicsLength"  
+    ## [88] "PreAnalLength"      "PostHeadDepth"      "PostTrunkDepth"    
+    ## [91] "MaximumDepth"       "PeduncleDepth"      "PeduncleLength"    
+    ## [94] "CaudalHeight"       "PreorbitalLength"   "EyeLength"         
     ## [1] "T_b_single_sum, Species field count"
     ## [1] 1
     ## [1] "T_b_multiple_sum, Species field count"
@@ -4470,88 +4539,95 @@ names(out)[str_which(names(out),table_name)]
     ##  [45] "Vraymax_morphology"                                               
     ##  [46] "Forklength_morphology"                                            
     ##  [47] "Totallength_morphology"                                           
-    ##  [48] "PostHeadDepth_morphology"                                         
-    ##  [49] "PostTrunkDepth_morphology"                                        
-    ##  [50] "MaximumDepth_morphology"                                          
-    ##  [51] "PeduncleDepth_morphology"                                         
-    ##  [52] "CaudalHeight_morphology"                                          
-    ##  [53] "StrikingFeaturesnone_morphology"                                  
-    ##  [54] "StrikingFeaturesother..see.diagnosis._morphology"                 
-    ##  [55] "StrikingFeaturesstriking.eyes_morphology"                         
-    ##  [56] "StrikingFeaturesstriking.fins_morphology"                         
-    ##  [57] "StrikingFeaturesstriking.shape.of.body_morphology"                
-    ##  [58] "BodyShapeIeel.like_morphology"                                    
-    ##  [59] "BodyShapeIelongated_morphology"                                   
-    ##  [60] "BodyShapeIfusiform...normal_morphology"                           
-    ##  [61] "BodyShapeIother_morphology"                                       
-    ##  [62] "BodyShapeIshort.and...or.deep_morphology"                         
-    ##  [63] "Foreheadclearly.concave_morphology"                               
-    ##  [64] "Foreheadclearly.convex_morphology"                                
-    ##  [65] "Foreheadmore.or.less.straight_morphology"                         
-    ##  [66] "PosofMouthsub.terminal.inferior_morphology"                       
-    ##  [67] "PosofMouthsuperior_morphology"                                    
-    ##  [68] "PosofMouthterminal_morphology"                                    
-    ##  [69] "MandibleTeethabsent_morphology"                                   
-    ##  [70] "MandibleTeethpresent_morphology"                                  
-    ##  [71] "MandibleTeethT1bicuspidate_morphology"                            
-    ##  [72] "MandibleTeethT1canine.like_morphology"                            
-    ##  [73] "MandibleTeethT1conical_morphology"                                
-    ##  [74] "MandibleTeethT1tricuspidate_morphology"                           
-    ##  [75] "MaxillaTeethabsent_morphology"                                    
-    ##  [76] "MaxillaTeethpresent_morphology"                                   
-    ##  [77] "MaxillaTeethT1canine.like_morphology"                             
-    ##  [78] "MaxillaTeethT1conical_morphology"                                 
-    ##  [79] "MaxillaTeethT1tricuspidate_morphology"                            
-    ##  [80] "VomerineTeeth_morphology"                                         
-    ##  [81] "Palatine_morphology"                                              
-    ##  [82] "PharyngealTeethabsent_morphology"                                 
-    ##  [83] "PharyngealTeethpresent_morphology"                                
-    ##  [84] "TeethonTongue_morphology"                                         
-    ##  [85] "Scutesabsent_morphology"                                          
-    ##  [86] "Scutesalong.belly_morphology"                                     
-    ##  [87] "HorStripesTTI_morphology"                                         
-    ##  [88] "VerStripesTTIabsent_morphology"                                   
-    ##  [89] "VerStripesTTIpresent_morphology"                                  
-    ##  [90] "DiaStripesTTI_morphology"                                         
-    ##  [91] "CurStripesTTI_morphology"                                         
-    ##  [92] "SpotsTTImore.than.one.spot_morphology"                            
-    ##  [93] "SpotsTTIno.spots_morphology"                                      
-    ##  [94] "SpotsTTIone.spot.only_morphology"                                 
-    ##  [95] "DorsalFinImore.than.one.spot.or.stripe_morphology"                
-    ##  [96] "DorsalFinIno.spots.or.stripes_morphology"                         
-    ##  [97] "DorsalFinIone.spot.or.stripe_morphology"                          
-    ##  [98] "CaudalFinImore.than.one.spot.or.stripe_morphology"                
-    ##  [99] "CaudalFinIno.spots.or.stripes_morphology"                         
-    ## [100] "CaudalFinIone.spot.or.stripe_morphology"                          
-    ## [101] "AnalFinImore.than.one.spot.or.stripe_morphology"                  
-    ## [102] "AnalFinIno.spots.or.stripes_morphology"                           
-    ## [103] "AnalFinIone.spot.or.stripe_morphology"                            
-    ## [104] "Spiracle_morphology"                                              
-    ## [105] "DorsalAttributescontinuous.with.caudal.fin_morphology"            
-    ## [106] "DorsalAttributesextending.over.most.of.the.back.length_morphology"
-    ## [107] "DorsalAttributesgreatly.reduced.or.absent_morphology"             
-    ## [108] "DorsalAttributesmodified.to.suction.disc_morphology"              
-    ## [109] "DorsalAttributesno.striking.attributes_morphology"                
-    ## [110] "DorsalAttributesother_morphology"                                 
-    ## [111] "Adifin_morphology"                                                
-    ## [112] "CShapeforked_morphology"                                          
-    ## [113] "CShapemore.or.less.truncate_morphology"                           
-    ## [114] "CShapeother..see.remark._morphology"                              
-    ## [115] "CShapepointed_morphology"                                         
-    ## [116] "Attributesconfluent_morphology"                                   
-    ## [117] "Attributesmore.or.less.normal_morphology"                         
-    ## [118] "PectoralAttributesabsent_morphology"                              
-    ## [119] "PectoralAttributesmore.or.less.normal_morphology"                 
-    ## [120] "PectoralAttributestransformed.to..aerofoils._morphology"          
-    ## [121] "PectoralAttributesused.for.locomotion_morphology"                 
-    ## [122] "PectoralAttributesvery.large...lobe.like_morphology"              
-    ## [123] "PelvicsAttributesmore.or.less.normal_morphology"                  
-    ## [124] "PelvicsAttributessuppressed.absent_morphology"                    
-    ## [125] "VPositionabdominal_morphology"                                    
-    ## [126] "VPositionabsent_morphology"                                       
-    ## [127] "VPositionjugular_morphology"                                      
-    ## [128] "VPositionthoracic_morphology"                                     
-    ## [129] "record_count_species_morphology"
+    ##  [48] "HeadLength_morphology"                                            
+    ##  [49] "PreDorsalLength_morphology"                                       
+    ##  [50] "PrePelvicsLength_morphology"                                      
+    ##  [51] "PreAnalLength_morphology"                                         
+    ##  [52] "PostHeadDepth_morphology"                                         
+    ##  [53] "PostTrunkDepth_morphology"                                        
+    ##  [54] "MaximumDepth_morphology"                                          
+    ##  [55] "PeduncleDepth_morphology"                                         
+    ##  [56] "PeduncleLength_morphology"                                        
+    ##  [57] "CaudalHeight_morphology"                                          
+    ##  [58] "PreorbitalLength_morphology"                                      
+    ##  [59] "EyeLength_morphology"                                             
+    ##  [60] "StrikingFeaturesnone_morphology"                                  
+    ##  [61] "StrikingFeaturesother..see.diagnosis._morphology"                 
+    ##  [62] "StrikingFeaturesstriking.eyes_morphology"                         
+    ##  [63] "StrikingFeaturesstriking.fins_morphology"                         
+    ##  [64] "StrikingFeaturesstriking.shape.of.body_morphology"                
+    ##  [65] "BodyShapeIeel.like_morphology"                                    
+    ##  [66] "BodyShapeIelongated_morphology"                                   
+    ##  [67] "BodyShapeIfusiform...normal_morphology"                           
+    ##  [68] "BodyShapeIother_morphology"                                       
+    ##  [69] "BodyShapeIshort.and...or.deep_morphology"                         
+    ##  [70] "Foreheadclearly.concave_morphology"                               
+    ##  [71] "Foreheadclearly.convex_morphology"                                
+    ##  [72] "Foreheadmore.or.less.straight_morphology"                         
+    ##  [73] "PosofMouthsub.terminal.inferior_morphology"                       
+    ##  [74] "PosofMouthsuperior_morphology"                                    
+    ##  [75] "PosofMouthterminal_morphology"                                    
+    ##  [76] "MandibleTeethabsent_morphology"                                   
+    ##  [77] "MandibleTeethpresent_morphology"                                  
+    ##  [78] "MandibleTeethT1bicuspidate_morphology"                            
+    ##  [79] "MandibleTeethT1canine.like_morphology"                            
+    ##  [80] "MandibleTeethT1conical_morphology"                                
+    ##  [81] "MandibleTeethT1tricuspidate_morphology"                           
+    ##  [82] "MaxillaTeethabsent_morphology"                                    
+    ##  [83] "MaxillaTeethpresent_morphology"                                   
+    ##  [84] "MaxillaTeethT1canine.like_morphology"                             
+    ##  [85] "MaxillaTeethT1conical_morphology"                                 
+    ##  [86] "MaxillaTeethT1tricuspidate_morphology"                            
+    ##  [87] "VomerineTeeth_morphology"                                         
+    ##  [88] "Palatine_morphology"                                              
+    ##  [89] "PharyngealTeethabsent_morphology"                                 
+    ##  [90] "PharyngealTeethpresent_morphology"                                
+    ##  [91] "TeethonTongue_morphology"                                         
+    ##  [92] "Scutesabsent_morphology"                                          
+    ##  [93] "Scutesalong.belly_morphology"                                     
+    ##  [94] "HorStripesTTI_morphology"                                         
+    ##  [95] "VerStripesTTIabsent_morphology"                                   
+    ##  [96] "VerStripesTTIpresent_morphology"                                  
+    ##  [97] "DiaStripesTTI_morphology"                                         
+    ##  [98] "CurStripesTTI_morphology"                                         
+    ##  [99] "SpotsTTImore.than.one.spot_morphology"                            
+    ## [100] "SpotsTTIno.spots_morphology"                                      
+    ## [101] "SpotsTTIone.spot.only_morphology"                                 
+    ## [102] "DorsalFinImore.than.one.spot.or.stripe_morphology"                
+    ## [103] "DorsalFinIno.spots.or.stripes_morphology"                         
+    ## [104] "DorsalFinIone.spot.or.stripe_morphology"                          
+    ## [105] "CaudalFinImore.than.one.spot.or.stripe_morphology"                
+    ## [106] "CaudalFinIno.spots.or.stripes_morphology"                         
+    ## [107] "CaudalFinIone.spot.or.stripe_morphology"                          
+    ## [108] "AnalFinImore.than.one.spot.or.stripe_morphology"                  
+    ## [109] "AnalFinIno.spots.or.stripes_morphology"                           
+    ## [110] "AnalFinIone.spot.or.stripe_morphology"                            
+    ## [111] "Spiracle_morphology"                                              
+    ## [112] "DorsalAttributescontinuous.with.caudal.fin_morphology"            
+    ## [113] "DorsalAttributesextending.over.most.of.the.back.length_morphology"
+    ## [114] "DorsalAttributesgreatly.reduced.or.absent_morphology"             
+    ## [115] "DorsalAttributesmodified.to.suction.disc_morphology"              
+    ## [116] "DorsalAttributesno.striking.attributes_morphology"                
+    ## [117] "DorsalAttributesother_morphology"                                 
+    ## [118] "Adifin_morphology"                                                
+    ## [119] "CShapeforked_morphology"                                          
+    ## [120] "CShapemore.or.less.truncate_morphology"                           
+    ## [121] "CShapeother..see.remark._morphology"                              
+    ## [122] "CShapepointed_morphology"                                         
+    ## [123] "Attributesconfluent_morphology"                                   
+    ## [124] "Attributesmore.or.less.normal_morphology"                         
+    ## [125] "PectoralAttributesabsent_morphology"                              
+    ## [126] "PectoralAttributesmore.or.less.normal_morphology"                 
+    ## [127] "PectoralAttributestransformed.to..aerofoils._morphology"          
+    ## [128] "PectoralAttributesused.for.locomotion_morphology"                 
+    ## [129] "PectoralAttributesvery.large...lobe.like_morphology"              
+    ## [130] "PelvicsAttributesmore.or.less.normal_morphology"                  
+    ## [131] "PelvicsAttributessuppressed.absent_morphology"                    
+    ## [132] "VPositionabdominal_morphology"                                    
+    ## [133] "VPositionabsent_morphology"                                       
+    ## [134] "VPositionjugular_morphology"                                      
+    ## [135] "VPositionthoracic_morphology"                                     
+    ## [136] "record_count_species_morphology"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
@@ -4701,30 +4777,46 @@ summary(out[,str_which(names(out),table_name)])
     ##  3rd Qu.: 7.000     3rd Qu.: 7.25      3rd Qu.:107.1        
     ##  Max.   :10.000     Max.   :12.00      Max.   :107.7        
     ##  NA's   :48         NA's   :48         NA's   :70           
-    ##  Totallength_morphology PostHeadDepth_morphology PostTrunkDepth_morphology
-    ##  Min.   :108.5          Min.   :19.70            Min.   :15.20            
-    ##  1st Qu.:109.8          1st Qu.:20.57            1st Qu.:17.02            
-    ##  Median :111.0          Median :21.45            Median :18.85            
-    ##  Mean   :111.0          Mean   :21.45            Mean   :18.85            
-    ##  3rd Qu.:112.3          3rd Qu.:22.32            3rd Qu.:20.68            
-    ##  Max.   :113.6          Max.   :23.20            Max.   :22.50            
-    ##  NA's   :70             NA's   :70               NA's   :70               
-    ##  MaximumDepth_morphology PeduncleDepth_morphology CaudalHeight_morphology
-    ##  Min.   :24.20           Min.   :5.60             Min.   :16.20          
-    ##  1st Qu.:26.15           1st Qu.:6.05             1st Qu.:17.07          
-    ##  Median :37.60           Median :6.50             Median :17.95          
-    ##  Mean   :38.07           Mean   :6.50             Mean   :17.95          
-    ##  3rd Qu.:47.70           3rd Qu.:6.95             3rd Qu.:18.82          
-    ##  Max.   :55.60           Max.   :7.40             Max.   :19.70          
-    ##  NA's   :66              NA's   :70               NA's   :70             
-    ##  StrikingFeaturesnone_morphology
-    ##  0   : 4                        
-    ##  1   :20                        
-    ##  NA's:48                        
-    ##                                 
-    ##                                 
-    ##                                 
-    ##                                 
+    ##  Totallength_morphology HeadLength_morphology PreDorsalLength_morphology
+    ##  Min.   :108.5          Min.   :20.00         Min.   :29.60             
+    ##  1st Qu.:109.8          1st Qu.:21.15         1st Qu.:35.05             
+    ##  Median :111.0          Median :22.30         Median :40.50             
+    ##  Mean   :111.0          Mean   :23.03         Mean   :40.50             
+    ##  3rd Qu.:112.3          3rd Qu.:24.55         3rd Qu.:45.95             
+    ##  Max.   :113.6          Max.   :26.80         Max.   :51.40             
+    ##  NA's   :70             NA's   :69            NA's   :70                
+    ##  PrePelvicsLength_morphology PreAnalLength_morphology PostHeadDepth_morphology
+    ##  Min.   :27.50               Min.   :47.90            Min.   :19.70           
+    ##  1st Qu.:34.35               1st Qu.:54.67            1st Qu.:20.57           
+    ##  Median :41.20               Median :61.45            Median :21.45           
+    ##  Mean   :41.20               Mean   :61.45            Mean   :21.45           
+    ##  3rd Qu.:48.05               3rd Qu.:68.22            3rd Qu.:22.32           
+    ##  Max.   :54.90               Max.   :75.00            Max.   :23.20           
+    ##  NA's   :70                  NA's   :70               NA's   :70              
+    ##  PostTrunkDepth_morphology MaximumDepth_morphology PeduncleDepth_morphology
+    ##  Min.   :15.20             Min.   :24.20           Min.   :5.60            
+    ##  1st Qu.:17.02             1st Qu.:26.15           1st Qu.:6.05            
+    ##  Median :18.85             Median :37.60           Median :6.50            
+    ##  Mean   :18.85             Mean   :38.07           Mean   :6.50            
+    ##  3rd Qu.:20.68             3rd Qu.:47.70           3rd Qu.:6.95            
+    ##  Max.   :22.50             Max.   :55.60           Max.   :7.40            
+    ##  NA's   :70                NA's   :66              NA's   :70              
+    ##  PeduncleLength_morphology CaudalHeight_morphology PreorbitalLength_morphology
+    ##  Min.   :11.30             Min.   :16.20           Min.   :31.60              
+    ##  1st Qu.:11.88             1st Qu.:17.07           1st Qu.:33.88              
+    ##  Median :12.45             Median :17.95           Median :36.15              
+    ##  Mean   :12.45             Mean   :17.95           Mean   :36.15              
+    ##  3rd Qu.:13.03             3rd Qu.:18.82           3rd Qu.:38.42              
+    ##  Max.   :13.60             Max.   :19.70           Max.   :40.70              
+    ##  NA's   :70                NA's   :70              NA's   :70                 
+    ##  EyeLength_morphology StrikingFeaturesnone_morphology
+    ##  Min.   :16.30        0   : 4                        
+    ##  1st Qu.:16.82        1   :20                        
+    ##  Median :17.35        NA's:48                        
+    ##  Mean   :17.35                                       
+    ##  3rd Qu.:17.88                                       
+    ##  Max.   :18.40                                       
+    ##  NA's   :70                                          
     ##  StrikingFeaturesother..see.diagnosis._morphology
     ##  0   :23                                         
     ##  1   : 1                                         
@@ -5166,12 +5258,12 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ##  [5] "FamilyOxRef"    "SpeciesOxRef"   "DataRef"        "Entered"       
     ##  [9] "DateEntered"    "Expert"         "Comment"        "Modified"      
     ## [13] "DateModified"   "DateChecked"    "SpecCode"       "StockCode"     
-    ## [17] "TestCode"       "Sex"            "FamilyOxRef"    "TS"            
-    ## [21] "DataRef"        "TS"             "MetabolicLevel"
+    ## [17] "TestCode"       "Sex"            "Number"         "FamilyOxRef"   
+    ## [21] "TS"             "DataRef"        "TS"             "MetabolicLevel"
     ## [1] "kept fields"
-    ##  [1] "Species"       "Weight"        "Number"        "Temp"         
-    ##  [5] "Salinity"      "Oxygen"        "Oxygenmgl"     "OxygenCons"   
-    ##  [9] "AppliedStress" "SwimmingSpeed"
+    ## [1] "Species"       "Weight"        "Temp"          "Salinity"     
+    ## [5] "Oxygen"        "Oxygenmgl"     "OxygenCons"    "AppliedStress"
+    ## [9] "SwimmingSpeed"
     ## [1] "T_n_sum, Species field count"
     ## [1] 1
     ## [1] "finished T_n"
@@ -5214,38 +5306,38 @@ length(str_which(names(out),"Species"))
 names(out)[str_which(names(out),table_name)]
 ```
 
-    ##  [1] "Weight_oxygen"                      "Number_oxygen"                     
-    ##  [3] "Temp_oxygen"                        "Salinity_oxygen"                   
-    ##  [5] "Oxygen_oxygen"                      "Oxygenmgl_oxygen"                  
-    ##  [7] "OxygenCons_oxygen"                  "SwimmingSpeed_oxygen"              
-    ##  [9] "AppliedStressfeeding_oxygen"        "AppliedStresshigh.ph_oxygen"       
-    ## [11] "AppliedStresshypercapnia_oxygen"    "AppliedStresshypoxia_oxygen"       
-    ## [13] "AppliedStresslow.ph_oxygen"         "AppliedStressnone.specified_oxygen"
-    ## [15] "AppliedStressother_oxygen"          "AppliedStressother.stress_oxygen"  
-    ## [17] "AppliedStressphotoperiod_oxygen"    "AppliedStresssalinity_oxygen"      
-    ## [19] "AppliedStresssedative_oxygen"       "AppliedStresstemperature_oxygen"   
-    ## [21] "AppliedStresstoxins_oxygen"         "record_count_species_oxygen"
+    ##  [1] "Weight_oxygen"                      "Temp_oxygen"                       
+    ##  [3] "Salinity_oxygen"                    "Oxygen_oxygen"                     
+    ##  [5] "Oxygenmgl_oxygen"                   "OxygenCons_oxygen"                 
+    ##  [7] "SwimmingSpeed_oxygen"               "AppliedStressfeeding_oxygen"       
+    ##  [9] "AppliedStresshigh.ph_oxygen"        "AppliedStresshypercapnia_oxygen"   
+    ## [11] "AppliedStresshypoxia_oxygen"        "AppliedStresslow.ph_oxygen"        
+    ## [13] "AppliedStressnone.specified_oxygen" "AppliedStressother_oxygen"         
+    ## [15] "AppliedStressother.stress_oxygen"   "AppliedStressphotoperiod_oxygen"   
+    ## [17] "AppliedStresssalinity_oxygen"       "AppliedStresssedative_oxygen"      
+    ## [19] "AppliedStresstemperature_oxygen"    "AppliedStresstoxins_oxygen"        
+    ## [21] "record_count_species_oxygen"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
 ```
 
-    ##  Weight_oxygen       Number_oxygen     Temp_oxygen      Salinity_oxygen 
-    ##  Min.   :   0.2229   Min.   : 1.000   Min.   : 0.6167   Min.   : 0.000  
-    ##  1st Qu.:   4.9562   1st Qu.: 1.929   1st Qu.:18.4688   1st Qu.: 0.000  
-    ##  Median :  42.8215   Median : 5.000   Median :23.0000   Median : 0.000  
-    ##  Mean   : 214.2989   Mean   : 5.385   Mean   :21.5638   Mean   : 6.457  
-    ##  3rd Qu.: 164.5378   3rd Qu.: 7.263   3rd Qu.:25.9615   3rd Qu.: 5.840  
-    ##  Max.   :1900.0000   Max.   :13.517   Max.   :30.3333   Max.   :34.543  
-    ##  NA's   :44          NA's   :47       NA's   :44        NA's   :51      
-    ##  Oxygen_oxygen    Oxygenmgl_oxygen OxygenCons_oxygen SwimmingSpeed_oxygen
-    ##  Min.   : 49.75   Min.   : 2.466   Min.   :  50.63   Min.   :1.695       
-    ##  1st Qu.:100.00   1st Qu.: 5.900   1st Qu.: 166.82   1st Qu.:1.990       
-    ##  Median :116.00   Median : 6.200   Median : 222.71   Median :2.286       
-    ##  Mean   :111.98   Mean   : 6.569   Mean   : 371.97   Mean   :2.164       
-    ##  3rd Qu.:126.21   3rd Qu.: 7.260   3rd Qu.: 546.11   3rd Qu.:2.399       
-    ##  Max.   :182.25   Max.   :12.387   Max.   :1222.80   Max.   :2.511       
-    ##  NA's   :55       NA's   :59       NA's   :44        NA's   :69          
+    ##  Weight_oxygen        Temp_oxygen      Salinity_oxygen  Oxygen_oxygen   
+    ##  Min.   :   0.2229   Min.   : 0.6167   Min.   : 0.000   Min.   : 49.75  
+    ##  1st Qu.:   4.9562   1st Qu.:18.4688   1st Qu.: 0.000   1st Qu.:100.00  
+    ##  Median :  42.8215   Median :23.0000   Median : 0.000   Median :116.00  
+    ##  Mean   : 214.2989   Mean   :21.5638   Mean   : 6.457   Mean   :111.98  
+    ##  3rd Qu.: 164.5378   3rd Qu.:25.9615   3rd Qu.: 5.840   3rd Qu.:126.21  
+    ##  Max.   :1900.0000   Max.   :30.3333   Max.   :34.543   Max.   :182.25  
+    ##  NA's   :44          NA's   :44        NA's   :51       NA's   :55      
+    ##  Oxygenmgl_oxygen OxygenCons_oxygen SwimmingSpeed_oxygen
+    ##  Min.   : 2.466   Min.   :  50.63   Min.   :1.695       
+    ##  1st Qu.: 5.900   1st Qu.: 166.82   1st Qu.:1.990       
+    ##  Median : 6.200   Median : 222.71   Median :2.286       
+    ##  Mean   : 6.569   Mean   : 371.97   Mean   :2.164       
+    ##  3rd Qu.: 7.260   3rd Qu.: 546.11   3rd Qu.:2.399       
+    ##  Max.   :12.387   Max.   :1222.80   Max.   :2.511       
+    ##  NA's   :59       NA's   :44        NA's   :69          
     ##  AppliedStressfeeding_oxygen AppliedStresshigh.ph_oxygen
     ##  0   :23                     0   :21                    
     ##  NA's:49                     1   : 2                    
@@ -5448,21 +5540,21 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ## [17] "DateChecked"     "SpecCode"        "StockCode"       "C_Code"         
     ## [21] "E_CODE"          "Sex"             "LmSex"           "Locality"       
     ## [25] "YearStart"       "YearEnd"         "YearRemark"      "AutoCtr"        
-    ## [29] "r2"              "r2_M"            "Comment2"        "TS"             
-    ## [33] "Locality"        "MethodGrowth"    "MethodM"         "Data"           
-    ## [37] "DataSourceRef"   "AssumedDistLoo"  "AssumedDistK"    "Type"           
-    ## [41] "TypeLm"          "Auxim"           "SourceWinfinity" "Mquality"       
-    ## [45] "TypeLm"          "GrowthEnviron"   "TS"             
+    ## [29] "r2"              "r2_M"            "Comment2"        "Number"         
+    ## [33] "Number_M"        "TS"              "Locality"        "MethodGrowth"   
+    ## [37] "MethodM"         "Data"            "DataSourceRef"   "AssumedDistLoo" 
+    ## [41] "AssumedDistK"    "Type"            "TypeLm"          "Auxim"          
+    ## [45] "SourceWinfinity" "Mquality"        "TypeLm"          "GrowthEnviron"  
+    ## [49] "TS"             
     ## [1] "kept fields"
-    ##  [1] "Species"      "Loo"          "Number"       "SE_Loo"       "SD_Loo"      
-    ##  [6] "LCL_Loo"      "UCL_Loo"      "TLinfinity"   "K"            "SE_K"        
-    ## [11] "SD_K"         "LCL_K"        "UCL_K"        "to"           "SE_to"       
-    ## [16] "SD_to"        "LCL_to"       "UCL_to"       "Winfinity"    "LinfLmax"    
-    ## [21] "LogKLogLoo"   "b"            "C"            "tmax"         "tm"          
-    ## [26] "M"            "Number_M"     "SE_M"         "SD_M"         "LCL_M"       
-    ## [31] "UCL_M"        "AssumedDistM" "Lm"           "LmLoo"        "LmMale"      
-    ## [36] "LmLooMale"    "LmFemale"     "LmLooFemale"  "Temperature"  "DeltaT"      
-    ## [41] "Rm"          
+    ##  [1] "Species"      "Loo"          "SE_Loo"       "SD_Loo"       "LCL_Loo"     
+    ##  [6] "UCL_Loo"      "TLinfinity"   "K"            "SE_K"         "SD_K"        
+    ## [11] "LCL_K"        "UCL_K"        "to"           "SE_to"        "SD_to"       
+    ## [16] "LCL_to"       "UCL_to"       "Winfinity"    "LinfLmax"     "LogKLogLoo"  
+    ## [21] "b"            "C"            "tmax"         "tm"           "M"           
+    ## [26] "SE_M"         "SD_M"         "LCL_M"        "UCL_M"        "AssumedDistM"
+    ## [31] "Lm"           "LmLoo"        "LmMale"       "LmLooMale"    "LmFemale"    
+    ## [36] "LmLooFemale"  "Temperature"  "DeltaT"       "Rm"          
     ## [1] "T_b_multiple_sum, Species field count"
     ## [1] 1
     ## [1] "T_n_sum, Species field count"
@@ -5506,99 +5598,98 @@ names(out)[str_which(names(out),table_name)]
 ```
 
     ##  [1] "to_popgrowth"                   "LinfLmax_popgrowth"            
-    ##  [3] "Loo_popgrowth"                  "Number_popgrowth"              
-    ##  [5] "SE_Loo_popgrowth"               "SD_Loo_popgrowth"              
-    ##  [7] "TLinfinity_popgrowth"           "K_popgrowth"                   
-    ##  [9] "SE_K_popgrowth"                 "SD_K_popgrowth"                
-    ## [11] "LCL_K_popgrowth"                "UCL_K_popgrowth"               
-    ## [13] "SE_to_popgrowth"                "SD_to_popgrowth"               
-    ## [15] "LCL_to_popgrowth"               "UCL_to_popgrowth"              
-    ## [17] "Winfinity_popgrowth"            "LogKLogLoo_popgrowth"          
-    ## [19] "b_popgrowth"                    "C_popgrowth"                   
-    ## [21] "tmax_popgrowth"                 "tm_popgrowth"                  
-    ## [23] "M_popgrowth"                    "Number_M_popgrowth"            
-    ## [25] "Lm_popgrowth"                   "LmLoo_popgrowth"               
-    ## [27] "LmMale_popgrowth"               "LmLooMale_popgrowth"           
-    ## [29] "LmFemale_popgrowth"             "LmLooFemale_popgrowth"         
-    ## [31] "Temperature_popgrowth"          "DeltaT_popgrowth"              
-    ## [33] "Rm_popgrowth"                   "record_count_species_popgrowth"
+    ##  [3] "Loo_popgrowth"                  "SE_Loo_popgrowth"              
+    ##  [5] "SD_Loo_popgrowth"               "TLinfinity_popgrowth"          
+    ##  [7] "K_popgrowth"                    "SE_K_popgrowth"                
+    ##  [9] "SD_K_popgrowth"                 "LCL_K_popgrowth"               
+    ## [11] "UCL_K_popgrowth"                "SE_to_popgrowth"               
+    ## [13] "SD_to_popgrowth"                "LCL_to_popgrowth"              
+    ## [15] "UCL_to_popgrowth"               "Winfinity_popgrowth"           
+    ## [17] "LogKLogLoo_popgrowth"           "b_popgrowth"                   
+    ## [19] "C_popgrowth"                    "tmax_popgrowth"                
+    ## [21] "tm_popgrowth"                   "M_popgrowth"                   
+    ## [23] "Lm_popgrowth"                   "LmLoo_popgrowth"               
+    ## [25] "LmMale_popgrowth"               "LmLooMale_popgrowth"           
+    ## [27] "LmFemale_popgrowth"             "LmLooFemale_popgrowth"         
+    ## [29] "Temperature_popgrowth"          "DeltaT_popgrowth"              
+    ## [31] "Rm_popgrowth"                   "record_count_species_popgrowth"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
 ```
 
-    ##   to_popgrowth LinfLmax_popgrowth Loo_popgrowth    Number_popgrowth 
-    ##  Min.   :1     Min.   :0.0000     Min.   :  3.70   Min.   :   39.0  
-    ##  1st Qu.:1     1st Qu.:0.0000     1st Qu.: 20.55   1st Qu.:  105.1  
-    ##  Median :1     Median :0.0000     Median : 44.26   Median :  277.9  
-    ##  Mean   :1     Mean   :0.4706     Mean   : 54.90   Mean   : 2490.7  
-    ##  3rd Qu.:1     3rd Qu.:1.0000     3rd Qu.: 92.70   3rd Qu.:  421.0  
-    ##  Max.   :1     Max.   :1.0000     Max.   :148.77   Max.   :22237.7  
-    ##  NA's   :66    NA's   :38         NA's   :38       NA's   :62       
-    ##  SE_Loo_popgrowth SD_Loo_popgrowth TLinfinity_popgrowth  K_popgrowth     
-    ##  Min.   : 1.100   Min.   :1.162    Min.   :  3.70       Min.   : 0.1090  
-    ##  1st Qu.: 2.710   1st Qu.:1.162    1st Qu.: 28.61       1st Qu.: 0.1923  
-    ##  Median : 4.320   Median :1.162    Median : 45.88       Median : 0.3340  
-    ##  Mean   : 6.173   Mean   :1.162    Mean   : 62.32       Mean   : 1.2207  
-    ##  3rd Qu.: 8.710   3rd Qu.:1.162    3rd Qu.: 99.41       3rd Qu.: 1.0573  
-    ##  Max.   :13.100   Max.   :1.162    Max.   :161.49       Max.   :12.6000  
-    ##  NA's   :69       NA's   :71       NA's   :44           NA's   :38       
-    ##  SE_K_popgrowth    SD_K_popgrowth   LCL_K_popgrowth  UCL_K_popgrowth 
-    ##  Min.   :0.03600   Min.   :0.1081   Min.   :0.1211   Min.   :0.1241  
-    ##  1st Qu.:0.04300   1st Qu.:0.1081   1st Qu.:0.1719   1st Qu.:0.1798  
-    ##  Median :0.05000   Median :0.1081   Median :0.2227   Median :0.2354  
-    ##  Mean   :0.08533   Mean   :0.1081   Mean   :0.2227   Mean   :0.2354  
-    ##  3rd Qu.:0.11000   3rd Qu.:0.1081   3rd Qu.:0.2735   3rd Qu.:0.2910  
-    ##  Max.   :0.17000   Max.   :0.1081   Max.   :0.3243   Max.   :0.3467  
-    ##  NA's   :69        NA's   :71       NA's   :70       NA's   :70      
-    ##  SE_to_popgrowth  SD_to_popgrowth  LCL_to_popgrowth   UCL_to_popgrowth  
-    ##  Min.   :0.2600   Min.   :0.6914   Min.   :-0.72650   Min.   :-0.60400  
-    ##  1st Qu.:0.2900   1st Qu.:0.6914   1st Qu.:-0.55321   1st Qu.:-0.45383  
-    ##  Median :0.3200   Median :0.6914   Median :-0.37992   Median :-0.30367  
-    ##  Mean   :0.3353   Mean   :0.6914   Mean   :-0.37992   Mean   :-0.30367  
-    ##  3rd Qu.:0.3730   3rd Qu.:0.6914   3rd Qu.:-0.20662   3rd Qu.:-0.15350  
-    ##  Max.   :0.4260   Max.   :0.6914   Max.   :-0.03333   Max.   :-0.00333  
-    ##  NA's   :69       NA's   :71       NA's   :70         NA's   :70        
-    ##  Winfinity_popgrowth LogKLogLoo_popgrowth  b_popgrowth     C_popgrowth    
-    ##  Min.   :    0.7     Min.   :-0.62014     Min.   :2.843   Min.   :0.2000  
-    ##  1st Qu.:  730.1     1st Qu.:-0.40683     1st Qu.:2.987   1st Qu.:0.3500  
-    ##  Median : 2271.1     Median :-0.36202     Median :3.000   Median :0.5000  
-    ##  Mean   : 8338.4     Mean   :-0.12938     Mean   :3.013   Mean   :0.5667  
-    ##  3rd Qu.: 6403.1     3rd Qu.:-0.03473     3rd Qu.:3.030   3rd Qu.:0.7500  
-    ##  Max.   :60447.4     Max.   : 1.41348     Max.   :3.166   Max.   :1.0000  
-    ##  NA's   :54          NA's   :51           NA's   :55      NA's   :69      
-    ##  tmax_popgrowth    tm_popgrowth    M_popgrowth     Number_M_popgrowth
-    ##  Min.   : 3.000   Min.   :1.000   Min.   :0.1500   Min.   :66        
-    ##  1st Qu.: 8.062   1st Qu.:2.314   1st Qu.:0.2783   1st Qu.:66        
-    ##  Median :10.692   Median :2.500   Median :0.3814   Median :66        
-    ##  Mean   :11.772   Mean   :2.961   Mean   :0.4203   Mean   :66        
-    ##  3rd Qu.:13.628   3rd Qu.:4.100   3rd Qu.:0.4000   3rd Qu.:66        
-    ##  Max.   :29.000   Max.   :4.889   Max.   :1.4000   Max.   :66        
-    ##  NA's   :56       NA's   :67      NA's   :59       NA's   :71        
-    ##   Lm_popgrowth   LmLoo_popgrowth  LmMale_popgrowth LmLooMale_popgrowth
-    ##  Min.   :13.85   Min.   :0.3000   Min.   : 8.69    Min.   :0.430      
-    ##  1st Qu.:24.43   1st Qu.:0.4650   1st Qu.:14.59    1st Qu.:0.470      
-    ##  Median :33.50   Median :0.5550   Median :25.05    Median :0.530      
-    ##  Mean   :33.21   Mean   :0.5474   Mean   :29.62    Mean   :0.514      
-    ##  3rd Qu.:38.65   3rd Qu.:0.6200   3rd Qu.:47.38    3rd Qu.:0.545      
-    ##  Max.   :61.25   Max.   :0.8115   Max.   :53.00    Max.   :0.595      
-    ##  NA's   :60      NA's   :63       NA's   :66       NA's   :67         
-    ##  LmFemale_popgrowth LmLooFemale_popgrowth Temperature_popgrowth
-    ##  Min.   :15.00      Min.   :0.3967        Min.   :-1.00        
-    ##  1st Qu.:15.20      1st Qu.:0.4192        1st Qu.:12.10        
-    ##  Median :39.83      Median :0.4533        Median :18.86        
-    ##  Mean   :40.01      Mean   :0.4558        Mean   :17.89        
-    ##  3rd Qu.:59.00      3rd Qu.:0.4900        3rd Qu.:25.00        
-    ##  Max.   :71.00      Max.   :0.5200        Max.   :28.00        
-    ##  NA's   :67         NA's   :68            NA's   :46           
-    ##  DeltaT_popgrowth  Rm_popgrowth    record_count_species_popgrowth
-    ##  Min.   : 5.80    Min.   :0.1500   Min.   :  1.000               
-    ##  1st Qu.:10.90    1st Qu.:0.4000   1st Qu.:  1.000               
-    ##  Median :16.00    Median :0.5965   Median :  1.000               
-    ##  Mean   :13.62    Mean   :0.7117   Mean   :  8.667               
-    ##  3rd Qu.:17.52    3rd Qu.:0.7910   3rd Qu.:  4.250               
-    ##  Max.   :19.05    Max.   :1.6210   Max.   :124.000               
-    ##  NA's   :69       NA's   :67
+    ##   to_popgrowth LinfLmax_popgrowth Loo_popgrowth    SE_Loo_popgrowth
+    ##  Min.   :1     Min.   :0.0000     Min.   :  3.70   Min.   : 1.100  
+    ##  1st Qu.:1     1st Qu.:0.0000     1st Qu.: 20.55   1st Qu.: 2.710  
+    ##  Median :1     Median :0.0000     Median : 44.26   Median : 4.320  
+    ##  Mean   :1     Mean   :0.4706     Mean   : 54.90   Mean   : 6.173  
+    ##  3rd Qu.:1     3rd Qu.:1.0000     3rd Qu.: 92.70   3rd Qu.: 8.710  
+    ##  Max.   :1     Max.   :1.0000     Max.   :148.77   Max.   :13.100  
+    ##  NA's   :66    NA's   :38         NA's   :38       NA's   :69      
+    ##  SD_Loo_popgrowth TLinfinity_popgrowth  K_popgrowth      SE_K_popgrowth   
+    ##  Min.   :1.162    Min.   :  3.70       Min.   : 0.1090   Min.   :0.03600  
+    ##  1st Qu.:1.162    1st Qu.: 28.61       1st Qu.: 0.1923   1st Qu.:0.04300  
+    ##  Median :1.162    Median : 45.88       Median : 0.3340   Median :0.05000  
+    ##  Mean   :1.162    Mean   : 62.32       Mean   : 1.2207   Mean   :0.08533  
+    ##  3rd Qu.:1.162    3rd Qu.: 99.41       3rd Qu.: 1.0573   3rd Qu.:0.11000  
+    ##  Max.   :1.162    Max.   :161.49       Max.   :12.6000   Max.   :0.17000  
+    ##  NA's   :71       NA's   :44           NA's   :38        NA's   :69       
+    ##  SD_K_popgrowth   LCL_K_popgrowth  UCL_K_popgrowth  SE_to_popgrowth 
+    ##  Min.   :0.1081   Min.   :0.1211   Min.   :0.1241   Min.   :0.2600  
+    ##  1st Qu.:0.1081   1st Qu.:0.1719   1st Qu.:0.1798   1st Qu.:0.2900  
+    ##  Median :0.1081   Median :0.2227   Median :0.2354   Median :0.3200  
+    ##  Mean   :0.1081   Mean   :0.2227   Mean   :0.2354   Mean   :0.3353  
+    ##  3rd Qu.:0.1081   3rd Qu.:0.2735   3rd Qu.:0.2910   3rd Qu.:0.3730  
+    ##  Max.   :0.1081   Max.   :0.3243   Max.   :0.3467   Max.   :0.4260  
+    ##  NA's   :71       NA's   :70       NA's   :70       NA's   :69      
+    ##  SD_to_popgrowth  LCL_to_popgrowth   UCL_to_popgrowth   Winfinity_popgrowth
+    ##  Min.   :0.6914   Min.   :-0.72650   Min.   :-0.60400   Min.   :    0.7    
+    ##  1st Qu.:0.6914   1st Qu.:-0.55321   1st Qu.:-0.45383   1st Qu.:  730.1    
+    ##  Median :0.6914   Median :-0.37992   Median :-0.30367   Median : 2271.1    
+    ##  Mean   :0.6914   Mean   :-0.37992   Mean   :-0.30367   Mean   : 8338.4    
+    ##  3rd Qu.:0.6914   3rd Qu.:-0.20662   3rd Qu.:-0.15350   3rd Qu.: 6403.1    
+    ##  Max.   :0.6914   Max.   :-0.03333   Max.   :-0.00333   Max.   :60447.4    
+    ##  NA's   :71       NA's   :70         NA's   :70         NA's   :54         
+    ##  LogKLogLoo_popgrowth  b_popgrowth     C_popgrowth     tmax_popgrowth  
+    ##  Min.   :-0.62014     Min.   :2.843   Min.   :0.2000   Min.   : 3.000  
+    ##  1st Qu.:-0.40683     1st Qu.:2.987   1st Qu.:0.3500   1st Qu.: 8.062  
+    ##  Median :-0.36202     Median :3.000   Median :0.5000   Median :10.692  
+    ##  Mean   :-0.12938     Mean   :3.013   Mean   :0.5667   Mean   :11.772  
+    ##  3rd Qu.:-0.03473     3rd Qu.:3.030   3rd Qu.:0.7500   3rd Qu.:13.628  
+    ##  Max.   : 1.41348     Max.   :3.166   Max.   :1.0000   Max.   :29.000  
+    ##  NA's   :51           NA's   :55      NA's   :69       NA's   :56      
+    ##   tm_popgrowth    M_popgrowth      Lm_popgrowth   LmLoo_popgrowth 
+    ##  Min.   :1.000   Min.   :0.1500   Min.   :13.85   Min.   :0.3000  
+    ##  1st Qu.:2.314   1st Qu.:0.2783   1st Qu.:24.43   1st Qu.:0.4650  
+    ##  Median :2.500   Median :0.3814   Median :33.50   Median :0.5550  
+    ##  Mean   :2.961   Mean   :0.4203   Mean   :33.21   Mean   :0.5474  
+    ##  3rd Qu.:4.100   3rd Qu.:0.4000   3rd Qu.:38.65   3rd Qu.:0.6200  
+    ##  Max.   :4.889   Max.   :1.4000   Max.   :61.25   Max.   :0.8115  
+    ##  NA's   :67      NA's   :59       NA's   :60      NA's   :63      
+    ##  LmMale_popgrowth LmLooMale_popgrowth LmFemale_popgrowth LmLooFemale_popgrowth
+    ##  Min.   : 8.69    Min.   :0.430       Min.   :15.00      Min.   :0.3967       
+    ##  1st Qu.:14.59    1st Qu.:0.470       1st Qu.:15.20      1st Qu.:0.4192       
+    ##  Median :25.05    Median :0.530       Median :39.83      Median :0.4533       
+    ##  Mean   :29.62    Mean   :0.514       Mean   :40.01      Mean   :0.4558       
+    ##  3rd Qu.:47.38    3rd Qu.:0.545       3rd Qu.:59.00      3rd Qu.:0.4900       
+    ##  Max.   :53.00    Max.   :0.595       Max.   :71.00      Max.   :0.5200       
+    ##  NA's   :66       NA's   :67          NA's   :67         NA's   :68           
+    ##  Temperature_popgrowth DeltaT_popgrowth  Rm_popgrowth   
+    ##  Min.   :-1.00         Min.   : 5.80    Min.   :0.1500  
+    ##  1st Qu.:12.10         1st Qu.:10.90    1st Qu.:0.4000  
+    ##  Median :18.86         Median :16.00    Median :0.5965  
+    ##  Mean   :17.89         Mean   :13.62    Mean   :0.7117  
+    ##  3rd Qu.:25.00         3rd Qu.:17.52    3rd Qu.:0.7910  
+    ##  Max.   :28.00         Max.   :19.05    Max.   :1.6210  
+    ##  NA's   :46            NA's   :69       NA's   :67      
+    ##  record_count_species_popgrowth
+    ##  Min.   :  1.000               
+    ##  1st Qu.:  1.000               
+    ##  Median :  1.000               
+    ##  Mean   :  8.667               
+    ##  3rd Qu.:  4.250               
+    ##  Max.   :124.000               
+    ## 
 
 ``` r
 save(out, file = "out.Rdata")
@@ -5768,13 +5859,11 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ##  [9] "Expert"         "Modified"       "DateModified"   "DateChecked"   
     ## [13] "SpecCode"       "StockCode"      "C_Code"         "AlphaCode"     
     ## [17] "Predatcode"     "PredatorName"   "Locality"       "PredatorII"    
-    ## [21] "TS"             "Locality"       "MaxLength"      "MaxLengthType" 
-    ## [25] "MaxLengthType"  "PredatorName"   "PredatorGroup"  "StomachContent"
-    ## [29] "MaxLength"      "MaxLengthType"  "MaxLength"      "MaxLengthType" 
-    ## [33] "TS"            
+    ## [21] "TS"             "Locality"       "MaxLengthType"  "PredatorName"  
+    ## [25] "PredatorGroup"  "StomachContent" "TS"            
     ## [1] "kept fields"
     ## [1] "Species"       "Predatstage"   "PredatorI"     "PreyStage"    
-    ## [5] "DietP"         "PredatTroph"   "PredatseTroph"
+    ## [5] "DietP"         "MaxLength"     "PredatTroph"   "PredatseTroph"
     ## [1] "T_n_sum, Species field count"
     ## [1] 1
     ## [1] "finished T_n"
@@ -5818,93 +5907,101 @@ length(str_which(names(out),"Species"))
 names(out)[str_which(names(out),table_name)]
 ```
 
-    ##  [1] "DietP_predators"                    "PredatTroph_predators"             
-    ##  [3] "PredatseTroph_predators"            "Predatstageadults_predators"       
-    ##  [5] "Predatstagejuv..adults_predators"   "Predatstagelarvae_predators"       
-    ##  [7] "Predatstagerecruits.juv._predators" "PredatorIbirds_predators"          
-    ##  [9] "PredatorIcrustaceans_predators"     "PredatorIfinfish_predators"        
-    ## [11] "PredatorIherps_predators"           "PredatorIinsects_predators"        
-    ## [13] "PredatorImammals_predators"         "PredatorImollusks_predators"       
-    ## [15] "PredatorIother_predators"           "PreyStageadults_predators"         
-    ## [17] "PreyStageeggs_predators"            "PreyStagejuv..adults_predators"    
-    ## [19] "PreyStagelarvae_predators"          "PreyStagerecruits.juv._predators"  
-    ## [21] "record_count_species_predators"
+    ##  [1] "DietP_predators"                    "MaxLength_predators"               
+    ##  [3] "PredatTroph_predators"              "PredatseTroph_predators"           
+    ##  [5] "Predatstageadults_predators"        "Predatstagejuv..adults_predators"  
+    ##  [7] "Predatstagelarvae_predators"        "Predatstagerecruits.juv._predators"
+    ##  [9] "PredatorIbirds_predators"           "PredatorIcrustaceans_predators"    
+    ## [11] "PredatorIfinfish_predators"         "PredatorIherps_predators"          
+    ## [13] "PredatorIinsects_predators"         "PredatorImammals_predators"        
+    ## [15] "PredatorImollusks_predators"        "PredatorIother_predators"          
+    ## [17] "PreyStageadults_predators"          "PreyStageeggs_predators"           
+    ## [19] "PreyStagejuv..adults_predators"     "PreyStagelarvae_predators"         
+    ## [21] "PreyStagerecruits.juv._predators"   "record_count_species_predators"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
 ```
 
-    ##  DietP_predators PredatTroph_predators PredatseTroph_predators
-    ##  Min.   : 0.10   Min.   :3.212         Min.   :0.3400         
-    ##  1st Qu.: 1.05   1st Qu.:3.500         1st Qu.:0.7099         
-    ##  Median :11.93   Median :3.500         Median :0.8000         
-    ##  Mean   :24.17   Mean   :3.504         Mean   :0.7335         
-    ##  3rd Qu.:42.04   3rd Qu.:3.500         3rd Qu.:0.8000         
-    ##  Max.   :71.00   Max.   :3.765         Max.   :0.8033         
-    ##  NA's   :65      NA's   :54            NA's   :54             
-    ##  Predatstageadults_predators Predatstagejuv..adults_predators
-    ##  0   :19                     0   : 2                         
-    ##  1   :10                     1   :27                         
-    ##  NA's:43                     NA's:43                         
+    ##  DietP_predators MaxLength_predators PredatTroph_predators
+    ##  Min.   : 0.10   Min.   :13.20       Min.   :3.212        
+    ##  1st Qu.: 1.05   1st Qu.:31.50       1st Qu.:3.500        
+    ##  Median :11.93   Median :67.00       Median :3.500        
+    ##  Mean   :24.17   Mean   :54.35       Mean   :3.504        
+    ##  3rd Qu.:42.04   3rd Qu.:73.88       3rd Qu.:3.500        
+    ##  Max.   :71.00   Max.   :89.50       Max.   :3.765        
+    ##  NA's   :65      NA's   :65          NA's   :54           
+    ##  PredatseTroph_predators Predatstageadults_predators
+    ##  Min.   :0.3400          0   :19                    
+    ##  1st Qu.:0.7099          1   :10                    
+    ##  Median :0.8000          NA's:43                    
+    ##  Mean   :0.7335                                     
+    ##  3rd Qu.:0.8000                                     
+    ##  Max.   :0.8033                                     
+    ##  NA's   :54                                         
+    ##  Predatstagejuv..adults_predators Predatstagelarvae_predators
+    ##  0   : 2                          0   :28                    
+    ##  1   :27                          1   : 1                    
+    ##  NA's:43                          NA's:43                    
     ##                                                              
     ##                                                              
     ##                                                              
     ##                                                              
-    ##  Predatstagelarvae_predators Predatstagerecruits.juv._predators
-    ##  0   :28                     0   :23                           
-    ##  1   : 1                     1   : 6                           
-    ##  NA's:43                     NA's:43                           
-    ##                                                                
-    ##                                                                
-    ##                                                                
-    ##                                                                
-    ##  PredatorIbirds_predators PredatorIcrustaceans_predators
-    ##  0   :18                  0   :28                       
-    ##  1   :11                  1   : 1                       
-    ##  NA's:43                  NA's:43                       
-    ##                                                         
-    ##                                                         
-    ##                                                         
-    ##                                                         
-    ##  PredatorIfinfish_predators PredatorIherps_predators PredatorIinsects_predators
-    ##  0   : 3                    0   :28                  0   :25                   
-    ##  1   :26                    1   : 1                  1   : 4                   
-    ##  NA's:43                    NA's:43                  NA's:43                   
+    ##  Predatstagerecruits.juv._predators PredatorIbirds_predators
+    ##  0   :23                            0   :18                 
+    ##  1   : 6                            1   :11                 
+    ##  NA's:43                            NA's:43                 
+    ##                                                             
+    ##                                                             
+    ##                                                             
+    ##                                                             
+    ##  PredatorIcrustaceans_predators PredatorIfinfish_predators
+    ##  0   :28                        0   : 3                   
+    ##  1   : 1                        1   :26                   
+    ##  NA's:43                        NA's:43                   
+    ##                                                           
+    ##                                                           
+    ##                                                           
+    ##                                                           
+    ##  PredatorIherps_predators PredatorIinsects_predators PredatorImammals_predators
+    ##  0   :28                  0   :25                    0   :25                   
+    ##  1   : 1                  1   : 4                    1   : 4                   
+    ##  NA's:43                  NA's:43                    NA's:43                   
     ##                                                                                
     ##                                                                                
     ##                                                                                
     ##                                                                                
-    ##  PredatorImammals_predators PredatorImollusks_predators
-    ##  0   :25                    0   :26                    
-    ##  1   : 4                    1   : 3                    
-    ##  NA's:43                    NA's:43                    
+    ##  PredatorImollusks_predators PredatorIother_predators PreyStageadults_predators
+    ##  0   :26                     0   :27                  0   :25                  
+    ##  1   : 3                     1   : 2                  1   : 4                  
+    ##  NA's:43                     NA's:43                  NA's:43                  
+    ##                                                                                
+    ##                                                                                
+    ##                                                                                
+    ##                                                                                
+    ##  PreyStageeggs_predators PreyStagejuv..adults_predators
+    ##  0   :24                 0   : 4                       
+    ##  1   : 5                 1   :25                       
+    ##  NA's:43                 NA's:43                       
     ##                                                        
     ##                                                        
     ##                                                        
     ##                                                        
-    ##  PredatorIother_predators PreyStageadults_predators PreyStageeggs_predators
-    ##  0   :27                  0   :25                   0   :24                
-    ##  1   : 2                  1   : 4                   1   : 5                
-    ##  NA's:43                  NA's:43                   NA's:43                
-    ##                                                                            
-    ##                                                                            
-    ##                                                                            
-    ##                                                                            
-    ##  PreyStagejuv..adults_predators PreyStagelarvae_predators
-    ##  0   : 4                        0   :25                  
-    ##  1   :25                        1   : 4                  
-    ##  NA's:43                        NA's:43                  
-    ##                                                          
-    ##                                                          
-    ##                                                          
-    ##                                                          
-    ##  PreyStagerecruits.juv._predators record_count_species_predators
-    ##  0   :18                          Min.   : 1.000                
-    ##  1   :11                          1st Qu.: 1.000                
-    ##  NA's:43                          Median : 1.000                
-    ##                                   Mean   : 3.556                
-    ##                                   3rd Qu.: 2.000                
-    ##                                   Max.   :48.000                
+    ##  PreyStagelarvae_predators PreyStagerecruits.juv._predators
+    ##  0   :25                   0   :18                         
+    ##  1   : 4                   1   :11                         
+    ##  NA's:43                   NA's:43                         
+    ##                                                            
+    ##                                                            
+    ##                                                            
+    ##                                                            
+    ##  record_count_species_predators
+    ##  Min.   : 1.000                
+    ##  1st Qu.: 1.000                
+    ##  Median : 1.000                
+    ##  Mean   : 3.556                
+    ##  3rd Qu.: 2.000                
+    ##  Max.   :48.000                
     ## 
 
 ``` r
@@ -6531,40 +6628,31 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
 ```
 
     ## [1] "removed fields"
-    ##  [1] "SpecCode"           "autoctr"            "StockCode"         
-    ##  [4] "SpawningRefNo"      "SourceRef"          "SexRmodRef"        
-    ##  [7] "FecundityRef"       "SpCycleRef"         "GestationMinRef"   
-    ## [10] "GestationMaxRef"    "LengthOffMinRef"    "LengthOffMaxRef"   
-    ## [13] "FecunMinRef"        "FecunMeanRef"       "FecunMaxRef"       
-    ## [16] "SpawnMinRef"        "SpawnMeanRef"       "SpawnMaxRef"       
-    ## [19] "Entered"            "Dateentered"        "Expert"            
-    ## [22] "Datechecked"        "FecComment"         "Modified"          
-    ## [25] "AddInfos"           "Datemodified"       "SpecCode"          
-    ## [28] "StockCode"          "C_Code"             "E_CODE"            
-    ## [31] "SexRatiomid"        "SexRmodRef"         "TS"                
-    ## [34] "LengthFecunMin"     "LengthTypeFecMin"   "LengthFecunMax"    
-    ## [37] "LengthTypeFecMax"   "LengthOffspringMin" "LengthOffMinRef"   
-    ## [40] "LengthOffspringMax" "LengthOffMaxRef"    "LengthMin"         
-    ## [43] "LengthMax"          "LengthType"         "LengthTypeFecMin"  
-    ## [46] "LengthTypeFecMax"   "LengthType"         "Spawningarea"      
-    ## [49] "LengthFecunMin"     "LengthTypeFecMin"   "LengthFecunMax"    
-    ## [52] "LengthTypeFecMax"   "LengthOffspringMin" "LengthOffMinRef"   
-    ## [55] "LengthOffspringMax" "LengthOffMaxRef"    "LengthMin"         
-    ## [58] "LengthMax"          "LengthType"         "LengthFecunMin"    
-    ## [61] "LengthTypeFecMin"   "LengthFecunMax"     "LengthTypeFecMax"  
-    ## [64] "LengthOffspringMin" "LengthOffMinRef"    "LengthOffspringMax"
-    ## [67] "LengthOffMaxRef"    "LengthMin"          "LengthMax"         
-    ## [70] "LengthType"         "TS"                
+    ##  [1] "SpecCode"         "autoctr"          "StockCode"        "SpawningRefNo"   
+    ##  [5] "SourceRef"        "SexRmodRef"       "FecundityRef"     "SpCycleRef"      
+    ##  [9] "GestationMinRef"  "GestationMaxRef"  "LengthOffMinRef"  "LengthOffMaxRef" 
+    ## [13] "FecunMinRef"      "FecunMeanRef"     "FecunMaxRef"      "SpawnMinRef"     
+    ## [17] "SpawnMeanRef"     "SpawnMaxRef"      "Entered"          "Dateentered"     
+    ## [21] "Expert"           "Datechecked"      "FecComment"       "Modified"        
+    ## [25] "AddInfos"         "Datemodified"     "SpecCode"         "StockCode"       
+    ## [29] "C_Code"           "E_CODE"           "SexRatiomid"      "SexRmodRef"      
+    ## [33] "Number"           "TS"               "LengthTypeFecMin" "LengthTypeFecMax"
+    ## [37] "LengthType"       "Spawningarea"     "TS"              
     ## [1] "kept fields"
-    ##  [1] "Species"          "SpawningGround"   "Jan"              "Feb"             
-    ##  [5] "Mar"              "Apr"              "May"              "Jun"             
-    ##  [9] "Jul"              "Aug"              "Sep"              "Oct"             
-    ## [13] "Nov"              "Dec"              "GSI"              "PercentFemales"  
-    ## [17] "TempLow"          "TempHigh"         "FecundityMin"     "WeightMin"       
-    ## [21] "FecundityMax"     "WeightMax"        "SpawningCycles"   "GestationMin"    
-    ## [25] "GestationMax"     "RelFecundityMin"  "RelFecundityMean" "RelFecundityMax" 
-    ## [29] "Number"           "a"                "b"                "CorrCoeff"       
-    ## [33] "Dailyspawnmin"    "Dailyspawnmean"   "Dailyspawnmax"   
+    ##  [1] "Species"            "SpawningGround"     "Jan"               
+    ##  [4] "Feb"                "Mar"                "Apr"               
+    ##  [7] "May"                "Jun"                "Jul"               
+    ## [10] "Aug"                "Sep"                "Oct"               
+    ## [13] "Nov"                "Dec"                "GSI"               
+    ## [16] "PercentFemales"     "TempLow"            "TempHigh"          
+    ## [19] "FecundityMin"       "WeightMin"          "LengthFecunMin"    
+    ## [22] "FecundityMax"       "WeightMax"          "LengthFecunMax"    
+    ## [25] "SpawningCycles"     "GestationMin"       "GestationMax"      
+    ## [28] "LengthOffspringMin" "LengthOffspringMax" "RelFecundityMin"   
+    ## [31] "RelFecundityMean"   "RelFecundityMax"    "LengthMin"         
+    ## [34] "LengthMax"          "a"                  "b"                 
+    ## [37] "CorrCoeff"          "Dailyspawnmin"      "Dailyspawnmean"    
+    ## [40] "Dailyspawnmax"     
     ## [1] "T_b_multiple_sum, Species field count"
     ## [1] 1
     ## [1] "T_n_sum, Species field count"
@@ -6618,16 +6706,18 @@ names(out)[str_which(names(out),table_name)]
     ## [13] "Nov_spawning"                      "Dec_spawning"                     
     ## [15] "TempLow_spawning"                  "TempHigh_spawning"                
     ## [17] "FecundityMin_spawning"             "WeightMin_spawning"               
-    ## [19] "FecundityMax_spawning"             "WeightMax_spawning"               
-    ## [21] "SpawningCycles_spawning"           "GestationMin_spawning"            
-    ## [23] "GestationMax_spawning"             "RelFecundityMin_spawning"         
-    ## [25] "RelFecundityMean_spawning"         "RelFecundityMax_spawning"         
-    ## [27] "Number_spawning"                   "a_spawning"                       
-    ## [29] "b_spawning"                        "CorrCoeff_spawning"               
-    ## [31] "Dailyspawnmin_spawning"            "Dailyspawnmax_spawning"           
-    ## [33] "SpawningGroundcoastal_spawning"    "SpawningGroundestuarine_spawning" 
-    ## [35] "SpawningGroundlacustrine_spawning" "SpawningGroundriverine_spawning"  
-    ## [37] "SpawningGroundshelf_spawning"      "record_count_species_spawning"
+    ## [19] "LengthFecunMin_spawning"           "FecundityMax_spawning"            
+    ## [21] "WeightMax_spawning"                "LengthFecunMax_spawning"          
+    ## [23] "SpawningCycles_spawning"           "GestationMin_spawning"            
+    ## [25] "GestationMax_spawning"             "LengthOffspringMin_spawning"      
+    ## [27] "RelFecundityMin_spawning"          "RelFecundityMean_spawning"        
+    ## [29] "RelFecundityMax_spawning"          "LengthMin_spawning"               
+    ## [31] "LengthMax_spawning"                "a_spawning"                       
+    ## [33] "b_spawning"                        "CorrCoeff_spawning"               
+    ## [35] "Dailyspawnmin_spawning"            "Dailyspawnmax_spawning"           
+    ## [37] "SpawningGroundcoastal_spawning"    "SpawningGroundestuarine_spawning" 
+    ## [39] "SpawningGroundlacustrine_spawning" "SpawningGroundriverine_spawning"  
+    ## [41] "SpawningGroundshelf_spawning"      "record_count_species_spawning"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
@@ -6665,69 +6755,85 @@ summary(out[,str_which(names(out),table_name)])
     ##  3rd Qu.:111.00   3rd Qu.:111.0   3rd Qu.:20.000   3rd Qu.:29.00    
     ##  Max.   :111.00   Max.   :111.0   Max.   :27.000   Max.   :36.00    
     ##  NA's   :54       NA's   :57      NA's   :59       NA's   :59       
-    ##  FecundityMin_spawning WeightMin_spawning  FecundityMax_spawning
-    ##  Min.   :      20      Min.   :    34.10   Min.   :      25     
-    ##  1st Qu.:     367      1st Qu.:    81.78   1st Qu.:     954     
-    ##  Median :    3518      Median :  1600.00   Median :   13798     
-    ##  Mean   : 1290787      Mean   : 51393.08   Mean   : 4484567     
-    ##  3rd Qu.:   48626      3rd Qu.:  4561.50   3rd Qu.:  286667     
-    ##  Max.   :15300000      Max.   :300000.00   Max.   :47700000     
-    ##  NA's   :50            NA's   :66          NA's   :51           
-    ##  WeightMax_spawning SpawningCycles_spawning GestationMin_spawning
-    ##  Min.   :  165      Min.   :1.000           Min.   :8.00         
-    ##  1st Qu.:  500      1st Qu.:1.000           1st Qu.:8.25         
-    ##  Median : 4195      Median :1.000           Median :8.50         
-    ##  Mean   : 7556      Mean   :1.115           Mean   :8.50         
-    ##  3rd Qu.: 8450      3rd Qu.:1.000           3rd Qu.:8.75         
-    ##  Max.   :24469      Max.   :2.500           Max.   :9.00         
-    ##  NA's   :67         NA's   :59              NA's   :70           
-    ##  GestationMax_spawning RelFecundityMin_spawning RelFecundityMean_spawning
-    ##  Min.   :18            Min.   :   2.0           Min.   :249.8            
-    ##  1st Qu.:18            1st Qu.: 200.6           1st Qu.:369.1            
-    ##  Median :18            Median : 461.8           Median :488.4            
-    ##  Mean   :18            Mean   : 974.9           Mean   :488.4            
-    ##  3rd Qu.:18            3rd Qu.: 897.7           3rd Qu.:607.7            
-    ##  Max.   :18            Max.   :3767.2           Max.   :727.0            
-    ##  NA's   :71            NA's   :66               NA's   :70               
-    ##  RelFecundityMax_spawning Number_spawning    a_spawning        b_spawning   
-    ##  Min.   :  399.0          Min.   : 29.00   Min.   :0.08371   Min.   :2.010  
-    ##  1st Qu.:  477.0          1st Qu.: 34.50   1st Qu.:0.97700   1st Qu.:3.027  
-    ##  Median :  718.5          Median : 42.00   Median :2.71667   Median :3.298  
-    ##  Mean   : 3281.5          Mean   : 96.24   Mean   :3.03950   Mean   :3.148  
-    ##  3rd Qu.: 3523.0          3rd Qu.:128.00   3rd Qu.:4.29015   3rd Qu.:3.360  
-    ##  Max.   :11290.0          Max.   :277.67   Max.   :7.13000   Max.   :4.043  
-    ##  NA's   :68               NA's   :65       NA's   :67        NA's   :67     
-    ##  CorrCoeff_spawning Dailyspawnmin_spawning Dailyspawnmax_spawning
-    ##  Min.   :0.5400     Min.   :0.2            Min.   :0.5           
-    ##  1st Qu.:0.7000     1st Qu.:0.2            1st Qu.:0.5           
-    ##  Median :0.8310     Median :0.2            Median :0.5           
-    ##  Mean   :0.7754     Mean   :0.2            Mean   :0.5           
-    ##  3rd Qu.:0.8750     3rd Qu.:0.2            3rd Qu.:0.5           
-    ##  Max.   :0.9066     Max.   :0.2            Max.   :0.5           
-    ##  NA's   :65         NA's   :71             NA's   :71            
-    ##  SpawningGroundcoastal_spawning SpawningGroundestuarine_spawning
-    ##  0   :12                        0   :13                         
-    ##  1   : 3                        1   : 2                         
-    ##  NA's:57                        NA's:57                         
-    ##                                                                 
-    ##                                                                 
-    ##                                                                 
-    ##                                                                 
-    ##  SpawningGroundlacustrine_spawning SpawningGroundriverine_spawning
-    ##  0   :13                           0   : 9                        
-    ##  1   : 2                           1   : 6                        
-    ##  NA's:57                           NA's:57                        
-    ##                                                                   
-    ##                                                                   
-    ##                                                                   
-    ##                                                                   
-    ##  SpawningGroundshelf_spawning record_count_species_spawning
-    ##  0   :13                      Min.   : 1.000               
-    ##  1   : 2                      1st Qu.: 1.000               
-    ##  NA's:57                      Median : 1.000               
-    ##                               Mean   : 3.444               
-    ##                               3rd Qu.: 2.000               
-    ##                               Max.   :61.000               
+    ##  FecundityMin_spawning WeightMin_spawning  LengthFecunMin_spawning
+    ##  Min.   :      20      Min.   :    34.10   Min.   : 10.80         
+    ##  1st Qu.:     367      1st Qu.:    81.78   1st Qu.: 13.10         
+    ##  Median :    3518      Median :  1600.00   Median : 22.00         
+    ##  Mean   : 1290787      Mean   : 51393.08   Mean   : 33.08         
+    ##  3rd Qu.:   48626      3rd Qu.:  4561.50   3rd Qu.: 43.00         
+    ##  Max.   :15300000      Max.   :300000.00   Max.   :102.00         
+    ##  NA's   :50            NA's   :66          NA's   :63             
+    ##  FecundityMax_spawning WeightMax_spawning LengthFecunMax_spawning
+    ##  Min.   :      25      Min.   :  165      Min.   : 12.40         
+    ##  1st Qu.:     954      1st Qu.:  500      1st Qu.: 25.00         
+    ##  Median :   13798      Median : 4195      Median : 25.70         
+    ##  Mean   : 4484567      Mean   : 7556      Mean   : 57.00         
+    ##  3rd Qu.:  286667      3rd Qu.: 8450      3rd Qu.: 80.33         
+    ##  Max.   :47700000      Max.   :24469      Max.   :157.00         
+    ##  NA's   :51            NA's   :67         NA's   :63             
+    ##  SpawningCycles_spawning GestationMin_spawning GestationMax_spawning
+    ##  Min.   :1.000           Min.   :8.00          Min.   :18           
+    ##  1st Qu.:1.000           1st Qu.:8.25          1st Qu.:18           
+    ##  Median :1.000           Median :8.50          Median :18           
+    ##  Mean   :1.115           Mean   :8.50          Mean   :18           
+    ##  3rd Qu.:1.000           3rd Qu.:8.75          3rd Qu.:18           
+    ##  Max.   :2.500           Max.   :9.00          Max.   :18           
+    ##  NA's   :59              NA's   :70            NA's   :71           
+    ##  LengthOffspringMin_spawning RelFecundityMin_spawning RelFecundityMean_spawning
+    ##  Min.   :15                  Min.   :   2.0           Min.   :249.8            
+    ##  1st Qu.:15                  1st Qu.: 200.6           1st Qu.:369.1            
+    ##  Median :15                  Median : 461.8           Median :488.4            
+    ##  Mean   :15                  Mean   : 974.9           Mean   :488.4            
+    ##  3rd Qu.:15                  3rd Qu.: 897.7           3rd Qu.:607.7            
+    ##  Max.   :15                  Max.   :3767.2           Max.   :727.0            
+    ##  NA's   :71                  NA's   :66               NA's   :70               
+    ##  RelFecundityMax_spawning LengthMin_spawning LengthMax_spawning
+    ##  Min.   :  399.0          Min.   : 4.50      Min.   :12.80     
+    ##  1st Qu.:  477.0          1st Qu.: 7.70      1st Qu.:15.85     
+    ##  Median :  718.5          Median :16.70      Median :37.80     
+    ##  Mean   : 3281.5          Mean   :20.71      Mean   :43.29     
+    ##  3rd Qu.: 3523.0          3rd Qu.:32.70      3rd Qu.:67.70     
+    ##  Max.   :11290.0          Max.   :43.00      Max.   :85.33     
+    ##  NA's   :68               NA's   :65         NA's   :65        
+    ##    a_spawning        b_spawning    CorrCoeff_spawning Dailyspawnmin_spawning
+    ##  Min.   :0.08371   Min.   :2.010   Min.   :0.5400     Min.   :0.2           
+    ##  1st Qu.:0.97700   1st Qu.:3.027   1st Qu.:0.7000     1st Qu.:0.2           
+    ##  Median :2.71667   Median :3.298   Median :0.8310     Median :0.2           
+    ##  Mean   :3.03950   Mean   :3.148   Mean   :0.7754     Mean   :0.2           
+    ##  3rd Qu.:4.29015   3rd Qu.:3.360   3rd Qu.:0.8750     3rd Qu.:0.2           
+    ##  Max.   :7.13000   Max.   :4.043   Max.   :0.9066     Max.   :0.2           
+    ##  NA's   :67        NA's   :67      NA's   :65         NA's   :71            
+    ##  Dailyspawnmax_spawning SpawningGroundcoastal_spawning
+    ##  Min.   :0.5            0   :12                       
+    ##  1st Qu.:0.5            1   : 3                       
+    ##  Median :0.5            NA's:57                       
+    ##  Mean   :0.5                                          
+    ##  3rd Qu.:0.5                                          
+    ##  Max.   :0.5                                          
+    ##  NA's   :71                                           
+    ##  SpawningGroundestuarine_spawning SpawningGroundlacustrine_spawning
+    ##  0   :13                          0   :13                          
+    ##  1   : 2                          1   : 2                          
+    ##  NA's:57                          NA's:57                          
+    ##                                                                    
+    ##                                                                    
+    ##                                                                    
+    ##                                                                    
+    ##  SpawningGroundriverine_spawning SpawningGroundshelf_spawning
+    ##  0   : 9                         0   :13                     
+    ##  1   : 6                         1   : 2                     
+    ##  NA's:57                         NA's:57                     
+    ##                                                              
+    ##                                                              
+    ##                                                              
+    ##                                                              
+    ##  record_count_species_spawning
+    ##  Min.   : 1.000               
+    ##  1st Qu.: 1.000               
+    ##  Median : 1.000               
+    ##  Mean   : 3.444               
+    ##  3rd Qu.: 2.000               
+    ##  Max.   :61.000               
     ## 
 
 ``` r
@@ -6794,13 +6900,10 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ##  [1] "SpecCode"        "autoctr"         "StockCode"       "SpeedRefNo"     
     ##  [5] "DataRef"         "Entered"         "DateEntered"     "Expert"         
     ##  [9] "Comment"         "Modified"        "DateModified"    "DateChecked"    
-    ## [13] "SpecCode"        "StockCode"       "TS"              "Length"         
-    ## [17] "LengthType"      "LengthTypeSpeed" "DataRef"         "LengthType"     
-    ## [21] "LengthTypeSpeed" "Length"          "LengthType"      "LengthTypeSpeed"
-    ## [25] "Reliable"        "Length"          "LengthType"      "LengthTypeSpeed"
-    ## [29] "TS"             
+    ## [13] "SpecCode"        "StockCode"       "TS"              "DataRef"        
+    ## [17] "LengthType"      "LengthTypeSpeed" "Reliable"        "TS"             
     ## [1] "kept fields"
-    ## [1] "Species" "SpeedLS" "Speedms" "Mode"    "SLa"     "SLb"    
+    ## [1] "Species" "Length"  "SpeedLS" "Speedms" "Mode"    "SLa"     "SLb"    
     ## [1] "T_n_sum, Species field count"
     ## [1] 1
     ## [1] "finished T_n"
@@ -6843,30 +6946,31 @@ length(str_which(names(out),"Species"))
 names(out)[str_which(names(out),table_name)]
 ```
 
-    ## [1] "SpeedLS_speed"              "Speedms_speed"             
-    ## [3] "SLa_speed"                  "SLb_speed"                 
-    ## [5] "Modeburst_speed"            "Modeother_speed"           
-    ## [7] "Modesustained_speed"        "record_count_species_speed"
+    ## [1] "Length_speed"               "SpeedLS_speed"             
+    ## [3] "Speedms_speed"              "SLa_speed"                 
+    ## [5] "SLb_speed"                  "Modeburst_speed"           
+    ## [7] "Modeother_speed"            "Modesustained_speed"       
+    ## [9] "record_count_species_speed"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
 ```
 
-    ##  SpeedLS_speed   Speedms_speed      SLa_speed    SLb_speed      Modeburst_speed
-    ##  Min.   :1.695   Min.   :0.4577   Min.   :0    Min.   :0.8320   0   : 1        
-    ##  1st Qu.:6.256   1st Qu.:0.9582   1st Qu.:0    1st Qu.:0.8605   1   : 4        
-    ##  Median :6.970   Median :1.5237   Median :0    Median :0.8850   NA's:67        
-    ##  Mean   :6.443   Mean   :1.3160   Mean   :0    Mean   :0.8825                  
-    ##  3rd Qu.:8.495   3rd Qu.:1.7425   3rd Qu.:0    3rd Qu.:0.9070                  
-    ##  Max.   :8.796   Max.   :1.8982   Max.   :0    Max.   :0.9280                  
-    ##  NA's   :67      NA's   :67       NA's   :68   NA's   :68                      
-    ##  Modeother_speed Modesustained_speed record_count_species_speed
-    ##  0   : 4         0   : 1             Min.   : 1.000            
-    ##  1   : 1         1   : 4             1st Qu.: 1.000            
-    ##  NA's:67         NA's:67             Median : 1.000            
-    ##                                      Mean   : 1.903            
-    ##                                      3rd Qu.: 1.000            
-    ##                                      Max.   :38.000            
+    ##   Length_speed   SpeedLS_speed   Speedms_speed      SLa_speed    SLb_speed     
+    ##  Min.   :11.17   Min.   :1.695   Min.   :0.4577   Min.   :0    Min.   :0.8320  
+    ##  1st Qu.:25.00   1st Qu.:6.256   1st Qu.:0.9582   1st Qu.:0    1st Qu.:0.8605  
+    ##  Median :25.50   Median :6.970   Median :1.5237   Median :0    Median :0.8850  
+    ##  Mean   :23.11   Mean   :6.443   Mean   :1.3160   Mean   :0    Mean   :0.8825  
+    ##  3rd Qu.:26.89   3rd Qu.:8.495   3rd Qu.:1.7425   3rd Qu.:0    3rd Qu.:0.9070  
+    ##  Max.   :27.00   Max.   :8.796   Max.   :1.8982   Max.   :0    Max.   :0.9280  
+    ##  NA's   :67      NA's   :67      NA's   :67       NA's   :68   NA's   :68      
+    ##  Modeburst_speed Modeother_speed Modesustained_speed record_count_species_speed
+    ##  0   : 1         0   : 4         0   : 1             Min.   : 1.000            
+    ##  1   : 4         1   : 1         1   : 4             1st Qu.: 1.000            
+    ##  NA's:67         NA's:67         NA's:67             Median : 1.000            
+    ##                                                      Mean   : 1.903            
+    ##                                                      3rd Qu.: 1.000            
+    ##                                                      Max.   :38.000            
     ## 
 
 ``` r
@@ -6982,41 +7086,30 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
 ```
 
     ## [1] "removed fields"
-    ##   [1] "SpecCode"         "StockCode"        "StocksRefNo"     
-    ##   [4] "CITES_Ref"        "BoundingRef"      "TempRef"         
-    ##   [7] "TempPrefRef"      "pHRef"            "dHRef"           
-    ##  [10] "CITES_Remarks"    "ResilienceRemark" "Entered"         
-    ##  [13] "DateEntered"      "Expert"           "Modified"        
-    ##  [16] "DateModified"     "DateChecked"      "SpecCode"        
-    ##  [19] "StockCode"        "IUCN_Code"        "CITES_Code"      
-    ##  [22] "IGFAName"         "TempPref25"       "FAOAqua"         
-    ##  [25] "TS"               "LengthWeight"     "LengthRelations" 
-    ##  [28] "LengthFrequency"  "BoundingMethod"   "LengthWeight"    
-    ##  [31] "LengthRelations"  "LengthFrequency"  "LengthWeight"    
-    ##  [34] "LengthRelations"  "LengthFrequency"  "TS"              
-    ##  [37] "Level"            "StockDefs"        "StockDefsGeneral"
-    ##  [40] "LocalUnique"      "CITES_Remarks"    "IGFAName"        
-    ##  [43] "ICESStockID"      "RfeID"            "NorthSouthN"     
-    ##  [46] "NorthSouthS"      "WestEastW"        "WestEastE"       
-    ##  [49] "GenBankID"        "FIGIS_ID"         "EcotoxID"        
-    ##  [52] "SCRFA_data"       "GMAD_ID"          "SAUP"            
-    ##  [55] "SAUP_ID"          "SAUP_Group"       "AusMuseum"       
-    ##  [58] "FishTrace"        "IUCN_ID"          "IUCN_IDAssess"   
-    ##  [61] "BOLD_ID"          "EssayID"          "OsteoBaseID"     
-    ##  [64] "DORIS_ID"         "Aquamaps"         "Occurrence"      
-    ##  [67] "Strains"          "SynOC"            "Protected"       
-    ##  [70] "Ecology"          "Abnorm"           "Metabolism"      
-    ##  [73] "Predators"        "Spawning"         "Fecundity"       
-    ##  [76] "Speed"            "LarvSpeed"        "Diet"            
-    ##  [79] "Eggs"             "EggDevelop"       "Food"            
-    ##  [82] "Foods"            "Larvae"           "LarvDyn"         
-    ##  [85] "LarvSpeed"        "PopDyn"           "Gillarea"        
-    ##  [88] "Maturity"         "MatSizes"         "Processing"      
-    ##  [91] "Reproduction"     "Introductions"    "Abundance"       
-    ##  [94] "Vision"           "Genetics"         "CountryComp"     
-    ##  [97] "Allele"           "GeneticStudies"   "Ration"          
-    ## [100] "Foods"            "Ecotoxicology"    "Brains"          
-    ## [103] "Catches"          "FAOAqua"         
+    ##  [1] "SpecCode"         "StockCode"        "StocksRefNo"      "CITES_Ref"       
+    ##  [5] "BoundingRef"      "TempRef"          "TempPrefRef"      "pHRef"           
+    ##  [9] "dHRef"            "CITES_Remarks"    "ResilienceRemark" "Entered"         
+    ## [13] "DateEntered"      "Expert"           "Modified"         "DateModified"    
+    ## [17] "DateChecked"      "SpecCode"         "StockCode"        "IUCN_Code"       
+    ## [21] "CITES_Code"       "IGFAName"         "TempPref25"       "FAOAqua"         
+    ## [25] "TS"               "BoundingMethod"   "TS"               "Level"           
+    ## [29] "StockDefs"        "StockDefsGeneral" "LocalUnique"      "CITES_Remarks"   
+    ## [33] "IGFAName"         "ICESStockID"      "RfeID"            "NorthSouthN"     
+    ## [37] "NorthSouthS"      "WestEastW"        "WestEastE"        "GenBankID"       
+    ## [41] "FIGIS_ID"         "EcotoxID"         "SCRFA_data"       "GMAD_ID"         
+    ## [45] "SAUP"             "SAUP_ID"          "SAUP_Group"       "AusMuseum"       
+    ## [49] "FishTrace"        "IUCN_ID"          "IUCN_IDAssess"    "BOLD_ID"         
+    ## [53] "EssayID"          "OsteoBaseID"      "DORIS_ID"         "Aquamaps"        
+    ## [57] "Occurrence"       "Strains"          "SynOC"            "Protected"       
+    ## [61] "Ecology"          "Abnorm"           "Metabolism"       "Predators"       
+    ## [65] "Spawning"         "Fecundity"        "Speed"            "LarvSpeed"       
+    ## [69] "Diet"             "Eggs"             "EggDevelop"       "Food"            
+    ## [73] "Foods"            "Larvae"           "LarvDyn"          "LarvSpeed"       
+    ## [77] "PopDyn"           "Gillarea"         "Maturity"         "MatSizes"        
+    ## [81] "Processing"       "Reproduction"     "Introductions"    "Abundance"       
+    ## [85] "Vision"           "Genetics"         "CountryComp"      "Allele"          
+    ## [89] "GeneticStudies"   "Ration"           "Foods"            "Ecotoxicology"   
+    ## [93] "Brains"           "Catches"          "FAOAqua"         
     ## [1] "kept fields"
     ##  [1] "Species"           "IUCN_Assessment"   "IUCN_DateAssessed"
     ##  [4] "CITES_Date"        "CMS"               "Northernmost"     
@@ -7025,9 +7118,10 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ## [13] "TempPref50"        "TempPref75"        "EnvTemp"          
     ## [16] "Resilience"        "pHMin"             "pHMax"            
     ## [19] "dHMin"             "dHMax"             "Morphology"       
-    ## [22] "Diseases"          "Aquaculture"       "Sounds"           
-    ## [25] "Broodstock"        "EggNursery"        "FryNursery"       
-    ## [28] "LarvalNursery"    
+    ## [22] "Diseases"          "LengthWeight"      "Aquaculture"      
+    ## [25] "LengthRelations"   "LengthFrequency"   "Sounds"           
+    ## [28] "Broodstock"        "EggNursery"        "FryNursery"       
+    ## [31] "LarvalNursery"    
     ## [1] "T_n_sum, Species field count"
     ## [1] 1
     ## [1] "finished T_n"
@@ -7085,29 +7179,32 @@ names(out)[str_which(names(out),table_name)]
     ## [13] "dHMax_stocks"                                
     ## [14] "Morphology_stocks"                           
     ## [15] "Diseases_stocks"                             
-    ## [16] "Aquaculture_stocks"                          
-    ## [17] "Sounds_stocks"                               
-    ## [18] "Broodstock_stocks"                           
-    ## [19] "EggNursery_stocks"                           
-    ## [20] "FryNursery_stocks"                           
-    ## [21] "LarvalNursery_stocks"                        
-    ## [22] "IUCN_Assessmenta1bd_stocks"                  
-    ## [23] "IUCN_Assessmenta1ce.2ce..b1.2abc..c2a_stocks"
-    ## [24] "IUCN_Assessmenta2ace_stocks"                 
-    ## [25] "IUCN_Assessmenta2b_stocks"                   
-    ## [26] "IUCN_Assessmenta2bd.4bcd_stocks"             
-    ## [27] "IUCN_Assessmenta2bd.4bd_stocks"              
-    ## [28] "IUCN_Assessmenta4cd_stocks"                  
-    ## [29] "IUCN_Assessmentb2ab.iii._stocks"             
-    ## [30] "EnvTempboreal_stocks"                        
-    ## [31] "EnvTemppolar_stocks"                         
-    ## [32] "EnvTempsubtropical_stocks"                   
-    ## [33] "EnvTemptemperate_stocks"                     
-    ## [34] "EnvTemptropical_stocks"                      
-    ## [35] "Resiliencehigh_stocks"                       
-    ## [36] "Resiliencelow_stocks"                        
-    ## [37] "Resiliencemedium_stocks"                     
-    ## [38] "record_count_species_stocks"
+    ## [16] "LengthWeight_stocks"                         
+    ## [17] "Aquaculture_stocks"                          
+    ## [18] "LengthRelations_stocks"                      
+    ## [19] "LengthFrequency_stocks"                      
+    ## [20] "Sounds_stocks"                               
+    ## [21] "Broodstock_stocks"                           
+    ## [22] "EggNursery_stocks"                           
+    ## [23] "FryNursery_stocks"                           
+    ## [24] "LarvalNursery_stocks"                        
+    ## [25] "IUCN_Assessmenta1bd_stocks"                  
+    ## [26] "IUCN_Assessmenta1ce.2ce..b1.2abc..c2a_stocks"
+    ## [27] "IUCN_Assessmenta2ace_stocks"                 
+    ## [28] "IUCN_Assessmenta2b_stocks"                   
+    ## [29] "IUCN_Assessmenta2bd.4bcd_stocks"             
+    ## [30] "IUCN_Assessmenta2bd.4bd_stocks"              
+    ## [31] "IUCN_Assessmenta4cd_stocks"                  
+    ## [32] "IUCN_Assessmentb2ab.iii._stocks"             
+    ## [33] "EnvTempboreal_stocks"                        
+    ## [34] "EnvTemppolar_stocks"                         
+    ## [35] "EnvTempsubtropical_stocks"                   
+    ## [36] "EnvTemptemperate_stocks"                     
+    ## [37] "EnvTemptropical_stocks"                      
+    ## [38] "Resiliencehigh_stocks"                       
+    ## [39] "Resiliencelow_stocks"                        
+    ## [40] "Resiliencemedium_stocks"                     
+    ## [41] "record_count_species_stocks"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
@@ -7137,14 +7234,22 @@ summary(out[,str_which(names(out),table_name)])
     ##  3rd Qu.:28.00     3rd Qu.:7.000   3rd Qu.:8.000   3rd Qu.: 9.000  
     ##  Max.   :29.00     Max.   :8.500   Max.   :9.000   Max.   :20.000  
     ##  NA's   :60        NA's   :54      NA's   :53      NA's   :57      
-    ##   dHMax_stocks   Morphology_stocks Diseases_stocks  Aquaculture_stocks
-    ##  Min.   :15.00   Min.   :0.0000    Min.   :0.0000   Min.   :0.00000   
-    ##  1st Qu.:19.00   1st Qu.:0.2375    1st Qu.:0.0000   1st Qu.:0.00000   
-    ##  Median :19.00   Median :1.0000    Median :0.0000   Median :0.00000   
-    ##  Mean   :20.06   Mean   :0.7449    Mean   :0.4102   Mean   :0.01736   
-    ##  3rd Qu.:19.00   3rd Qu.:1.0000    3rd Qu.:1.0000   3rd Qu.:0.00000   
-    ##  Max.   :30.00   Max.   :1.0000    Max.   :1.0000   Max.   :1.00000   
-    ##  NA's   :54                                                           
+    ##   dHMax_stocks   Morphology_stocks Diseases_stocks  LengthWeight_stocks
+    ##  Min.   :15.00   Min.   :0.0000    Min.   :0.0000   Min.   :0.000      
+    ##  1st Qu.:19.00   1st Qu.:0.2375    1st Qu.:0.0000   1st Qu.:0.000      
+    ##  Median :19.00   Median :1.0000    Median :0.0000   Median :1.000      
+    ##  Mean   :20.06   Mean   :0.7449    Mean   :0.4102   Mean   :0.616      
+    ##  3rd Qu.:19.00   3rd Qu.:1.0000    3rd Qu.:1.0000   3rd Qu.:1.000      
+    ##  Max.   :30.00   Max.   :1.0000    Max.   :1.0000   Max.   :1.000      
+    ##  NA's   :54                                                            
+    ##  Aquaculture_stocks LengthRelations_stocks LengthFrequency_stocks
+    ##  Min.   :0.00000    Min.   :0.0000         Min.   :0.000         
+    ##  1st Qu.:0.00000    1st Qu.:0.0000         1st Qu.:0.000         
+    ##  Median :0.00000    Median :1.0000         Median :0.000         
+    ##  Mean   :0.01736    Mean   :0.6528         Mean   :0.112         
+    ##  3rd Qu.:0.00000    3rd Qu.:1.0000         3rd Qu.:0.000         
+    ##  Max.   :1.00000    Max.   :1.0000         Max.   :1.000         
+    ##                                                                  
     ##  Sounds_stocks     Broodstock_stocks EggNursery_stocks FryNursery_stocks
     ##  Min.   :0.00000   Min.   :0.0000    Min.   :0.0000    Min.   :0.0000   
     ##  1st Qu.:0.00000   1st Qu.:0.0000    1st Qu.:0.0000    1st Qu.:0.0000   
@@ -7290,13 +7395,14 @@ table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_fra
     ##  [6] "DateEntered"  "Expert"       "Modified"     "DateModified" "DateChecked" 
     ## [11] "SpecCode"     "DietCode"     "StockCode"    "C_Code"       "E_Code"      
     ## [16] "Locality"     "YearStart"    "YearEnd"      "SampleSize"   "Locality"    
-    ## [21] "FishLength"   "Method"       "MethodType"   "MethodType"   "SizeType"    
-    ## [26] "FishLength"   "FishLength"   "DietCode"     "DietRefNo"   
+    ## [21] "Method"       "MethodType"   "MethodType"   "SizeType"     "DietCode"    
+    ## [26] "DietRefNo"   
     ## [1] "kept fields"
     ##  [1] "Species"      "SampleStage"  "January"      "February"     "March"       
     ##  [6] "April"        "May"          "June"         "July"         "August"      
     ## [11] "September"    "October"      "November"     "December"     "OtherItems"  
     ## [16] "PercentEmpty" "Troph"        "seTroph"      "SizeMin"      "SizeMax"     
+    ## [21] "FishLength"  
     ## [1] "T_b_multiple_sum, Species field count"
     ## [1] 1
     ## [1] "T_n_sum, Species field count"
@@ -7350,9 +7456,9 @@ names(out)[str_which(names(out),table_name)]
     ## [13] "OtherItems_diet"               "PercentEmpty_diet"            
     ## [15] "Troph_diet"                    "seTroph_diet"                 
     ## [17] "SizeMin_diet"                  "SizeMax_diet"                 
-    ## [19] "SampleStageadults_diet"        "SampleStagejuv..adults_diet"  
-    ## [21] "SampleStagelarvae_diet"        "SampleStagerecruits.juv._diet"
-    ## [23] "record_count_species_diet"
+    ## [19] "FishLength_diet"               "SampleStageadults_diet"       
+    ## [21] "SampleStagejuv..adults_diet"   "SampleStagelarvae_diet"       
+    ## [23] "SampleStagerecruits.juv._diet" "record_count_species_diet"
 
 ``` r
 summary(out[,str_which(names(out),table_name)])
@@ -7390,14 +7496,14 @@ summary(out[,str_which(names(out),table_name)])
     ##  3rd Qu.:10.1212   3rd Qu.:27.775    3rd Qu.:3.875   3rd Qu.:0.4862  
     ##  Max.   :39.8000   Max.   :58.000    Max.   :4.387   Max.   :0.8200  
     ##  NA's   :48        NA's   :56        NA's   :43      NA's   :43      
-    ##   SizeMin_diet     SizeMax_diet    SampleStageadults_diet
-    ##  Min.   : 3.100   Min.   :  4.90   0   :18               
-    ##  1st Qu.: 8.576   1st Qu.: 18.70   1   :11               
-    ##  Median :15.300   Median : 26.25   NA's:43               
-    ##  Mean   :19.317   Mean   : 38.21                         
-    ##  3rd Qu.:25.210   3rd Qu.: 59.24                         
-    ##  Max.   :76.600   Max.   :129.12                         
-    ##  NA's   :48       NA's   :48                             
+    ##   SizeMin_diet     SizeMax_diet    FishLength_diet SampleStageadults_diet
+    ##  Min.   : 3.100   Min.   :  4.90   Min.   : 3.70   0   :18               
+    ##  1st Qu.: 8.576   1st Qu.: 18.70   1st Qu.:12.92   1   :11               
+    ##  Median :15.300   Median : 26.25   Median :21.34   NA's:43               
+    ##  Mean   :19.317   Mean   : 38.21   Mean   :27.11                         
+    ##  3rd Qu.:25.210   3rd Qu.: 59.24   3rd Qu.:39.71                         
+    ##  Max.   :76.600   Max.   :129.12   Max.   :70.00                         
+    ##  NA's   :48       NA's   :48       NA's   :44                            
     ##  SampleStagejuv..adults_diet SampleStagelarvae_diet
     ##  0   : 5                     0   :26               
     ##  1   :24                     1   : 3               
@@ -7689,717 +7795,756 @@ DF_fields
 
     ##                                                                 field
     ## 1                                                             Species
-    ## 9                                         record_count_species_brains
-    ## 10                                                         range_area
-    ## 106                                      record_count_species_ecology
-    ## 108                                                Shelf_distribution
-    ## 110                                            SpecSport_distribution
-    ## 111                                        Statusendemic_distribution
-    ## 112                                     Statusintroduced_distribution
-    ## 113                                         Statusnative_distribution
-    ## 114                                   Statusquestionable_distribution
-    ## 125                                 record_count_species_distribution
-    ## 126                                               TLObserved_estimate
-    ## 127                                                    Troph_estimate
-    ## 128                                                  seTroph_estimate
-    ## 129                                            TrophObserved_estimate
-    ## 142                                        ComDepMinObserved_estimate
-    ## 143                                        ComDepMaxObserved_estimate
-    ## 146                                         DepthMinEstimate_estimate
-    ## 147                                         DepthMaxEstimate_estimate
-    ## 148                                         PredPreyRatioMin_estimate
-    ## 149                                         PredPreyRatioMax_estimate
+    ## 7                                         record_count_species_brains
+    ## 8                                                          range_area
+    ## 104                                      record_count_species_ecology
+    ## 106                                                Shelf_distribution
+    ## 108                                            SpecSport_distribution
+    ## 109                                        Statusendemic_distribution
+    ## 110                                     Statusintroduced_distribution
+    ## 111                                         Statusnative_distribution
+    ## 112                                   Statusquestionable_distribution
+    ## 123                                 record_count_species_distribution
+    ## 124                                              MaxLengthTL_estimate
+    ## 125                                               TLObserved_estimate
+    ## 126                                                    Troph_estimate
+    ## 127                                                  seTroph_estimate
+    ## 128                                            TrophObserved_estimate
+    ## 141                                        ComDepMinObserved_estimate
+    ## 142                                        ComDepMaxObserved_estimate
+    ## 145                                         DepthMinEstimate_estimate
+    ## 146                                         DepthMaxEstimate_estimate
+    ## 147                                         PredPreyRatioMin_estimate
+    ## 148                                         PredPreyRatioMax_estimate
+    ## 154                                              MaxLengthSL_estimate
     ## 155                                                KObserved_estimate
     ## 156                                     record_count_species_estimate
-    ## 175                                    record_count_species_fecundity
-    ## 193                                    record_count_species_fooditems
-    ## 271                                record_count_species_introductions
-    ## 400                                   record_count_species_morphology
-    ## 422                                       record_count_species_oxygen
-    ## 426                                      record_count_species_popchar
-    ## 460                                    record_count_species_popgrowth
-    ## 472                                        record_count_species_popqb
-    ## 494                                    record_count_species_predators
-    ## 505                                       record_count_species_ration
-    ## 539                                 record_count_species_reproduction
-    ## 577                                     record_count_species_spawning
-    ## 585                                        record_count_species_speed
-    ## 599                                                 Morphology_stocks
-    ## 600                                                   Diseases_stocks
-    ## 601                                                Aquaculture_stocks
-    ## 602                                                     Sounds_stocks
-    ## 603                                                 Broodstock_stocks
-    ## 604                                                 EggNursery_stocks
-    ## 605                                                 FryNursery_stocks
-    ## 606                                              LarvalNursery_stocks
-    ## 615                                              EnvTempboreal_stocks
-    ## 616                                               EnvTemppolar_stocks
-    ## 617                                         EnvTempsubtropical_stocks
-    ## 618                                           EnvTemptemperate_stocks
-    ## 619                                            EnvTemptropical_stocks
-    ## 623                                       record_count_species_stocks
-    ## 646                                         record_count_species_diet
-    ## 659                                     record_count_species_swimming
-    ## 115                                   ContinentGrpafrica_distribution
-    ## 116                                     ContinentGrpasia_distribution
-    ## 117                           ContinentGrpatlantic.ocean_distribution
-    ## 118                        ContinentGrpeurope..form.ussr_distribution
-    ## 119                             ContinentGrpindian.ocean_distribution
-    ## 120                            ContinentGrpmed.black.sea_distribution
-    ## 121                      ContinentGrpnorth.centr.america_distribution
-    ## 122                                  ContinentGrpoceania_distribution
-    ## 123                            ContinentGrppacific.ocean_distribution
-    ## 124                            ContinentGrpsouth.america_distribution
-    ## 130                                                        a_estimate
-    ## 131                                                sd_log10a_estimate
-    ## 132                                                        b_estimate
-    ## 133                                                     sd_b_estimate
-    ## 620                                             Resiliencehigh_stocks
-    ## 621                                              Resiliencelow_stocks
-    ## 622                                           Resiliencemedium_stocks
-    ## 506                                             SpawnAgg_reproduction
-    ## 507                                         BatchSpawner_reproduction
-    ## 510                                    ReproModedioecism_reproduction
-    ## 511                             ReproModeparthenogenesis_reproduction
-    ## 512                                   ReproModeprotandry_reproduction
-    ## 513                                   ReproModeprotogyny_reproduction
-    ## 514                        ReproModetrue.hermaphroditism_reproduction
-    ## 515                                Fertilizationexternal_reproduction
-    ## 516     Fertilizationin.brood.pouch.or.similar.structure_reproduction
-    ## 517                                Fertilizationin.mouth_reproduction
-    ## 518                      Fertilizationinternal..oviduct._reproduction
-    ## 519                                   Fertilizationother_reproduction
-    ## 39                                                    Neritic_ecology
-    ## 40                                                 Intertidal_ecology
-    ## 41                                                Hadopelagic_ecology
-    ## 42                                                  Estuaries_ecology
-    ## 43                                                     Stream_ecology
-    ## 44                                                      Lakes_ecology
-    ## 45                                                  Schooling_ecology
-    ## 46                                                  TidePools_ecology
-    ## 47                                                SubLittoral_ecology
-    ## 48                                               Bathypelagic_ecology
-    ## 49                                              Abyssopelagic_ecology
-    ## 50                                             CaveAnchialine_ecology
-    ## 57                                                 Parasitism_ecology
-    ## 58                                                  Symbiosis_ecology
-    ## 59                                                 Symphorism_ecology
-    ## 60                                               Commensalism_ecology
-    ## 61                                                  Mutualism_ecology
-    ## 62                                                  Epiphytic_ecology
-    ## 63                                                OutsideHost_ecology
-    ## 64                                                 InsideHost_ecology
-    ## 65                                                    Sessile_ecology
-    ## 66                                                   Demersal_ecology
-    ## 67                                                  Endofauna_ecology
-    ## 68                                                    Pelagic_ecology
-    ## 69                                                Megabenthos_ecology
-    ## 70                                               Macrobenthos_ecology
-    ## 71                                                Meiobenthos_ecology
-    ## 72                                                     Coarse_ecology
-    ## 73                                                       Fine_ecology
-    ## 74                                                    Sloping_ecology
-    ## 75                                                       Silt_ecology
-    ## 76                                                       Ooze_ecology
-    ## 77                                                   Detritus_ecology
-    ## 78                                                    Organic_ecology
-    ## 79                                                     Gravel_ecology
-    ## 80                                                BedsBivalve_ecology
-    ## 81                                                   BedsRock_ecology
-    ## 82                                                 BedsOthers_ecology
-    ## 83                                              ReefExclusive_ecology
-    ## 84                                                   DropOffs_ecology
-    ## 85                                                    Tunnels_ecology
-    ## 86                                                   Crevices_ecology
-    ## 87                                                      Vents_ecology
-    ## 88                                                  Seamounts_ecology
-    ## 89                                            DeepWaterCorals_ecology
-    ## 90                                                     Leaves_ecology
-    ## 91                                                      Roots_ecology
-    ## 92                                                  Driftwood_ecology
-    ## 93                                            OInverterbrates_ecology
-    ## 94                                               Verterbrates_ecology
-    ## 95                                                    Pilings_ecology
-    ## 96                                                  BoatHulls_ecology
-    ## 97                                                     Corals_ecology
-    ## 98                                                 SoftCorals_ecology
-    ## 99                                                    OnPolyp_ecology
-    ## 100                                             BetweenPolyps_ecology
-    ## 101                                                HardCorals_ecology
-    ## 102                                             OnExoskeleton_ecology
-    ## 103                                        InterstitialSpaces_ecology
-    ## 138                                                        K_estimate
-    ## 528                                     RepGuild1bearers_reproduction
-    ## 529                                    RepGuild1guarders_reproduction
-    ## 530                                 RepGuild1nonguarders_reproduction
-    ## 11                                          SupraLittoralZone_ecology
-    ## 12                                                Saltmarshes_ecology
-    ## 13                                               LittoralZone_ecology
-    ## 14                                                      Caves_ecology
-    ## 15                                                    Oceanic_ecology
-    ## 16                                                 Epipelagic_ecology
-    ## 17                                                Mesopelagic_ecology
-    ## 18                                                  Mangroves_ecology
-    ## 19                                              MarshesSwamps_ecology
-    ## 20                                                       Cave_ecology
-    ## 21                                                   Solitary_ecology
-    ## 22                                                   Shoaling_ecology
-    ## 23                                                    Benthic_ecology
-    ## 24                                                     Mobile_ecology
-    ## 25                                                 SoftBottom_ecology
-    ## 26                                                       Sand_ecology
-    ## 27                                                        Mud_ecology
-    ## 28                                                 HardBottom_ecology
-    ## 29                                                      Rocky_ecology
-    ## 30                                                     Rubble_ecology
-    ## 31                                                 Macrophyte_ecology
-    ## 32                                               SeaGrassBeds_ecology
-    ## 33                                                 CoralReefs_ecology
-    ## 34                                                  ReefFlats_ecology
-    ## 35                                                    Lagoons_ecology
-    ## 36                                                    Burrows_ecology
-    ## 37                                                 Vegetation_ecology
-    ## 38                                                      Stems_ecology
-    ## 273                                                Females_morphology
-    ## 274                                                  Males_morphology
-    ## 275                                       OperculumPresent_morphology
-    ## 276                                          LLinterrupted_morphology
-    ## 586                                               Northernmost_stocks
-    ## 587                                                Southermost_stocks
-    ## 55                                                  FoodTroph_ecology
-    ## 56                                                FoodSeTroph_ecology
-    ## 272                                                Notched_morphology
-    ## 329                                     BodyShapeIeel.like_morphology
-    ## 330                                    BodyShapeIelongated_morphology
-    ## 331                            BodyShapeIfusiform...normal_morphology
-    ## 332                                        BodyShapeIother_morphology
-    ## 333                          BodyShapeIshort.and...or.deep_morphology
-    ## 107                                            Coastline_distribution
-    ## 109                                              EEZarea_distribution
-    ## 176                                           FoodIdetritus_fooditems
-    ## 177                                             FoodInekton_fooditems
-    ## 178                                             FoodIothers_fooditems
-    ## 179                                             FoodIplants_fooditems
-    ## 180                                         FoodIzoobenthos_fooditems
-    ## 181                                        FoodIzooplankton_fooditems
-    ## 182                                         PreyStageadults_fooditems
-    ## 183                                           PreyStageeggs_fooditems
-    ## 184                                   PreyStagefruits.seeds_fooditems
-    ## 185                                    PreyStagejuv..adults_fooditems
-    ## 186                                         PreyStagelarvae_fooditems
-    ## 187                                  PreyStageleaves.blades_fooditems
-    ## 188                                    PreyStagen.a..others_fooditems
-    ## 189                                         PreyStagenymphs_fooditems
-    ## 190                                          PreyStagepupae_fooditems
-    ## 191                                  PreyStagerecruits.juv._fooditems
-    ## 192                                          PreyStageroots_fooditems
-    ## 298                                                 Dfinno_morphology
-    ## 590                                                    TempMin_stocks
-    ## 591                                                    TempMax_stocks
-    ## 509                                        ParentalCareQ_reproduction
-    ## 531                               ParentalCarebiparental_reproduction
-    ## 532                                 ParentalCarematernal_reproduction
-    ## 533                                     ParentalCarenone_reproduction
-    ## 534                                 ParentalCarepaternal_reproduction
-    ## 424                                                      Lmax_popchar
-    ## 144                                                 DepthMin_estimate
-    ## 307                                                 Afinno_morphology
-    ## 389                               PectoralAttributesabsent_morphology
-    ## 390                  PectoralAttributesmore.or.less.normal_morphology
-    ## 391           PectoralAttributestransformed.to..aerofoils._morphology
-    ## 392                  PectoralAttributesused.for.locomotion_morphology
-    ## 393               PectoralAttributesvery.large...lobe.like_morphology
-    ## 299                                        DorsalSpinesMin_morphology
-    ## 300                                        DorsalSpinesMax_morphology
-    ## 301                                      DorsalSoftRaysMin_morphology
-    ## 302                                      DorsalSoftRaysMax_morphology
-    ## 382                                                 Adifin_morphology
-    ## 383                                           CShapeforked_morphology
-    ## 384                            CShapemore.or.less.truncate_morphology
-    ## 385                               CShapeother..see.remark._morphology
-    ## 386                                          CShapepointed_morphology
-    ## 394                   PelvicsAttributesmore.or.less.normal_morphology
-    ## 395                     PelvicsAttributessuppressed.absent_morphology
-    ## 310                                                Araymin_morphology
-    ## 396                                     VPositionabdominal_morphology
-    ## 397                                        VPositionabsent_morphology
-    ## 398                                       VPositionjugular_morphology
-    ## 399                                      VPositionthoracic_morphology
-    ## 540                                                      GSI_spawning
-    ## 541                                           PercentFemales_spawning
-    ## 588                                                Westernmost_stocks
-    ## 589                                                Easternmost_stocks
-    ## 311                                                Araymax_morphology
-    ## 141                                              ComDepthMax_estimate
-    ## 145                                                 DepthMax_estimate
-    ## 428                                                LinfLmax_popgrowth
-    ## 429                                                     Loo_popgrowth
-    ## 434                                                       K_popgrowth
-    ## 140                                              ComDepthMin_estimate
+    ## 178                                    record_count_species_fecundity
+    ## 196                                    record_count_species_fooditems
+    ## 274                                record_count_species_introductions
+    ## 288                                record_count_species_length_weight
+    ## 424                                   record_count_species_morphology
+    ## 445                                       record_count_species_oxygen
+    ## 449                                      record_count_species_popchar
+    ## 481                                    record_count_species_popgrowth
+    ## 493                                        record_count_species_popqb
+    ## 516                                    record_count_species_predators
+    ## 527                                       record_count_species_ration
+    ## 561                                 record_count_species_reproduction
+    ## 603                                     record_count_species_spawning
+    ## 612                                        record_count_species_speed
+    ## 626                                                 Morphology_stocks
+    ## 627                                                   Diseases_stocks
+    ## 628                                               LengthWeight_stocks
+    ## 629                                                Aquaculture_stocks
+    ## 630                                            LengthRelations_stocks
+    ## 631                                            LengthFrequency_stocks
+    ## 632                                                     Sounds_stocks
+    ## 633                                                 Broodstock_stocks
+    ## 634                                                 EggNursery_stocks
+    ## 635                                                 FryNursery_stocks
+    ## 636                                              LarvalNursery_stocks
+    ## 645                                              EnvTempboreal_stocks
+    ## 646                                               EnvTemppolar_stocks
+    ## 647                                         EnvTempsubtropical_stocks
+    ## 648                                           EnvTemptemperate_stocks
+    ## 649                                            EnvTemptropical_stocks
+    ## 653                                       record_count_species_stocks
+    ## 677                                         record_count_species_diet
+    ## 690                                     record_count_species_swimming
+    ## 113                                   ContinentGrpafrica_distribution
+    ## 114                                     ContinentGrpasia_distribution
+    ## 115                           ContinentGrpatlantic.ocean_distribution
+    ## 116                        ContinentGrpeurope..form.ussr_distribution
+    ## 117                             ContinentGrpindian.ocean_distribution
+    ## 118                            ContinentGrpmed.black.sea_distribution
+    ## 119                      ContinentGrpnorth.centr.america_distribution
+    ## 120                                  ContinentGrpoceania_distribution
+    ## 121                            ContinentGrppacific.ocean_distribution
+    ## 122                            ContinentGrpsouth.america_distribution
+    ## 129                                                        a_estimate
+    ## 130                                                sd_log10a_estimate
+    ## 131                                                        b_estimate
+    ## 132                                                     sd_b_estimate
+    ## 650                                             Resiliencehigh_stocks
+    ## 651                                              Resiliencelow_stocks
+    ## 652                                           Resiliencemedium_stocks
+    ## 528                                             SpawnAgg_reproduction
+    ## 529                                         BatchSpawner_reproduction
+    ## 532                                    ReproModedioecism_reproduction
+    ## 533                             ReproModeparthenogenesis_reproduction
+    ## 534                                   ReproModeprotandry_reproduction
+    ## 535                                   ReproModeprotogyny_reproduction
+    ## 536                        ReproModetrue.hermaphroditism_reproduction
+    ## 537                                Fertilizationexternal_reproduction
+    ## 538     Fertilizationin.brood.pouch.or.similar.structure_reproduction
+    ## 539                                Fertilizationin.mouth_reproduction
+    ## 540                      Fertilizationinternal..oviduct._reproduction
+    ## 541                                   Fertilizationother_reproduction
+    ## 37                                                    Neritic_ecology
+    ## 38                                                 Intertidal_ecology
+    ## 39                                                Hadopelagic_ecology
+    ## 40                                                  Estuaries_ecology
+    ## 41                                                     Stream_ecology
+    ## 42                                                      Lakes_ecology
+    ## 43                                                  Schooling_ecology
+    ## 44                                                  TidePools_ecology
+    ## 45                                                SubLittoral_ecology
+    ## 46                                               Bathypelagic_ecology
+    ## 47                                              Abyssopelagic_ecology
+    ## 48                                             CaveAnchialine_ecology
+    ## 55                                                 Parasitism_ecology
+    ## 56                                                  Symbiosis_ecology
+    ## 57                                                 Symphorism_ecology
+    ## 58                                               Commensalism_ecology
+    ## 59                                                  Mutualism_ecology
+    ## 60                                                  Epiphytic_ecology
+    ## 61                                                OutsideHost_ecology
+    ## 62                                                 InsideHost_ecology
+    ## 63                                                    Sessile_ecology
+    ## 64                                                   Demersal_ecology
+    ## 65                                                  Endofauna_ecology
+    ## 66                                                    Pelagic_ecology
+    ## 67                                                Megabenthos_ecology
+    ## 68                                               Macrobenthos_ecology
+    ## 69                                                Meiobenthos_ecology
+    ## 70                                                     Coarse_ecology
+    ## 71                                                       Fine_ecology
+    ## 72                                                    Sloping_ecology
+    ## 73                                                       Silt_ecology
+    ## 74                                                       Ooze_ecology
+    ## 75                                                   Detritus_ecology
+    ## 76                                                    Organic_ecology
+    ## 77                                                     Gravel_ecology
+    ## 78                                                BedsBivalve_ecology
+    ## 79                                                   BedsRock_ecology
+    ## 80                                                 BedsOthers_ecology
+    ## 81                                              ReefExclusive_ecology
+    ## 82                                                   DropOffs_ecology
+    ## 83                                                    Tunnels_ecology
+    ## 84                                                   Crevices_ecology
+    ## 85                                                      Vents_ecology
+    ## 86                                                  Seamounts_ecology
+    ## 87                                            DeepWaterCorals_ecology
+    ## 88                                                     Leaves_ecology
+    ## 89                                                      Roots_ecology
+    ## 90                                                  Driftwood_ecology
+    ## 91                                            OInverterbrates_ecology
+    ## 92                                               Verterbrates_ecology
+    ## 93                                                    Pilings_ecology
+    ## 94                                                  BoatHulls_ecology
+    ## 95                                                     Corals_ecology
+    ## 96                                                 SoftCorals_ecology
+    ## 97                                                    OnPolyp_ecology
+    ## 98                                              BetweenPolyps_ecology
+    ## 99                                                 HardCorals_ecology
+    ## 100                                             OnExoskeleton_ecology
+    ## 101                                        InterstitialSpaces_ecology
+    ## 137                                                        K_estimate
+    ## 550                                     RepGuild1bearers_reproduction
+    ## 551                                    RepGuild1guarders_reproduction
+    ## 552                                 RepGuild1nonguarders_reproduction
+    ## 9                                           SupraLittoralZone_ecology
+    ## 10                                                Saltmarshes_ecology
+    ## 11                                               LittoralZone_ecology
+    ## 12                                                      Caves_ecology
+    ## 13                                                    Oceanic_ecology
+    ## 14                                                 Epipelagic_ecology
+    ## 15                                                Mesopelagic_ecology
+    ## 16                                                  Mangroves_ecology
+    ## 17                                              MarshesSwamps_ecology
+    ## 18                                                       Cave_ecology
+    ## 19                                                   Solitary_ecology
+    ## 20                                                   Shoaling_ecology
+    ## 21                                                    Benthic_ecology
+    ## 22                                                     Mobile_ecology
+    ## 23                                                 SoftBottom_ecology
+    ## 24                                                       Sand_ecology
+    ## 25                                                        Mud_ecology
+    ## 26                                                 HardBottom_ecology
+    ## 27                                                      Rocky_ecology
+    ## 28                                                     Rubble_ecology
+    ## 29                                                 Macrophyte_ecology
+    ## 30                                               SeaGrassBeds_ecology
+    ## 31                                                 CoralReefs_ecology
+    ## 32                                                  ReefFlats_ecology
+    ## 33                                                    Lagoons_ecology
+    ## 34                                                    Burrows_ecology
+    ## 35                                                 Vegetation_ecology
+    ## 36                                                      Stems_ecology
+    ## 290                                                Females_morphology
+    ## 291                                                  Males_morphology
+    ## 292                                       OperculumPresent_morphology
+    ## 293                                          LLinterrupted_morphology
+    ## 613                                               Northernmost_stocks
+    ## 614                                                Southermost_stocks
+    ## 53                                                  FoodTroph_ecology
+    ## 54                                                FoodSeTroph_ecology
+    ## 289                                                Notched_morphology
+    ## 353                                     BodyShapeIeel.like_morphology
+    ## 354                                    BodyShapeIelongated_morphology
+    ## 355                            BodyShapeIfusiform...normal_morphology
+    ## 356                                        BodyShapeIother_morphology
+    ## 357                          BodyShapeIshort.and...or.deep_morphology
+    ## 105                                            Coastline_distribution
+    ## 107                                              EEZarea_distribution
+    ## 179                                           FoodIdetritus_fooditems
+    ## 180                                             FoodInekton_fooditems
+    ## 181                                             FoodIothers_fooditems
+    ## 182                                             FoodIplants_fooditems
+    ## 183                                         FoodIzoobenthos_fooditems
+    ## 184                                        FoodIzooplankton_fooditems
+    ## 185                                         PreyStageadults_fooditems
+    ## 186                                           PreyStageeggs_fooditems
+    ## 187                                   PreyStagefruits.seeds_fooditems
+    ## 188                                    PreyStagejuv..adults_fooditems
+    ## 189                                         PreyStagelarvae_fooditems
+    ## 190                                  PreyStageleaves.blades_fooditems
+    ## 191                                    PreyStagen.a..others_fooditems
+    ## 192                                         PreyStagenymphs_fooditems
+    ## 193                                          PreyStagepupae_fooditems
+    ## 194                                  PreyStagerecruits.juv._fooditems
+    ## 195                                          PreyStageroots_fooditems
+    ## 315                                                 Dfinno_morphology
+    ## 277                                                   a_length_weight
+    ## 279                                                   b_length_weight
+    ## 617                                                    TempMin_stocks
+    ## 618                                                    TempMax_stocks
+    ## 531                                        ParentalCareQ_reproduction
+    ## 553                               ParentalCarebiparental_reproduction
+    ## 554                                 ParentalCarematernal_reproduction
+    ## 555                                     ParentalCarenone_reproduction
+    ## 556                                 ParentalCarepaternal_reproduction
+    ## 447                                                      Lmax_popchar
+    ## 143                                                 DepthMin_estimate
+    ## 280                                  CoeffDetermination_length_weight
+    ## 324                                                 Afinno_morphology
+    ## 413                               PectoralAttributesabsent_morphology
+    ## 414                  PectoralAttributesmore.or.less.normal_morphology
+    ## 415           PectoralAttributestransformed.to..aerofoils._morphology
+    ## 416                  PectoralAttributesused.for.locomotion_morphology
+    ## 417               PectoralAttributesvery.large...lobe.like_morphology
+    ## 316                                        DorsalSpinesMin_morphology
+    ## 317                                        DorsalSpinesMax_morphology
+    ## 318                                      DorsalSoftRaysMin_morphology
+    ## 319                                      DorsalSoftRaysMax_morphology
+    ## 406                                                 Adifin_morphology
+    ## 407                                           CShapeforked_morphology
+    ## 408                            CShapemore.or.less.truncate_morphology
+    ## 409                               CShapeother..see.remark._morphology
+    ## 410                                          CShapepointed_morphology
+    ## 418                   PelvicsAttributesmore.or.less.normal_morphology
+    ## 419                     PelvicsAttributessuppressed.absent_morphology
+    ## 327                                                Araymin_morphology
+    ## 420                                     VPositionabdominal_morphology
+    ## 421                                        VPositionabsent_morphology
+    ## 422                                       VPositionjugular_morphology
+    ## 423                                      VPositionthoracic_morphology
+    ## 562                                                      GSI_spawning
+    ## 563                                           PercentFemales_spawning
+    ## 615                                                Westernmost_stocks
+    ## 616                                                Easternmost_stocks
+    ## 328                                                Araymax_morphology
+    ## 140                                              ComDepthMax_estimate
+    ## 144                                                 DepthMax_estimate
+    ## 451                                                LinfLmax_popgrowth
+    ## 452                                                     Loo_popgrowth
+    ## 456                                                       K_popgrowth
+    ## 139                                              ComDepthMin_estimate
     ## 157                                            FecundityMin_fecundity
-    ## 194                                           EstabAqua_introductions
-    ## 195                                            Invasive_introductions
-    ## 198                                  Period18th.century_introductions
-    ## 199                                     Period1900.1924_introductions
-    ## 200                                     Period1925.1949_introductions
-    ## 201                                     Period1950.1974_introductions
-    ## 202                                     Period1975.1999_introductions
-    ## 203                                  Period19th.century_introductions
-    ## 204                                  Period2000.present_introductions
-    ## 205                              Periodpre.18th.century_introductions
-    ## 206                                       Periodunknown_introductions
-    ## 308                                       AnalFinSpinesMin_morphology
-    ## 309                                       AnalFinSpinesMax_morphology
-    ## 150                                                   AgeMin_estimate
-    ## 207                                    Reasonaccidental_introductions
-    ## 208                         Reasonaccidental.with.ships_introductions
-    ## 209                                 Reasonangling.sport_introductions
-    ## 210                                   Reasonaquaculture_introductions
-    ## 211                 Reasondiffused.from.other.countries_introductions
-    ## 212                         Reasonfill.ecological.niche_introductions
-    ## 213                                     Reasonfisheries_introductions
-    ## 214                                        Reasonforage_introductions
-    ## 215                          Reasonlessepsian.migration_introductions
-    ## 216                              Reasonmosquito.control_introductions
-    ## 217                                       Reasonno.data_introductions
-    ## 218                                    Reasonornamental_introductions
-    ## 219                    Reasonremoval.of.natural.barrier_introductions
-    ## 220                                      Reasonresearch_introductions
-    ## 221                                       Reasonunknown_introductions
-    ## 237                                Estabwildestablished_introductions
-    ## 238                                         Estabwildno_introductions
-    ## 239                                    Estabwildno.data_introductions
-    ## 240                            Estabwildnot.established_introductions
-    ## 241                       Estabwildprobably.established_introductions
-    ## 242                                Estabwildprobably.no_introductions
-    ## 243                   Estabwildprobably.not.established_introductions
-    ## 244                               Estabwildprobably.yes_introductions
-    ## 245                                    Estabwildunknown_introductions
-    ## 246                                        Estabwildyes_introductions
-    ## 312                                                Praymin_morphology
-    ## 313                                                Praymax_morphology
-    ## 159                                            FecundityMax_fecundity
-    ## 387                                    Attributesconfluent_morphology
-    ## 388                          Attributesmore.or.less.normal_morphology
-    ## 473                                                  predator_mammals
-    ## 477                                       Predatstageadults_predators
-    ## 478                                  Predatstagejuv..adults_predators
-    ## 479                                       Predatstagelarvae_predators
-    ## 480                                Predatstagerecruits.juv._predators
-    ## 481                                          PredatorIbirds_predators
-    ## 482                                    PredatorIcrustaceans_predators
-    ## 483                                        PredatorIfinfish_predators
-    ## 484                                          PredatorIherps_predators
-    ## 485                                        PredatorIinsects_predators
-    ## 486                                        PredatorImammals_predators
-    ## 487                                       PredatorImollusks_predators
-    ## 488                                          PredatorIother_predators
-    ## 489                                         PreyStageadults_predators
-    ## 490                                           PreyStageeggs_predators
-    ## 491                                    PreyStagejuv..adults_predators
-    ## 492                                         PreyStagelarvae_predators
-    ## 493                                  PreyStagerecruits.juv._predators
-    ## 624                                                      January_diet
-    ## 625                                                     February_diet
-    ## 626                                                        March_diet
-    ## 627                                                        April_diet
-    ## 628                                                          May_diet
-    ## 629                                                         June_diet
-    ## 630                                                         July_diet
-    ## 631                                                       August_diet
-    ## 632                                                    September_diet
-    ## 633                                                      October_diet
-    ## 634                                                     November_diet
-    ## 635                                                     December_diet
-    ## 638                                                        Troph_diet
-    ## 639                                                      seTroph_diet
-    ## 642                                            SampleStageadults_diet
-    ## 643                                       SampleStagejuv..adults_diet
-    ## 644                                            SampleStagelarvae_diet
-    ## 645                                     SampleStagerecruits.juv._diet
-    ## 304                                            DFinletsmax_morphology
-    ## 306                                            VFinletsmax_morphology
-    ## 401                                                     Weight_oxygen
-    ## 403                                                       Temp_oxygen
-    ## 407                                                 OxygenCons_oxygen
-    ## 433                                              TLinfinity_popgrowth
-    ## 151                                                   AgeMax_estimate
-    ## 152                                              TempPrefMin_estimate
-    ## 153                                             TempPrefMean_estimate
-    ## 154                                              TempPrefMax_estimate
-    ## 376             DorsalAttributescontinuous.with.caudal.fin_morphology
-    ## 377 DorsalAttributesextending.over.most.of.the.back.length_morphology
-    ## 378              DorsalAttributesgreatly.reduced.or.absent_morphology
-    ## 379               DorsalAttributesmodified.to.suction.disc_morphology
-    ## 380                 DorsalAttributesno.striking.attributes_morphology
-    ## 381                                  DorsalAttributesother_morphology
-    ## 545                                                      Apr_spawning
-    ## 139                                                     Winf_estimate
-    ## 303                                            DFinletsmin_morphology
-    ## 305                                            VFinletsmin_morphology
-    ## 457                                             Temperature_popgrowth
-    ## 546                                                      May_spawning
-    ## 547                                                      Jun_spawning
-    ## 337                        PosofMouthsub.terminal.inferior_morphology
-    ## 338                                     PosofMouthsuperior_morphology
-    ## 339                                     PosofMouthterminal_morphology
-    ## 402                                                     Number_oxygen
-    ## 51                                                  DietTroph_ecology
-    ## 315                                                Vraymin_morphology
-    ## 316                                                Vraymax_morphology
-    ## 324                                   StrikingFeaturesnone_morphology
-    ## 325                  StrikingFeaturesother..see.diagnosis._morphology
-    ## 326                          StrikingFeaturesstriking.eyes_morphology
-    ## 327                          StrikingFeaturesstriking.fins_morphology
-    ## 328                 StrikingFeaturesstriking.shape.of.body_morphology
-    ## 524                     Spawningno.obvious.seasonal.peak_reproduction
-    ## 525                           Spawningonce.in.a.lifetime_reproduction
-    ## 526             Spawningone.clear.seasonal.peak.per.year_reproduction
-    ## 527        Spawningthroughout.the.year..but.peaking.once_reproduction
-    ## 544                                                      Mar_spawning
-    ## 636                                                   OtherItems_diet
-    ## 640                                                      SizeMin_diet
-    ## 641                                                      SizeMax_diet
-    ## 53                                                    DietTLu_ecology
-    ## 54                                                  DietseTLu_ecology
-    ## 314                                                Vspines_morphology
-    ## 409                                       AppliedStressfeeding_oxygen
-    ## 410                                       AppliedStresshigh.ph_oxygen
-    ## 411                                   AppliedStresshypercapnia_oxygen
-    ## 412                                       AppliedStresshypoxia_oxygen
-    ## 413                                        AppliedStresslow.ph_oxygen
-    ## 414                                AppliedStressnone.specified_oxygen
-    ## 415                                         AppliedStressother_oxygen
-    ## 416                                  AppliedStressother.stress_oxygen
-    ## 417                                   AppliedStressphotoperiod_oxygen
-    ## 418                                      AppliedStresssalinity_oxygen
-    ## 419                                      AppliedStresssedative_oxygen
-    ## 420                                   AppliedStresstemperature_oxygen
-    ## 421                                        AppliedStresstoxins_oxygen
-    ## 3                                                   BodyWeight_brains
-    ## 4                                                  BrainWeight_brains
-    ## 5                                                     EncCoeff_brains
-    ## 334                                Foreheadclearly.concave_morphology
-    ## 335                                 Foreheadclearly.convex_morphology
-    ## 336                          Foreheadmore.or.less.straight_morphology
-    ## 423                                                      Wmax_popchar
-    ## 556                                             FecundityMin_spawning
-    ## 404                                                   Salinity_oxygen
-    ## 425                                                      tmax_popchar
-    ## 444                                              LogKLogLoo_popgrowth
-    ## 558                                             FecundityMax_spawning
-    ## 648             AdultTypemovements.of.body.and.or.caudal.fin_swimming
-    ## 649          AdultTypeoscillation.of.median.or.pectoral.fins_swimming
-    ## 650           AdultTypeundulation.of.median.or.pectoral.fins_swimming
-    ## 651                                    AdultModeanguilliform_swimming
-    ## 652                                     AdultModebalistiform_swimming
-    ## 653                                     AdultModecarangiform_swimming
-    ## 654                                    AdultModediodontiform_swimming
-    ## 655                                     AdultModegymnotiform_swimming
-    ## 656                                       AdultModelabriform_swimming
-    ## 657                                        AdultModerajiform_swimming
-    ## 658                                  AdultModesubcarangiform_swimming
-    ## 52                                                DietSeTroph_ecology
-    ## 197                                            RangeMax_introductions
-    ## 548                                                      Jul_spawning
-    ## 196                                            RangeMin_introductions
-    ## 358                                          HorStripesTTI_morphology
-    ## 359                                    VerStripesTTIabsent_morphology
-    ## 360                                   VerStripesTTIpresent_morphology
-    ## 361                                          DiaStripesTTI_morphology
-    ## 362                                          CurStripesTTI_morphology
-    ## 551                                                      Oct_spawning
-    ## 596                                                      pHMax_stocks
-    ## 290                                              BarbelsNo_morphology
-    ## 369                 CaudalFinImore.than.one.spot.or.stripe_morphology
-    ## 370                          CaudalFinIno.spots.or.stripes_morphology
-    ## 371                           CaudalFinIone.spot.or.stripe_morphology
-    ## 443                                               Winfinity_popgrowth
-    ## 475                                             PredatTroph_predators
-    ## 476                                           PredatseTroph_predators
-    ## 543                                                      Feb_spawning
-    ## 550                                                      Sep_spawning
-    ## 552                                                      Nov_spawning
-    ## 595                                                      pHMin_stocks
-    ## 598                                                      dHMax_stocks
-    ## 363                             SpotsTTImore.than.one.spot_morphology
-    ## 364                                       SpotsTTIno.spots_morphology
-    ## 365                                  SpotsTTIone.spot.only_morphology
-    ## 372                   AnalFinImore.than.one.spot.or.stripe_morphology
-    ## 373                            AnalFinIno.spots.or.stripes_morphology
-    ## 374                             AnalFinIone.spot.or.stripe_morphology
-    ## 405                                                     Oxygen_oxygen
-    ## 445                                                       b_popgrowth
-    ## 549                                                      Aug_spawning
-    ## 366                 DorsalFinImore.than.one.spot.or.stripe_morphology
-    ## 367                          DorsalFinIno.spots.or.stripes_morphology
-    ## 368                           DorsalFinIone.spot.or.stripe_morphology
-    ## 447                                                    tmax_popgrowth
-    ## 637                                                 PercentEmpty_diet
-    ## 174                                          SpawningCycles_fecundity
-    ## 520                                 MatingSystemmonogamy_reproduction
-    ## 521                                MatingSystempolyandry_reproduction
-    ## 522                                 MatingSystempolygyny_reproduction
-    ## 523                              MatingSystempromiscuity_reproduction
-    ## 553                                                      Dec_spawning
-    ## 572                                    SpawningGroundcoastal_spawning
-    ## 573                                  SpawningGroundestuarine_spawning
-    ## 574                                 SpawningGroundlacustrine_spawning
-    ## 575                                   SpawningGroundriverine_spawning
-    ## 576                                      SpawningGroundshelf_spawning
-    ## 597                                                      dHMin_stocks
-    ## 2                                                       Number_brains
-    ## 356                                           Scutesabsent_morphology
-    ## 357                                      Scutesalong.belly_morphology
-    ## 292                                       GillRakersLowMin_morphology
-    ## 293                                       GillRakersLowMax_morphology
-    ## 406                                                  Oxygenmgl_oxygen
-    ## 449                                                       M_popgrowth
-    ## 508                                        MatingQuality_reproduction
-    ## 535                                      RepAquariumhigh_reproduction
-    ## 536                                       RepAquariumlow_reproduction
-    ## 537                                    RepAquariummedium_reproduction
-    ## 538                              RepAquariumnever.rarely_reproduction
-    ## 542                                                      Jan_spawning
-    ## 554                                                  TempLow_spawning
-    ## 555                                                 TempHigh_spawning
-    ## 560                                           SpawningCycles_spawning
-    ## 592                                              TempPreferred_stocks
-    ## 281                                                  Keels_morphology
-    ## 296                                     GillRakersTotalMin_morphology
-    ## 297                                     GillRakersTotalMax_morphology
-    ## 451                                                      Lm_popgrowth
-    ## 593                                                 TempPref50_stocks
-    ## 594                                                 TempPref75_stocks
-    ## 340                                    MandibleTeethabsent_morphology
-    ## 341                                   MandibleTeethpresent_morphology
-    ## 346                                     MaxillaTeethabsent_morphology
-    ## 347                                    MaxillaTeethpresent_morphology
-    ## 165                                                  Number_fecundity
-    ## 284                                      ScaleRowsAboveMin_morphology
-    ## 285                                      ScaleRowsAboveMax_morphology
-    ## 294                                        GillRakersUpMin_morphology
-    ## 295                                        GillRakersUpMax_morphology
-    ## 430                                                  Number_popgrowth
-    ## 461                                                       PopQB_popqb
-    ## 463                                                        Winf_popqb
-    ## 464                                                           K_popqb
-    ## 466                                                 Temperature_popqb
-    ## 452                                                   LmLoo_popgrowth
-    ## 469                                            Salinitybrackish_popqb
-    ## 470                                          Salinityfreshwater_popqb
-    ## 471                                            Salinityseawater_popqb
-    ## 647                                              AspectRatio_swimming
-    ## 7                                                           SL_brains
-    ## 134                                                  prior_r_estimate
-    ## 135                                                    lcl_r_estimate
-    ## 136                                                    ucl_r_estimate
-    ## 137                                                      n_r_estimate
-    ## 162                                         RelFecundityMin_fecundity
-    ## 286                                      ScaleRowsBelowMin_morphology
-    ## 287                                      ScaleRowsBelowMax_morphology
-    ## 6                                                     EncIndex_brains
-    ## 8                                                           TL_brains
-    ## 166                                                       a_fecundity
-    ## 167                                                       b_fecundity
-    ## 351                                          VomerineTeeth_morphology
-    ## 467                                                   Mortality_popqb
-    ## 468                                                           b_popqb
-    ## 474                                                   DietP_predators
-    ## 566                                                   Number_spawning
-    ## 569                                                CorrCoeff_spawning
-    ## 607                                        IUCN_Assessmenta1bd_stocks
-    ## 608                      IUCN_Assessmenta1ce.2ce..b1.2abc..c2a_stocks
-    ## 609                                       IUCN_Assessmenta2ace_stocks
-    ## 610                                         IUCN_Assessmenta2b_stocks
-    ## 611                                   IUCN_Assessmenta2bd.4bcd_stocks
-    ## 612                                    IUCN_Assessmenta2bd.4bd_stocks
-    ## 613                                        IUCN_Assessmenta4cd_stocks
-    ## 614                                   IUCN_Assessmentb2ab.iii._stocks
+    ## 197                                           EstabAqua_introductions
+    ## 198                                            Invasive_introductions
+    ## 201                                  Period18th.century_introductions
+    ## 202                                     Period1900.1924_introductions
+    ## 203                                     Period1925.1949_introductions
+    ## 204                                     Period1950.1974_introductions
+    ## 205                                     Period1975.1999_introductions
+    ## 206                                  Period19th.century_introductions
+    ## 207                                  Period2000.present_introductions
+    ## 208                              Periodpre.18th.century_introductions
+    ## 209                                       Periodunknown_introductions
+    ## 325                                       AnalFinSpinesMin_morphology
+    ## 326                                       AnalFinSpinesMax_morphology
+    ## 149                                                   AgeMin_estimate
+    ## 210                                    Reasonaccidental_introductions
+    ## 211                         Reasonaccidental.with.ships_introductions
+    ## 212                                 Reasonangling.sport_introductions
+    ## 213                                   Reasonaquaculture_introductions
+    ## 214                 Reasondiffused.from.other.countries_introductions
+    ## 215                         Reasonfill.ecological.niche_introductions
+    ## 216                                     Reasonfisheries_introductions
+    ## 217                                        Reasonforage_introductions
+    ## 218                          Reasonlessepsian.migration_introductions
+    ## 219                              Reasonmosquito.control_introductions
+    ## 220                                       Reasonno.data_introductions
+    ## 221                                    Reasonornamental_introductions
+    ## 222                    Reasonremoval.of.natural.barrier_introductions
+    ## 223                                      Reasonresearch_introductions
+    ## 224                                       Reasonunknown_introductions
+    ## 240                                Estabwildestablished_introductions
+    ## 241                                         Estabwildno_introductions
+    ## 242                                    Estabwildno.data_introductions
+    ## 243                            Estabwildnot.established_introductions
+    ## 244                       Estabwildprobably.established_introductions
+    ## 245                                Estabwildprobably.no_introductions
+    ## 246                   Estabwildprobably.not.established_introductions
+    ## 247                               Estabwildprobably.yes_introductions
+    ## 248                                    Estabwildunknown_introductions
+    ## 249                                        Estabwildyes_introductions
+    ## 329                                                Praymin_morphology
+    ## 330                                                Praymax_morphology
+    ## 160                                            FecundityMax_fecundity
+    ## 284                                                LCLa_length_weight
+    ## 285                                                UCLa_length_weight
+    ## 286                                                LCLb_length_weight
+    ## 287                                                UCLb_length_weight
+    ## 411                                    Attributesconfluent_morphology
+    ## 412                          Attributesmore.or.less.normal_morphology
+    ## 494                                                  predator_mammals
+    ## 499                                       Predatstageadults_predators
+    ## 500                                  Predatstagejuv..adults_predators
+    ## 501                                       Predatstagelarvae_predators
+    ## 502                                Predatstagerecruits.juv._predators
+    ## 503                                          PredatorIbirds_predators
+    ## 504                                    PredatorIcrustaceans_predators
+    ## 505                                        PredatorIfinfish_predators
+    ## 506                                          PredatorIherps_predators
+    ## 507                                        PredatorIinsects_predators
+    ## 508                                        PredatorImammals_predators
+    ## 509                                       PredatorImollusks_predators
+    ## 510                                          PredatorIother_predators
+    ## 511                                         PreyStageadults_predators
+    ## 512                                           PreyStageeggs_predators
+    ## 513                                    PreyStagejuv..adults_predators
+    ## 514                                         PreyStagelarvae_predators
+    ## 515                                  PreyStagerecruits.juv._predators
+    ## 654                                                      January_diet
+    ## 655                                                     February_diet
+    ## 656                                                        March_diet
+    ## 657                                                        April_diet
+    ## 658                                                          May_diet
+    ## 659                                                         June_diet
+    ## 660                                                         July_diet
+    ## 661                                                       August_diet
+    ## 662                                                    September_diet
+    ## 663                                                      October_diet
+    ## 664                                                     November_diet
+    ## 665                                                     December_diet
+    ## 668                                                        Troph_diet
+    ## 669                                                      seTroph_diet
+    ## 673                                            SampleStageadults_diet
+    ## 674                                       SampleStagejuv..adults_diet
+    ## 675                                            SampleStagelarvae_diet
+    ## 676                                     SampleStagerecruits.juv._diet
+    ## 321                                            DFinletsmax_morphology
+    ## 323                                            VFinletsmax_morphology
+    ## 425                                                     Weight_oxygen
+    ## 426                                                       Temp_oxygen
+    ## 430                                                 OxygenCons_oxygen
+    ## 455                                              TLinfinity_popgrowth
+    ## 672                                                   FishLength_diet
+    ## 150                                                   AgeMax_estimate
+    ## 151                                              TempPrefMin_estimate
+    ## 152                                             TempPrefMean_estimate
+    ## 153                                              TempPrefMax_estimate
+    ## 278                                                 aTL_length_weight
+    ## 400             DorsalAttributescontinuous.with.caudal.fin_morphology
+    ## 401 DorsalAttributesextending.over.most.of.the.back.length_morphology
+    ## 402              DorsalAttributesgreatly.reduced.or.absent_morphology
+    ## 403               DorsalAttributesmodified.to.suction.disc_morphology
+    ## 404                 DorsalAttributesno.striking.attributes_morphology
+    ## 405                                  DorsalAttributesother_morphology
+    ## 567                                                      Apr_spawning
+    ## 138                                                     Winf_estimate
+    ## 320                                            DFinletsmin_morphology
+    ## 322                                            VFinletsmin_morphology
+    ## 478                                             Temperature_popgrowth
+    ## 568                                                      May_spawning
+    ## 569                                                      Jun_spawning
+    ## 361                        PosofMouthsub.terminal.inferior_morphology
+    ## 362                                     PosofMouthsuperior_morphology
+    ## 363                                     PosofMouthterminal_morphology
+    ## 49                                                  DietTroph_ecology
+    ## 332                                                Vraymin_morphology
+    ## 333                                                Vraymax_morphology
+    ## 348                                   StrikingFeaturesnone_morphology
+    ## 349                  StrikingFeaturesother..see.diagnosis._morphology
+    ## 350                          StrikingFeaturesstriking.eyes_morphology
+    ## 351                          StrikingFeaturesstriking.fins_morphology
+    ## 352                 StrikingFeaturesstriking.shape.of.body_morphology
+    ## 546                     Spawningno.obvious.seasonal.peak_reproduction
+    ## 547                           Spawningonce.in.a.lifetime_reproduction
+    ## 548             Spawningone.clear.seasonal.peak.per.year_reproduction
+    ## 549        Spawningthroughout.the.year..but.peaking.once_reproduction
+    ## 566                                                      Mar_spawning
+    ## 666                                                   OtherItems_diet
+    ## 670                                                      SizeMin_diet
+    ## 671                                                      SizeMax_diet
+    ## 51                                                    DietTLu_ecology
+    ## 52                                                  DietseTLu_ecology
+    ## 331                                                Vspines_morphology
+    ## 432                                       AppliedStressfeeding_oxygen
+    ## 433                                       AppliedStresshigh.ph_oxygen
+    ## 434                                   AppliedStresshypercapnia_oxygen
+    ## 435                                       AppliedStresshypoxia_oxygen
+    ## 436                                        AppliedStresslow.ph_oxygen
+    ## 437                                AppliedStressnone.specified_oxygen
+    ## 438                                         AppliedStressother_oxygen
+    ## 439                                  AppliedStressother.stress_oxygen
+    ## 440                                   AppliedStressphotoperiod_oxygen
+    ## 441                                      AppliedStresssalinity_oxygen
+    ## 442                                      AppliedStresssedative_oxygen
+    ## 443                                   AppliedStresstemperature_oxygen
+    ## 444                                        AppliedStresstoxins_oxygen
+    ## 2                                                   BodyWeight_brains
+    ## 3                                                     EncCoeff_brains
+    ## 358                                Foreheadclearly.concave_morphology
+    ## 359                                 Foreheadclearly.convex_morphology
+    ## 360                          Foreheadmore.or.less.straight_morphology
+    ## 446                                                      Wmax_popchar
+    ## 578                                             FecundityMin_spawning
+    ## 427                                                   Salinity_oxygen
+    ## 448                                                      tmax_popchar
+    ## 466                                              LogKLogLoo_popgrowth
+    ## 581                                             FecundityMax_spawning
+    ## 679             AdultTypemovements.of.body.and.or.caudal.fin_swimming
+    ## 680          AdultTypeoscillation.of.median.or.pectoral.fins_swimming
+    ## 681           AdultTypeundulation.of.median.or.pectoral.fins_swimming
+    ## 682                                    AdultModeanguilliform_swimming
+    ## 683                                     AdultModebalistiform_swimming
+    ## 684                                     AdultModecarangiform_swimming
+    ## 685                                    AdultModediodontiform_swimming
+    ## 686                                     AdultModegymnotiform_swimming
+    ## 687                                       AdultModelabriform_swimming
+    ## 688                                        AdultModerajiform_swimming
+    ## 689                                  AdultModesubcarangiform_swimming
+    ## 50                                                DietSeTroph_ecology
+    ## 200                                            RangeMax_introductions
+    ## 275                                           LengthMin_length_weight
+    ## 276                                           LengthMax_length_weight
+    ## 570                                                      Jul_spawning
+    ## 199                                            RangeMin_introductions
+    ## 382                                          HorStripesTTI_morphology
+    ## 383                                    VerStripesTTIabsent_morphology
+    ## 384                                   VerStripesTTIpresent_morphology
+    ## 385                                          DiaStripesTTI_morphology
+    ## 386                                          CurStripesTTI_morphology
+    ## 573                                                      Oct_spawning
+    ## 623                                                      pHMax_stocks
+    ## 307                                              BarbelsNo_morphology
+    ## 393                 CaudalFinImore.than.one.spot.or.stripe_morphology
+    ## 394                          CaudalFinIno.spots.or.stripes_morphology
+    ## 395                           CaudalFinIone.spot.or.stripe_morphology
+    ## 465                                               Winfinity_popgrowth
+    ## 497                                             PredatTroph_predators
+    ## 498                                           PredatseTroph_predators
+    ## 565                                                      Feb_spawning
+    ## 572                                                      Sep_spawning
+    ## 574                                                      Nov_spawning
+    ## 622                                                      pHMin_stocks
+    ## 625                                                      dHMax_stocks
+    ## 387                             SpotsTTImore.than.one.spot_morphology
+    ## 388                                       SpotsTTIno.spots_morphology
+    ## 389                                  SpotsTTIone.spot.only_morphology
+    ## 396                   AnalFinImore.than.one.spot.or.stripe_morphology
+    ## 397                            AnalFinIno.spots.or.stripes_morphology
+    ## 398                             AnalFinIone.spot.or.stripe_morphology
+    ## 428                                                     Oxygen_oxygen
+    ## 467                                                       b_popgrowth
+    ## 571                                                      Aug_spawning
+    ## 390                 DorsalFinImore.than.one.spot.or.stripe_morphology
+    ## 391                          DorsalFinIno.spots.or.stripes_morphology
+    ## 392                           DorsalFinIone.spot.or.stripe_morphology
+    ## 469                                                    tmax_popgrowth
+    ## 667                                                 PercentEmpty_diet
+    ## 177                                          SpawningCycles_fecundity
+    ## 542                                 MatingSystemmonogamy_reproduction
+    ## 543                                MatingSystempolyandry_reproduction
+    ## 544                                 MatingSystempolygyny_reproduction
+    ## 545                              MatingSystempromiscuity_reproduction
+    ## 575                                                      Dec_spawning
+    ## 598                                    SpawningGroundcoastal_spawning
+    ## 599                                  SpawningGroundestuarine_spawning
+    ## 600                                 SpawningGroundlacustrine_spawning
+    ## 601                                   SpawningGroundriverine_spawning
+    ## 602                                      SpawningGroundshelf_spawning
+    ## 624                                                      dHMin_stocks
+    ## 380                                           Scutesabsent_morphology
+    ## 381                                      Scutesalong.belly_morphology
+    ## 282                                                 SEb_length_weight
+    ## 309                                       GillRakersLowMin_morphology
+    ## 310                                       GillRakersLowMax_morphology
+    ## 429                                                  Oxygenmgl_oxygen
+    ## 471                                                       M_popgrowth
+    ## 530                                        MatingQuality_reproduction
+    ## 557                                      RepAquariumhigh_reproduction
+    ## 558                                       RepAquariumlow_reproduction
+    ## 559                                    RepAquariummedium_reproduction
+    ## 560                              RepAquariumnever.rarely_reproduction
+    ## 564                                                      Jan_spawning
+    ## 576                                                  TempLow_spawning
+    ## 577                                                 TempHigh_spawning
+    ## 584                                           SpawningCycles_spawning
+    ## 619                                              TempPreferred_stocks
+    ## 298                                                  Keels_morphology
+    ## 313                                     GillRakersTotalMin_morphology
+    ## 314                                     GillRakersTotalMax_morphology
+    ## 472                                                      Lm_popgrowth
+    ## 620                                                 TempPref50_stocks
+    ## 621                                                 TempPref75_stocks
+    ## 364                                    MandibleTeethabsent_morphology
+    ## 365                                   MandibleTeethpresent_morphology
+    ## 370                                     MaxillaTeethabsent_morphology
+    ## 371                                    MaxillaTeethpresent_morphology
+    ## 159                                          LengthFecunMin_fecundity
+    ## 162                                          LengthFecunMax_fecundity
+    ## 301                                      ScaleRowsAboveMin_morphology
+    ## 302                                      ScaleRowsAboveMax_morphology
+    ## 311                                        GillRakersUpMin_morphology
+    ## 312                                        GillRakersUpMax_morphology
+    ## 482                                                       PopQB_popqb
+    ## 484                                                        Winf_popqb
+    ## 485                                                           K_popqb
+    ## 487                                                 Temperature_popqb
+    ## 167                                               LengthMin_fecundity
+    ## 168                                               LengthMax_fecundity
+    ## 473                                                   LmLoo_popgrowth
+    ## 490                                            Salinitybrackish_popqb
+    ## 491                                          Salinityfreshwater_popqb
+    ## 492                                            Salinityseawater_popqb
+    ## 580                                           LengthFecunMin_spawning
+    ## 583                                           LengthFecunMax_spawning
+    ## 678                                              AspectRatio_swimming
+    ## 5                                                           SL_brains
+    ## 133                                                  prior_r_estimate
+    ## 134                                                    lcl_r_estimate
+    ## 135                                                    ucl_r_estimate
+    ## 136                                                      n_r_estimate
+    ## 164                                         RelFecundityMin_fecundity
+    ## 303                                      ScaleRowsBelowMin_morphology
+    ## 304                                      ScaleRowsBelowMax_morphology
+    ## 4                                                     EncIndex_brains
+    ## 6                                                           TL_brains
+    ## 169                                                       a_fecundity
+    ## 170                                                       b_fecundity
+    ## 281                                                 SEa_length_weight
+    ## 375                                          VomerineTeeth_morphology
+    ## 488                                                   Mortality_popqb
+    ## 489                                                           b_popqb
+    ## 495                                                   DietP_predators
+    ## 496                                               MaxLength_predators
+    ## 591                                                LengthMin_spawning
+    ## 592                                                LengthMax_spawning
+    ## 595                                                CorrCoeff_spawning
+    ## 637                                        IUCN_Assessmenta1bd_stocks
+    ## 638                      IUCN_Assessmenta1ce.2ce..b1.2abc..c2a_stocks
+    ## 639                                       IUCN_Assessmenta2ace_stocks
+    ## 640                                         IUCN_Assessmenta2b_stocks
+    ## 641                                   IUCN_Assessmenta2bd.4bcd_stocks
+    ## 642                                    IUCN_Assessmenta2bd.4bd_stocks
+    ## 643                                        IUCN_Assessmenta4cd_stocks
+    ## 644                                   IUCN_Assessmentb2ab.iii._stocks
     ## 158                                               WeightMin_fecundity
-    ## 164                                         RelFecundityMax_fecundity
-    ## 321                                           MaximumDepth_morphology
-    ## 427                                                      to_popgrowth
-    ## 453                                                  LmMale_popgrowth
-    ## 462                                                     MaintQB_popqb
-    ## 465                                                          t0_popqb
-    ## 557                                                WeightMin_spawning
-    ## 563                                          RelFecundityMin_spawning
-    ## 160                                               WeightMax_fecundity
-    ## 282                                         PoredScalesMin_morphology
-    ## 283                                         PoredScalesMax_morphology
-    ## 352                                               Palatine_morphology
-    ## 353                                  PharyngealTeethabsent_morphology
-    ## 354                                 PharyngealTeethpresent_morphology
-    ## 448                                                      tm_popgrowth
-    ## 454                                               LmLooMale_popgrowth
-    ## 455                                                LmFemale_popgrowth
-    ## 459                                                      Rm_popgrowth
-    ## 495                                                        Rd1_ration
-    ## 497                                                        TBW_ration
-    ## 498                                                      Water_ration
-    ## 499                                                FoodInekton_ration
-    ## 500                                                FoodIothers_ration
-    ## 501                                            FoodIzoobenthos_ration
-    ## 559                                                WeightMax_spawning
-    ## 567                                                        a_spawning
-    ## 568                                                        b_spawning
-    ## 578                                                     SpeedLS_speed
-    ## 579                                                     Speedms_speed
-    ## 582                                                   Modeburst_speed
-    ## 583                                                   Modeother_speed
-    ## 584                                               Modesustained_speed
-    ## 163                                        RelFecundityMean_fecundity
-    ## 288                                        ScalesPeduncMin_morphology
-    ## 289                                        ScalesPeduncMax_morphology
-    ## 342                             MandibleTeethT1bicuspidate_morphology
-    ## 343                             MandibleTeethT1canine.like_morphology
-    ## 344                                 MandibleTeethT1conical_morphology
-    ## 345                            MandibleTeethT1tricuspidate_morphology
-    ## 456                                             LmLooFemale_popgrowth
-    ## 502                                           Salinitybrackish_ration
-    ## 503                                         Salinityfreshwater_ration
-    ## 504                                           Salinityseawater_ration
-    ## 565                                          RelFecundityMax_spawning
-    ## 580                                                         SLa_speed
-    ## 581                                                         SLb_speed
-    ## 258                                      EcolEffno.data_introductions
-    ## 259                                         EcolEffnone_introductions
-    ## 260                                EcolEffprobably.none_introductions
-    ## 261                                EcolEffprobably.some_introductions
-    ## 262                                         EcolEffsome_introductions
-    ## 263                                      EcolEffunknown_introductions
-    ## 264                                          EcolEffyes_introductions
-    ## 265                                     SocioEffno.data_introductions
-    ## 266                                        SocioEffnone_introductions
-    ## 267                               SocioEffprobably.none_introductions
-    ## 268                               SocioEffprobably.some_introductions
-    ## 269                                        SocioEffsome_introductions
-    ## 270                                     SocioEffunknown_introductions
-    ## 291                                           GillCleftsNo_morphology
-    ## 348                              MaxillaTeethT1canine.like_morphology
-    ## 349                                  MaxillaTeethT1conical_morphology
-    ## 350                             MaxillaTeethT1tricuspidate_morphology
-    ## 375                                               Spiracle_morphology
-    ## 408                                              SwimmingSpeed_oxygen
-    ## 431                                                  SE_Loo_popgrowth
-    ## 435                                                    SE_K_popgrowth
-    ## 439                                                   SE_to_popgrowth
-    ## 446                                                       C_popgrowth
-    ## 458                                                  DeltaT_popgrowth
-    ## 496                                                        GCE_ration
-    ## 168                                                     SEa_fecundity
-    ## 169                                                     SEb_fecundity
-    ## 247                                   ComAquanever.used_introductions
-    ## 248                                      ComAquano.data_introductions
-    ## 249                                  ComAquararely.used_introductions
-    ## 250                                      ComAquaunknown_introductions
-    ## 251                                  ComAquawidely.used_introductions
-    ## 252           ReproModeassisted.artificial.reproduction_introductions
-    ## 253                         ReproModecontinuous.imports_introductions
-    ## 254                       ReproModenatural.reproduction_introductions
-    ## 255                                    ReproModeno.data_introductions
-    ## 256                    ReproModeunassisted.reproduction_introductions
-    ## 257                                    ReproModeunknown_introductions
-    ## 277                                        MandibleRowsMin_morphology
-    ## 278                                        MandibleRowsMax_morphology
-    ## 279                                         MaxillaRowsMin_morphology
-    ## 280                                         MaxillaRowsMax_morphology
-    ## 317                                             Forklength_morphology
-    ## 318                                            Totallength_morphology
-    ## 319                                          PostHeadDepth_morphology
-    ## 320                                         PostTrunkDepth_morphology
-    ## 322                                          PeduncleDepth_morphology
-    ## 323                                           CaudalHeight_morphology
-    ## 355                                          TeethonTongue_morphology
-    ## 437                                                   LCL_K_popgrowth
-    ## 438                                                   UCL_K_popgrowth
-    ## 441                                                  LCL_to_popgrowth
-    ## 442                                                  UCL_to_popgrowth
-    ## 561                                             GestationMin_spawning
-    ## 564                                         RelFecundityMean_spawning
-    ## 104                                  SchoolingFrequencyalways_ecology
-    ## 105                               SchoolingFrequencysometimes_ecology
-    ## 161                                           FecundityMean_fecundity
-    ## 170                                                    LCLa_fecundity
-    ## 171                                                    UCLa_fecundity
-    ## 172                                                    LCLb_fecundity
-    ## 173                                                    UCLb_fecundity
-    ## 222                               OtherReasonaccidental_introductions
-    ## 223                    OtherReasonaccidental.with.ships_introductions
-    ## 224                            OtherReasonangling.sport_introductions
-    ## 225                              OtherReasonaquaculture_introductions
-    ## 226            OtherReasondiffused.from.other.countries_introductions
-    ## 227                    OtherReasonfill.ecological.niche_introductions
-    ## 228                                OtherReasonfisheries_introductions
-    ## 229                                   OtherReasonforage_introductions
-    ## 230                         OtherReasonmosquito.control_introductions
-    ## 231                                  OtherReasonno.data_introductions
-    ## 232                               OtherReasonornamental_introductions
-    ## 233                            OtherReasonother.reasons_introductions
-    ## 234                                 OtherReasonresearch_introductions
-    ## 235                                  OtherReasonunknown_introductions
-    ## 236                             OtherReasonweed.control_introductions
-    ## 432                                                  SD_Loo_popgrowth
-    ## 436                                                    SD_K_popgrowth
-    ## 440                                                   SD_to_popgrowth
-    ## 450                                                Number_M_popgrowth
-    ## 562                                             GestationMax_spawning
-    ## 570                                            Dailyspawnmin_spawning
-    ## 571                                            Dailyspawnmax_spawning
+    ## 166                                         RelFecundityMax_fecundity
+    ## 342                                           MaximumDepth_morphology
+    ## 450                                                      to_popgrowth
+    ## 474                                                  LmMale_popgrowth
+    ## 483                                                     MaintQB_popqb
+    ## 486                                                          t0_popqb
+    ## 579                                                WeightMin_spawning
+    ## 588                                          RelFecundityMin_spawning
+    ## 161                                               WeightMax_fecundity
+    ## 299                                         PoredScalesMin_morphology
+    ## 300                                         PoredScalesMax_morphology
+    ## 376                                               Palatine_morphology
+    ## 377                                  PharyngealTeethabsent_morphology
+    ## 378                                 PharyngealTeethpresent_morphology
+    ## 470                                                      tm_popgrowth
+    ## 475                                               LmLooMale_popgrowth
+    ## 476                                                LmFemale_popgrowth
+    ## 480                                                      Rm_popgrowth
+    ## 517                                                        Rd1_ration
+    ## 519                                                        TBW_ration
+    ## 520                                                      Water_ration
+    ## 521                                                FoodInekton_ration
+    ## 522                                                FoodIothers_ration
+    ## 523                                            FoodIzoobenthos_ration
+    ## 582                                                WeightMax_spawning
+    ## 593                                                        a_spawning
+    ## 594                                                        b_spawning
+    ## 604                                                      Length_speed
+    ## 605                                                     SpeedLS_speed
+    ## 606                                                     Speedms_speed
+    ## 609                                                   Modeburst_speed
+    ## 610                                                   Modeother_speed
+    ## 611                                               Modesustained_speed
+    ## 165                                        RelFecundityMean_fecundity
+    ## 305                                        ScalesPeduncMin_morphology
+    ## 306                                        ScalesPeduncMax_morphology
+    ## 366                             MandibleTeethT1bicuspidate_morphology
+    ## 367                             MandibleTeethT1canine.like_morphology
+    ## 368                                 MandibleTeethT1conical_morphology
+    ## 369                            MandibleTeethT1tricuspidate_morphology
+    ## 477                                             LmLooFemale_popgrowth
+    ## 524                                           Salinitybrackish_ration
+    ## 525                                         Salinityfreshwater_ration
+    ## 526                                           Salinityseawater_ration
+    ## 590                                          RelFecundityMax_spawning
+    ## 607                                                         SLa_speed
+    ## 608                                                         SLb_speed
+    ## 261                                      EcolEffno.data_introductions
+    ## 262                                         EcolEffnone_introductions
+    ## 263                                EcolEffprobably.none_introductions
+    ## 264                                EcolEffprobably.some_introductions
+    ## 265                                         EcolEffsome_introductions
+    ## 266                                      EcolEffunknown_introductions
+    ## 267                                          EcolEffyes_introductions
+    ## 268                                     SocioEffno.data_introductions
+    ## 269                                        SocioEffnone_introductions
+    ## 270                               SocioEffprobably.none_introductions
+    ## 271                               SocioEffprobably.some_introductions
+    ## 272                                        SocioEffsome_introductions
+    ## 273                                     SocioEffunknown_introductions
+    ## 308                                           GillCleftsNo_morphology
+    ## 336                                             HeadLength_morphology
+    ## 372                              MaxillaTeethT1canine.like_morphology
+    ## 373                                  MaxillaTeethT1conical_morphology
+    ## 374                             MaxillaTeethT1tricuspidate_morphology
+    ## 399                                               Spiracle_morphology
+    ## 431                                              SwimmingSpeed_oxygen
+    ## 453                                                  SE_Loo_popgrowth
+    ## 457                                                    SE_K_popgrowth
+    ## 461                                                   SE_to_popgrowth
+    ## 468                                                       C_popgrowth
+    ## 479                                                  DeltaT_popgrowth
+    ## 518                                                        GCE_ration
+    ## 171                                                     SEa_fecundity
+    ## 172                                                     SEb_fecundity
+    ## 250                                   ComAquanever.used_introductions
+    ## 251                                      ComAquano.data_introductions
+    ## 252                                  ComAquararely.used_introductions
+    ## 253                                      ComAquaunknown_introductions
+    ## 254                                  ComAquawidely.used_introductions
+    ## 255           ReproModeassisted.artificial.reproduction_introductions
+    ## 256                         ReproModecontinuous.imports_introductions
+    ## 257                       ReproModenatural.reproduction_introductions
+    ## 258                                    ReproModeno.data_introductions
+    ## 259                    ReproModeunassisted.reproduction_introductions
+    ## 260                                    ReproModeunknown_introductions
+    ## 283                                                 SDa_length_weight
+    ## 294                                        MandibleRowsMin_morphology
+    ## 295                                        MandibleRowsMax_morphology
+    ## 296                                         MaxillaRowsMin_morphology
+    ## 297                                         MaxillaRowsMax_morphology
+    ## 334                                             Forklength_morphology
+    ## 335                                            Totallength_morphology
+    ## 337                                        PreDorsalLength_morphology
+    ## 338                                       PrePelvicsLength_morphology
+    ## 339                                          PreAnalLength_morphology
+    ## 340                                          PostHeadDepth_morphology
+    ## 341                                         PostTrunkDepth_morphology
+    ## 343                                          PeduncleDepth_morphology
+    ## 344                                         PeduncleLength_morphology
+    ## 345                                           CaudalHeight_morphology
+    ## 346                                       PreorbitalLength_morphology
+    ## 347                                              EyeLength_morphology
+    ## 379                                          TeethonTongue_morphology
+    ## 459                                                   LCL_K_popgrowth
+    ## 460                                                   UCL_K_popgrowth
+    ## 463                                                  LCL_to_popgrowth
+    ## 464                                                  UCL_to_popgrowth
+    ## 585                                             GestationMin_spawning
+    ## 589                                         RelFecundityMean_spawning
+    ## 102                                  SchoolingFrequencyalways_ecology
+    ## 103                               SchoolingFrequencysometimes_ecology
+    ## 163                                           FecundityMean_fecundity
+    ## 173                                                    LCLa_fecundity
+    ## 174                                                    UCLa_fecundity
+    ## 175                                                    LCLb_fecundity
+    ## 176                                                    UCLb_fecundity
+    ## 225                               OtherReasonaccidental_introductions
+    ## 226                    OtherReasonaccidental.with.ships_introductions
+    ## 227                            OtherReasonangling.sport_introductions
+    ## 228                              OtherReasonaquaculture_introductions
+    ## 229            OtherReasondiffused.from.other.countries_introductions
+    ## 230                    OtherReasonfill.ecological.niche_introductions
+    ## 231                                OtherReasonfisheries_introductions
+    ## 232                                   OtherReasonforage_introductions
+    ## 233                         OtherReasonmosquito.control_introductions
+    ## 234                                  OtherReasonno.data_introductions
+    ## 235                               OtherReasonornamental_introductions
+    ## 236                            OtherReasonother.reasons_introductions
+    ## 237                                 OtherReasonresearch_introductions
+    ## 238                                  OtherReasonunknown_introductions
+    ## 239                             OtherReasonweed.control_introductions
+    ## 454                                                  SD_Loo_popgrowth
+    ## 458                                                    SD_K_popgrowth
+    ## 462                                                   SD_to_popgrowth
+    ## 586                                             GestationMax_spawning
+    ## 587                                       LengthOffspringMin_spawning
+    ## 596                                            Dailyspawnmin_spawning
+    ## 597                                            Dailyspawnmax_spawning
     ##     non_na_frac
     ## 1    1.00000000
-    ## 9    1.00000000
-    ## 10   1.00000000
+    ## 7    1.00000000
+    ## 8    1.00000000
+    ## 104  1.00000000
     ## 106  1.00000000
     ## 108  1.00000000
+    ## 109  1.00000000
     ## 110  1.00000000
     ## 111  1.00000000
     ## 112  1.00000000
-    ## 113  1.00000000
-    ## 114  1.00000000
+    ## 123  1.00000000
+    ## 124  1.00000000
     ## 125  1.00000000
     ## 126  1.00000000
     ## 127  1.00000000
     ## 128  1.00000000
-    ## 129  1.00000000
+    ## 141  1.00000000
     ## 142  1.00000000
-    ## 143  1.00000000
+    ## 145  1.00000000
     ## 146  1.00000000
     ## 147  1.00000000
     ## 148  1.00000000
-    ## 149  1.00000000
+    ## 154  1.00000000
     ## 155  1.00000000
     ## 156  1.00000000
-    ## 175  1.00000000
-    ## 193  1.00000000
-    ## 271  1.00000000
-    ## 400  1.00000000
-    ## 422  1.00000000
-    ## 426  1.00000000
-    ## 460  1.00000000
-    ## 472  1.00000000
-    ## 494  1.00000000
-    ## 505  1.00000000
-    ## 539  1.00000000
-    ## 577  1.00000000
-    ## 585  1.00000000
-    ## 599  1.00000000
-    ## 600  1.00000000
-    ## 601  1.00000000
-    ## 602  1.00000000
+    ## 178  1.00000000
+    ## 196  1.00000000
+    ## 274  1.00000000
+    ## 288  1.00000000
+    ## 424  1.00000000
+    ## 445  1.00000000
+    ## 449  1.00000000
+    ## 481  1.00000000
+    ## 493  1.00000000
+    ## 516  1.00000000
+    ## 527  1.00000000
+    ## 561  1.00000000
     ## 603  1.00000000
-    ## 604  1.00000000
-    ## 605  1.00000000
-    ## 606  1.00000000
-    ## 615  1.00000000
-    ## 616  1.00000000
-    ## 617  1.00000000
-    ## 618  1.00000000
-    ## 619  1.00000000
-    ## 623  1.00000000
+    ## 612  1.00000000
+    ## 626  1.00000000
+    ## 627  1.00000000
+    ## 628  1.00000000
+    ## 629  1.00000000
+    ## 630  1.00000000
+    ## 631  1.00000000
+    ## 632  1.00000000
+    ## 633  1.00000000
+    ## 634  1.00000000
+    ## 635  1.00000000
+    ## 636  1.00000000
+    ## 645  1.00000000
     ## 646  1.00000000
-    ## 659  1.00000000
+    ## 647  1.00000000
+    ## 648  1.00000000
+    ## 649  1.00000000
+    ## 653  1.00000000
+    ## 677  1.00000000
+    ## 690  1.00000000
+    ## 113  0.95833333
+    ## 114  0.95833333
     ## 115  0.95833333
     ## 116  0.95833333
     ## 117  0.95833333
@@ -8408,27 +8553,27 @@ DF_fields
     ## 120  0.95833333
     ## 121  0.95833333
     ## 122  0.95833333
-    ## 123  0.95833333
-    ## 124  0.95833333
+    ## 129  0.95833333
     ## 130  0.95833333
     ## 131  0.95833333
     ## 132  0.95833333
-    ## 133  0.95833333
-    ## 620  0.90277778
-    ## 621  0.90277778
-    ## 622  0.90277778
-    ## 506  0.88888889
-    ## 507  0.88888889
-    ## 510  0.88888889
-    ## 511  0.88888889
-    ## 512  0.88888889
-    ## 513  0.88888889
-    ## 514  0.88888889
-    ## 515  0.88888889
-    ## 516  0.88888889
-    ## 517  0.88888889
-    ## 518  0.88888889
-    ## 519  0.88888889
+    ## 650  0.90277778
+    ## 651  0.90277778
+    ## 652  0.90277778
+    ## 528  0.88888889
+    ## 529  0.88888889
+    ## 532  0.88888889
+    ## 533  0.88888889
+    ## 534  0.88888889
+    ## 535  0.88888889
+    ## 536  0.88888889
+    ## 537  0.88888889
+    ## 538  0.88888889
+    ## 539  0.88888889
+    ## 540  0.88888889
+    ## 541  0.88888889
+    ## 37   0.87500000
+    ## 38   0.87500000
     ## 39   0.87500000
     ## 40   0.87500000
     ## 41   0.87500000
@@ -8439,8 +8584,8 @@ DF_fields
     ## 46   0.87500000
     ## 47   0.87500000
     ## 48   0.87500000
-    ## 49   0.87500000
-    ## 50   0.87500000
+    ## 55   0.87500000
+    ## 56   0.87500000
     ## 57   0.87500000
     ## 58   0.87500000
     ## 59   0.87500000
@@ -8486,12 +8631,12 @@ DF_fields
     ## 99   0.87500000
     ## 100  0.87500000
     ## 101  0.87500000
-    ## 102  0.87500000
-    ## 103  0.87500000
-    ## 138  0.86111111
-    ## 528  0.86111111
-    ## 529  0.86111111
-    ## 530  0.86111111
+    ## 137  0.86111111
+    ## 550  0.86111111
+    ## 551  0.86111111
+    ## 552  0.86111111
+    ## 9    0.84722222
+    ## 10   0.84722222
     ## 11   0.84722222
     ## 12   0.84722222
     ## 13   0.84722222
@@ -8518,27 +8663,22 @@ DF_fields
     ## 34   0.84722222
     ## 35   0.84722222
     ## 36   0.84722222
-    ## 37   0.84722222
-    ## 38   0.84722222
-    ## 273  0.84722222
-    ## 274  0.84722222
-    ## 275  0.84722222
-    ## 276  0.84722222
-    ## 586  0.83333333
-    ## 587  0.83333333
-    ## 55   0.81944444
-    ## 56   0.81944444
-    ## 272  0.81944444
-    ## 329  0.80555556
-    ## 330  0.80555556
-    ## 331  0.80555556
-    ## 332  0.80555556
-    ## 333  0.80555556
+    ## 290  0.84722222
+    ## 291  0.84722222
+    ## 292  0.84722222
+    ## 293  0.84722222
+    ## 613  0.83333333
+    ## 614  0.83333333
+    ## 53   0.81944444
+    ## 54   0.81944444
+    ## 289  0.81944444
+    ## 353  0.80555556
+    ## 354  0.80555556
+    ## 355  0.80555556
+    ## 356  0.80555556
+    ## 357  0.80555556
+    ## 105  0.73611111
     ## 107  0.73611111
-    ## 109  0.73611111
-    ## 176  0.70833333
-    ## 177  0.70833333
-    ## 178  0.70833333
     ## 179  0.70833333
     ## 180  0.70833333
     ## 181  0.70833333
@@ -8553,67 +8693,70 @@ DF_fields
     ## 190  0.70833333
     ## 191  0.70833333
     ## 192  0.70833333
-    ## 298  0.68055556
-    ## 590  0.63888889
-    ## 591  0.63888889
-    ## 509  0.62500000
+    ## 193  0.70833333
+    ## 194  0.70833333
+    ## 195  0.70833333
+    ## 315  0.68055556
+    ## 277  0.66666667
+    ## 279  0.66666667
+    ## 617  0.63888889
+    ## 618  0.63888889
     ## 531  0.62500000
-    ## 532  0.62500000
-    ## 533  0.62500000
-    ## 534  0.62500000
-    ## 424  0.61111111
-    ## 144  0.58333333
-    ## 307  0.56944444
-    ## 389  0.56944444
-    ## 390  0.56944444
-    ## 391  0.56944444
-    ## 392  0.56944444
-    ## 393  0.56944444
-    ## 299  0.55555556
-    ## 300  0.55555556
-    ## 301  0.55555556
-    ## 302  0.55555556
-    ## 382  0.55555556
-    ## 383  0.55555556
-    ## 384  0.55555556
-    ## 385  0.55555556
-    ## 386  0.55555556
-    ## 394  0.55555556
-    ## 395  0.55555556
-    ## 310  0.52777778
-    ## 396  0.52777778
-    ## 397  0.52777778
-    ## 398  0.52777778
-    ## 399  0.52777778
-    ## 540  0.52777778
-    ## 541  0.52777778
-    ## 588  0.52777778
-    ## 589  0.52777778
-    ## 311  0.51388889
-    ## 141  0.47222222
-    ## 145  0.47222222
-    ## 428  0.47222222
-    ## 429  0.47222222
-    ## 434  0.47222222
-    ## 140  0.45833333
+    ## 553  0.62500000
+    ## 554  0.62500000
+    ## 555  0.62500000
+    ## 556  0.62500000
+    ## 447  0.61111111
+    ## 143  0.58333333
+    ## 280  0.58333333
+    ## 324  0.56944444
+    ## 413  0.56944444
+    ## 414  0.56944444
+    ## 415  0.56944444
+    ## 416  0.56944444
+    ## 417  0.56944444
+    ## 316  0.55555556
+    ## 317  0.55555556
+    ## 318  0.55555556
+    ## 319  0.55555556
+    ## 406  0.55555556
+    ## 407  0.55555556
+    ## 408  0.55555556
+    ## 409  0.55555556
+    ## 410  0.55555556
+    ## 418  0.55555556
+    ## 419  0.55555556
+    ## 327  0.52777778
+    ## 420  0.52777778
+    ## 421  0.52777778
+    ## 422  0.52777778
+    ## 423  0.52777778
+    ## 562  0.52777778
+    ## 563  0.52777778
+    ## 615  0.52777778
+    ## 616  0.52777778
+    ## 328  0.51388889
+    ## 140  0.47222222
+    ## 144  0.47222222
+    ## 451  0.47222222
+    ## 452  0.47222222
+    ## 456  0.47222222
+    ## 139  0.45833333
     ## 157  0.45833333
-    ## 194  0.45833333
-    ## 195  0.45833333
+    ## 197  0.45833333
     ## 198  0.45833333
-    ## 199  0.45833333
-    ## 200  0.45833333
     ## 201  0.45833333
     ## 202  0.45833333
     ## 203  0.45833333
     ## 204  0.45833333
     ## 205  0.45833333
     ## 206  0.45833333
-    ## 308  0.45833333
-    ## 309  0.45833333
-    ## 150  0.44444444
-    ## 207  0.44444444
-    ## 208  0.44444444
-    ## 209  0.44444444
+    ## 207  0.45833333
+    ## 208  0.45833333
+    ## 209  0.45833333
+    ## 325  0.45833333
+    ## 326  0.45833333
+    ## 149  0.44444444
     ## 210  0.44444444
     ## 211  0.44444444
     ## 212  0.44444444
@@ -8626,9 +8769,9 @@ DF_fields
     ## 219  0.44444444
     ## 220  0.44444444
     ## 221  0.44444444
-    ## 237  0.44444444
-    ## 238  0.44444444
-    ## 239  0.44444444
+    ## 222  0.44444444
+    ## 223  0.44444444
+    ## 224  0.44444444
     ## 240  0.44444444
     ## 241  0.44444444
     ## 242  0.44444444
@@ -8636,296 +8779,310 @@ DF_fields
     ## 244  0.44444444
     ## 245  0.44444444
     ## 246  0.44444444
-    ## 312  0.44444444
-    ## 313  0.43055556
-    ## 159  0.41666667
-    ## 387  0.40277778
-    ## 388  0.40277778
-    ## 473  0.40277778
-    ## 477  0.40277778
-    ## 478  0.40277778
-    ## 479  0.40277778
-    ## 480  0.40277778
-    ## 481  0.40277778
-    ## 482  0.40277778
-    ## 483  0.40277778
-    ## 484  0.40277778
-    ## 485  0.40277778
-    ## 486  0.40277778
-    ## 487  0.40277778
-    ## 488  0.40277778
-    ## 489  0.40277778
-    ## 490  0.40277778
-    ## 491  0.40277778
-    ## 492  0.40277778
-    ## 493  0.40277778
-    ## 624  0.40277778
-    ## 625  0.40277778
-    ## 626  0.40277778
-    ## 627  0.40277778
-    ## 628  0.40277778
-    ## 629  0.40277778
-    ## 630  0.40277778
-    ## 631  0.40277778
-    ## 632  0.40277778
-    ## 633  0.40277778
-    ## 634  0.40277778
-    ## 635  0.40277778
-    ## 638  0.40277778
-    ## 639  0.40277778
-    ## 642  0.40277778
-    ## 643  0.40277778
-    ## 644  0.40277778
-    ## 645  0.40277778
-    ## 304  0.38888889
-    ## 306  0.38888889
-    ## 401  0.38888889
-    ## 403  0.38888889
-    ## 407  0.38888889
-    ## 433  0.38888889
+    ## 247  0.44444444
+    ## 248  0.44444444
+    ## 249  0.44444444
+    ## 329  0.44444444
+    ## 330  0.43055556
+    ## 160  0.41666667
+    ## 284  0.41666667
+    ## 285  0.41666667
+    ## 286  0.41666667
+    ## 287  0.41666667
+    ## 411  0.40277778
+    ## 412  0.40277778
+    ## 494  0.40277778
+    ## 499  0.40277778
+    ## 500  0.40277778
+    ## 501  0.40277778
+    ## 502  0.40277778
+    ## 503  0.40277778
+    ## 504  0.40277778
+    ## 505  0.40277778
+    ## 506  0.40277778
+    ## 507  0.40277778
+    ## 508  0.40277778
+    ## 509  0.40277778
+    ## 510  0.40277778
+    ## 511  0.40277778
+    ## 512  0.40277778
+    ## 513  0.40277778
+    ## 514  0.40277778
+    ## 515  0.40277778
+    ## 654  0.40277778
+    ## 655  0.40277778
+    ## 656  0.40277778
+    ## 657  0.40277778
+    ## 658  0.40277778
+    ## 659  0.40277778
+    ## 660  0.40277778
+    ## 661  0.40277778
+    ## 662  0.40277778
+    ## 663  0.40277778
+    ## 664  0.40277778
+    ## 665  0.40277778
+    ## 668  0.40277778
+    ## 669  0.40277778
+    ## 673  0.40277778
+    ## 674  0.40277778
+    ## 675  0.40277778
+    ## 676  0.40277778
+    ## 321  0.38888889
+    ## 323  0.38888889
+    ## 425  0.38888889
+    ## 426  0.38888889
+    ## 430  0.38888889
+    ## 455  0.38888889
+    ## 672  0.38888889
+    ## 150  0.37500000
     ## 151  0.37500000
     ## 152  0.37500000
     ## 153  0.37500000
-    ## 154  0.37500000
-    ## 376  0.37500000
-    ## 377  0.37500000
-    ## 378  0.37500000
-    ## 379  0.37500000
-    ## 380  0.37500000
-    ## 381  0.37500000
-    ## 545  0.37500000
-    ## 139  0.36111111
-    ## 303  0.36111111
-    ## 305  0.36111111
-    ## 457  0.36111111
-    ## 546  0.36111111
-    ## 547  0.36111111
-    ## 337  0.34722222
-    ## 338  0.34722222
-    ## 339  0.34722222
-    ## 402  0.34722222
-    ## 51   0.33333333
-    ## 315  0.33333333
-    ## 316  0.33333333
-    ## 324  0.33333333
-    ## 325  0.33333333
-    ## 326  0.33333333
-    ## 327  0.33333333
-    ## 328  0.33333333
-    ## 524  0.33333333
-    ## 525  0.33333333
-    ## 526  0.33333333
-    ## 527  0.33333333
-    ## 544  0.33333333
-    ## 636  0.33333333
-    ## 640  0.33333333
-    ## 641  0.33333333
-    ## 53   0.31944444
-    ## 54   0.31944444
-    ## 314  0.31944444
-    ## 409  0.31944444
-    ## 410  0.31944444
-    ## 411  0.31944444
-    ## 412  0.31944444
-    ## 413  0.31944444
-    ## 414  0.31944444
-    ## 415  0.31944444
-    ## 416  0.31944444
-    ## 417  0.31944444
-    ## 418  0.31944444
-    ## 419  0.31944444
-    ## 420  0.31944444
-    ## 421  0.31944444
+    ## 278  0.37500000
+    ## 400  0.37500000
+    ## 401  0.37500000
+    ## 402  0.37500000
+    ## 403  0.37500000
+    ## 404  0.37500000
+    ## 405  0.37500000
+    ## 567  0.37500000
+    ## 138  0.36111111
+    ## 320  0.36111111
+    ## 322  0.36111111
+    ## 478  0.36111111
+    ## 568  0.36111111
+    ## 569  0.36111111
+    ## 361  0.34722222
+    ## 362  0.34722222
+    ## 363  0.34722222
+    ## 49   0.33333333
+    ## 332  0.33333333
+    ## 333  0.33333333
+    ## 348  0.33333333
+    ## 349  0.33333333
+    ## 350  0.33333333
+    ## 351  0.33333333
+    ## 352  0.33333333
+    ## 546  0.33333333
+    ## 547  0.33333333
+    ## 548  0.33333333
+    ## 549  0.33333333
+    ## 566  0.33333333
+    ## 666  0.33333333
+    ## 670  0.33333333
+    ## 671  0.33333333
+    ## 51   0.31944444
+    ## 52   0.31944444
+    ## 331  0.31944444
+    ## 432  0.31944444
+    ## 433  0.31944444
+    ## 434  0.31944444
+    ## 435  0.31944444
+    ## 436  0.31944444
+    ## 437  0.31944444
+    ## 438  0.31944444
+    ## 439  0.31944444
+    ## 440  0.31944444
+    ## 441  0.31944444
+    ## 442  0.31944444
+    ## 443  0.31944444
+    ## 444  0.31944444
+    ## 2    0.30555556
     ## 3    0.30555556
-    ## 4    0.30555556
-    ## 5    0.30555556
-    ## 334  0.30555556
-    ## 335  0.30555556
-    ## 336  0.30555556
-    ## 423  0.30555556
-    ## 556  0.30555556
-    ## 404  0.29166667
-    ## 425  0.29166667
-    ## 444  0.29166667
-    ## 558  0.29166667
-    ## 648  0.29166667
-    ## 649  0.29166667
-    ## 650  0.29166667
-    ## 651  0.29166667
-    ## 652  0.29166667
-    ## 653  0.29166667
-    ## 654  0.29166667
-    ## 655  0.29166667
-    ## 656  0.29166667
-    ## 657  0.29166667
-    ## 658  0.29166667
-    ## 52   0.27777778
-    ## 197  0.27777778
-    ## 548  0.27777778
-    ## 196  0.26388889
-    ## 358  0.26388889
-    ## 359  0.26388889
-    ## 360  0.26388889
-    ## 361  0.26388889
-    ## 362  0.26388889
-    ## 551  0.26388889
-    ## 596  0.26388889
-    ## 290  0.25000000
-    ## 369  0.25000000
-    ## 370  0.25000000
-    ## 371  0.25000000
-    ## 443  0.25000000
-    ## 475  0.25000000
-    ## 476  0.25000000
-    ## 543  0.25000000
-    ## 550  0.25000000
-    ## 552  0.25000000
-    ## 595  0.25000000
-    ## 598  0.25000000
-    ## 363  0.23611111
-    ## 364  0.23611111
-    ## 365  0.23611111
-    ## 372  0.23611111
-    ## 373  0.23611111
-    ## 374  0.23611111
-    ## 405  0.23611111
-    ## 445  0.23611111
-    ## 549  0.23611111
-    ## 366  0.22222222
-    ## 367  0.22222222
-    ## 368  0.22222222
-    ## 447  0.22222222
-    ## 637  0.22222222
-    ## 174  0.20833333
-    ## 520  0.20833333
-    ## 521  0.20833333
-    ## 522  0.20833333
-    ## 523  0.20833333
-    ## 553  0.20833333
-    ## 572  0.20833333
-    ## 573  0.20833333
-    ## 574  0.20833333
+    ## 358  0.30555556
+    ## 359  0.30555556
+    ## 360  0.30555556
+    ## 446  0.30555556
+    ## 578  0.30555556
+    ## 427  0.29166667
+    ## 448  0.29166667
+    ## 466  0.29166667
+    ## 581  0.29166667
+    ## 679  0.29166667
+    ## 680  0.29166667
+    ## 681  0.29166667
+    ## 682  0.29166667
+    ## 683  0.29166667
+    ## 684  0.29166667
+    ## 685  0.29166667
+    ## 686  0.29166667
+    ## 687  0.29166667
+    ## 688  0.29166667
+    ## 689  0.29166667
+    ## 50   0.27777778
+    ## 200  0.27777778
+    ## 275  0.27777778
+    ## 276  0.27777778
+    ## 570  0.27777778
+    ## 199  0.26388889
+    ## 382  0.26388889
+    ## 383  0.26388889
+    ## 384  0.26388889
+    ## 385  0.26388889
+    ## 386  0.26388889
+    ## 573  0.26388889
+    ## 623  0.26388889
+    ## 307  0.25000000
+    ## 393  0.25000000
+    ## 394  0.25000000
+    ## 395  0.25000000
+    ## 465  0.25000000
+    ## 497  0.25000000
+    ## 498  0.25000000
+    ## 565  0.25000000
+    ## 572  0.25000000
+    ## 574  0.25000000
+    ## 622  0.25000000
+    ## 625  0.25000000
+    ## 387  0.23611111
+    ## 388  0.23611111
+    ## 389  0.23611111
+    ## 396  0.23611111
+    ## 397  0.23611111
+    ## 398  0.23611111
+    ## 428  0.23611111
+    ## 467  0.23611111
+    ## 571  0.23611111
+    ## 390  0.22222222
+    ## 391  0.22222222
+    ## 392  0.22222222
+    ## 469  0.22222222
+    ## 667  0.22222222
+    ## 177  0.20833333
+    ## 542  0.20833333
+    ## 543  0.20833333
+    ## 544  0.20833333
+    ## 545  0.20833333
     ## 575  0.20833333
-    ## 576  0.20833333
-    ## 597  0.20833333
-    ## 2    0.19444444
-    ## 356  0.19444444
-    ## 357  0.19444444
-    ## 292  0.18055556
-    ## 293  0.18055556
-    ## 406  0.18055556
-    ## 449  0.18055556
-    ## 508  0.18055556
-    ## 535  0.18055556
-    ## 536  0.18055556
-    ## 537  0.18055556
-    ## 538  0.18055556
-    ## 542  0.18055556
-    ## 554  0.18055556
-    ## 555  0.18055556
+    ## 598  0.20833333
+    ## 599  0.20833333
+    ## 600  0.20833333
+    ## 601  0.20833333
+    ## 602  0.20833333
+    ## 624  0.20833333
+    ## 380  0.19444444
+    ## 381  0.19444444
+    ## 282  0.18055556
+    ## 309  0.18055556
+    ## 310  0.18055556
+    ## 429  0.18055556
+    ## 471  0.18055556
+    ## 530  0.18055556
+    ## 557  0.18055556
+    ## 558  0.18055556
+    ## 559  0.18055556
     ## 560  0.18055556
-    ## 592  0.18055556
-    ## 281  0.16666667
-    ## 296  0.16666667
-    ## 297  0.16666667
-    ## 451  0.16666667
-    ## 593  0.16666667
-    ## 594  0.16666667
-    ## 340  0.15277778
-    ## 341  0.15277778
-    ## 346  0.15277778
-    ## 347  0.15277778
-    ## 165  0.13888889
-    ## 284  0.13888889
-    ## 285  0.13888889
-    ## 294  0.13888889
-    ## 295  0.13888889
-    ## 430  0.13888889
-    ## 461  0.13888889
-    ## 463  0.13888889
-    ## 464  0.13888889
-    ## 466  0.13888889
-    ## 452  0.12500000
-    ## 469  0.12500000
-    ## 470  0.12500000
-    ## 471  0.12500000
-    ## 647  0.12500000
-    ## 7    0.11111111
+    ## 564  0.18055556
+    ## 576  0.18055556
+    ## 577  0.18055556
+    ## 584  0.18055556
+    ## 619  0.18055556
+    ## 298  0.16666667
+    ## 313  0.16666667
+    ## 314  0.16666667
+    ## 472  0.16666667
+    ## 620  0.16666667
+    ## 621  0.16666667
+    ## 364  0.15277778
+    ## 365  0.15277778
+    ## 370  0.15277778
+    ## 371  0.15277778
+    ## 159  0.13888889
+    ## 162  0.13888889
+    ## 301  0.13888889
+    ## 302  0.13888889
+    ## 311  0.13888889
+    ## 312  0.13888889
+    ## 482  0.13888889
+    ## 484  0.13888889
+    ## 485  0.13888889
+    ## 487  0.13888889
+    ## 167  0.12500000
+    ## 168  0.12500000
+    ## 473  0.12500000
+    ## 490  0.12500000
+    ## 491  0.12500000
+    ## 492  0.12500000
+    ## 580  0.12500000
+    ## 583  0.12500000
+    ## 678  0.12500000
+    ## 5    0.11111111
+    ## 133  0.11111111
     ## 134  0.11111111
     ## 135  0.11111111
     ## 136  0.11111111
-    ## 137  0.11111111
-    ## 162  0.11111111
-    ## 286  0.11111111
-    ## 287  0.11111111
+    ## 164  0.11111111
+    ## 303  0.11111111
+    ## 304  0.11111111
+    ## 4    0.09722222
     ## 6    0.09722222
-    ## 8    0.09722222
-    ## 166  0.09722222
-    ## 167  0.09722222
-    ## 351  0.09722222
-    ## 467  0.09722222
-    ## 468  0.09722222
-    ## 474  0.09722222
-    ## 566  0.09722222
-    ## 569  0.09722222
-    ## 607  0.09722222
-    ## 608  0.09722222
-    ## 609  0.09722222
-    ## 610  0.09722222
-    ## 611  0.09722222
-    ## 612  0.09722222
-    ## 613  0.09722222
-    ## 614  0.09722222
+    ## 169  0.09722222
+    ## 170  0.09722222
+    ## 281  0.09722222
+    ## 375  0.09722222
+    ## 488  0.09722222
+    ## 489  0.09722222
+    ## 495  0.09722222
+    ## 496  0.09722222
+    ## 591  0.09722222
+    ## 592  0.09722222
+    ## 595  0.09722222
+    ## 637  0.09722222
+    ## 638  0.09722222
+    ## 639  0.09722222
+    ## 640  0.09722222
+    ## 641  0.09722222
+    ## 642  0.09722222
+    ## 643  0.09722222
+    ## 644  0.09722222
     ## 158  0.08333333
-    ## 164  0.08333333
-    ## 321  0.08333333
-    ## 427  0.08333333
-    ## 453  0.08333333
-    ## 462  0.08333333
-    ## 465  0.08333333
-    ## 557  0.08333333
-    ## 563  0.08333333
-    ## 160  0.06944444
-    ## 282  0.06944444
-    ## 283  0.06944444
-    ## 352  0.06944444
-    ## 353  0.06944444
-    ## 354  0.06944444
-    ## 448  0.06944444
-    ## 454  0.06944444
-    ## 455  0.06944444
-    ## 459  0.06944444
-    ## 495  0.06944444
-    ## 497  0.06944444
-    ## 498  0.06944444
-    ## 499  0.06944444
-    ## 500  0.06944444
-    ## 501  0.06944444
-    ## 559  0.06944444
-    ## 567  0.06944444
-    ## 568  0.06944444
-    ## 578  0.06944444
-    ## 579  0.06944444
+    ## 166  0.08333333
+    ## 342  0.08333333
+    ## 450  0.08333333
+    ## 474  0.08333333
+    ## 483  0.08333333
+    ## 486  0.08333333
+    ## 579  0.08333333
+    ## 588  0.08333333
+    ## 161  0.06944444
+    ## 299  0.06944444
+    ## 300  0.06944444
+    ## 376  0.06944444
+    ## 377  0.06944444
+    ## 378  0.06944444
+    ## 470  0.06944444
+    ## 475  0.06944444
+    ## 476  0.06944444
+    ## 480  0.06944444
+    ## 517  0.06944444
+    ## 519  0.06944444
+    ## 520  0.06944444
+    ## 521  0.06944444
+    ## 522  0.06944444
+    ## 523  0.06944444
     ## 582  0.06944444
-    ## 583  0.06944444
-    ## 584  0.06944444
-    ## 163  0.05555556
-    ## 288  0.05555556
-    ## 289  0.05555556
-    ## 342  0.05555556
-    ## 343  0.05555556
-    ## 344  0.05555556
-    ## 345  0.05555556
-    ## 456  0.05555556
-    ## 502  0.05555556
-    ## 503  0.05555556
-    ## 504  0.05555556
-    ## 565  0.05555556
-    ## 580  0.05555556
-    ## 581  0.05555556
-    ## 258  0.04166667
-    ## 259  0.04166667
-    ## 260  0.04166667
+    ## 593  0.06944444
+    ## 594  0.06944444
+    ## 604  0.06944444
+    ## 605  0.06944444
+    ## 606  0.06944444
+    ## 609  0.06944444
+    ## 610  0.06944444
+    ## 611  0.06944444
+    ## 165  0.05555556
+    ## 305  0.05555556
+    ## 306  0.05555556
+    ## 366  0.05555556
+    ## 367  0.05555556
+    ## 368  0.05555556
+    ## 369  0.05555556
+    ## 477  0.05555556
+    ## 524  0.05555556
+    ## 525  0.05555556
+    ## 526  0.05555556
+    ## 590  0.05555556
+    ## 607  0.05555556
+    ## 608  0.05555556
     ## 261  0.04166667
     ## 262  0.04166667
     ## 263  0.04166667
@@ -8936,23 +9093,24 @@ DF_fields
     ## 268  0.04166667
     ## 269  0.04166667
     ## 270  0.04166667
-    ## 291  0.04166667
-    ## 348  0.04166667
-    ## 349  0.04166667
-    ## 350  0.04166667
-    ## 375  0.04166667
-    ## 408  0.04166667
+    ## 271  0.04166667
+    ## 272  0.04166667
+    ## 273  0.04166667
+    ## 308  0.04166667
+    ## 336  0.04166667
+    ## 372  0.04166667
+    ## 373  0.04166667
+    ## 374  0.04166667
+    ## 399  0.04166667
     ## 431  0.04166667
-    ## 435  0.04166667
-    ## 439  0.04166667
-    ## 446  0.04166667
-    ## 458  0.04166667
-    ## 496  0.04166667
-    ## 168  0.02777778
-    ## 169  0.02777778
-    ## 247  0.02777778
-    ## 248  0.02777778
-    ## 249  0.02777778
+    ## 453  0.04166667
+    ## 457  0.04166667
+    ## 461  0.04166667
+    ## 468  0.04166667
+    ## 479  0.04166667
+    ## 518  0.04166667
+    ## 171  0.02777778
+    ## 172  0.02777778
     ## 250  0.02777778
     ## 251  0.02777778
     ## 252  0.02777778
@@ -8961,33 +9119,40 @@ DF_fields
     ## 255  0.02777778
     ## 256  0.02777778
     ## 257  0.02777778
-    ## 277  0.02777778
-    ## 278  0.02777778
-    ## 279  0.02777778
-    ## 280  0.02777778
-    ## 317  0.02777778
-    ## 318  0.02777778
-    ## 319  0.02777778
-    ## 320  0.02777778
-    ## 322  0.02777778
-    ## 323  0.02777778
-    ## 355  0.02777778
-    ## 437  0.02777778
-    ## 438  0.02777778
-    ## 441  0.02777778
-    ## 442  0.02777778
-    ## 561  0.02777778
-    ## 564  0.02777778
-    ## 104  0.01388889
-    ## 105  0.01388889
-    ## 161  0.01388889
-    ## 170  0.01388889
-    ## 171  0.01388889
-    ## 172  0.01388889
+    ## 258  0.02777778
+    ## 259  0.02777778
+    ## 260  0.02777778
+    ## 283  0.02777778
+    ## 294  0.02777778
+    ## 295  0.02777778
+    ## 296  0.02777778
+    ## 297  0.02777778
+    ## 334  0.02777778
+    ## 335  0.02777778
+    ## 337  0.02777778
+    ## 338  0.02777778
+    ## 339  0.02777778
+    ## 340  0.02777778
+    ## 341  0.02777778
+    ## 343  0.02777778
+    ## 344  0.02777778
+    ## 345  0.02777778
+    ## 346  0.02777778
+    ## 347  0.02777778
+    ## 379  0.02777778
+    ## 459  0.02777778
+    ## 460  0.02777778
+    ## 463  0.02777778
+    ## 464  0.02777778
+    ## 585  0.02777778
+    ## 589  0.02777778
+    ## 102  0.01388889
+    ## 103  0.01388889
+    ## 163  0.01388889
     ## 173  0.01388889
-    ## 222  0.01388889
-    ## 223  0.01388889
-    ## 224  0.01388889
+    ## 174  0.01388889
+    ## 175  0.01388889
+    ## 176  0.01388889
     ## 225  0.01388889
     ## 226  0.01388889
     ## 227  0.01388889
@@ -9000,13 +9165,16 @@ DF_fields
     ## 234  0.01388889
     ## 235  0.01388889
     ## 236  0.01388889
-    ## 432  0.01388889
-    ## 436  0.01388889
-    ## 440  0.01388889
-    ## 450  0.01388889
-    ## 562  0.01388889
-    ## 570  0.01388889
-    ## 571  0.01388889
+    ## 237  0.01388889
+    ## 238  0.01388889
+    ## 239  0.01388889
+    ## 454  0.01388889
+    ## 458  0.01388889
+    ## 462  0.01388889
+    ## 586  0.01388889
+    ## 587  0.01388889
+    ## 596  0.01388889
+    ## 597  0.01388889
 
 ``` r
 plot <- ggplot(data = DF_fields, aes(x = non_na_frac))+
@@ -9039,185 +9207,201 @@ names_rm = DF_fields_rm$field
 names_rm#the fields to remove
 ```
 
-    ##   [1] "Number_fecundity"                                       
-    ##   [2] "ScaleRowsAboveMin_morphology"                           
-    ##   [3] "ScaleRowsAboveMax_morphology"                           
-    ##   [4] "GillRakersUpMin_morphology"                             
-    ##   [5] "GillRakersUpMax_morphology"                             
-    ##   [6] "Number_popgrowth"                                       
+    ##   [1] "LengthFecunMin_fecundity"                               
+    ##   [2] "LengthFecunMax_fecundity"                               
+    ##   [3] "ScaleRowsAboveMin_morphology"                           
+    ##   [4] "ScaleRowsAboveMax_morphology"                           
+    ##   [5] "GillRakersUpMin_morphology"                             
+    ##   [6] "GillRakersUpMax_morphology"                             
     ##   [7] "PopQB_popqb"                                            
     ##   [8] "Winf_popqb"                                             
     ##   [9] "K_popqb"                                                
     ##  [10] "Temperature_popqb"                                      
-    ##  [11] "LmLoo_popgrowth"                                        
-    ##  [12] "Salinitybrackish_popqb"                                 
-    ##  [13] "Salinityfreshwater_popqb"                               
-    ##  [14] "Salinityseawater_popqb"                                 
-    ##  [15] "AspectRatio_swimming"                                   
-    ##  [16] "SL_brains"                                              
-    ##  [17] "prior_r_estimate"                                       
-    ##  [18] "lcl_r_estimate"                                         
-    ##  [19] "ucl_r_estimate"                                         
-    ##  [20] "n_r_estimate"                                           
-    ##  [21] "RelFecundityMin_fecundity"                              
-    ##  [22] "ScaleRowsBelowMin_morphology"                           
-    ##  [23] "ScaleRowsBelowMax_morphology"                           
-    ##  [24] "EncIndex_brains"                                        
-    ##  [25] "TL_brains"                                              
-    ##  [26] "a_fecundity"                                            
-    ##  [27] "b_fecundity"                                            
-    ##  [28] "VomerineTeeth_morphology"                               
-    ##  [29] "Mortality_popqb"                                        
-    ##  [30] "b_popqb"                                                
-    ##  [31] "DietP_predators"                                        
-    ##  [32] "Number_spawning"                                        
-    ##  [33] "CorrCoeff_spawning"                                     
-    ##  [34] "IUCN_Assessmenta1bd_stocks"                             
-    ##  [35] "IUCN_Assessmenta1ce.2ce..b1.2abc..c2a_stocks"           
-    ##  [36] "IUCN_Assessmenta2ace_stocks"                            
-    ##  [37] "IUCN_Assessmenta2b_stocks"                              
-    ##  [38] "IUCN_Assessmenta2bd.4bcd_stocks"                        
-    ##  [39] "IUCN_Assessmenta2bd.4bd_stocks"                         
-    ##  [40] "IUCN_Assessmenta4cd_stocks"                             
-    ##  [41] "IUCN_Assessmentb2ab.iii._stocks"                        
-    ##  [42] "WeightMin_fecundity"                                    
-    ##  [43] "RelFecundityMax_fecundity"                              
-    ##  [44] "MaximumDepth_morphology"                                
-    ##  [45] "to_popgrowth"                                           
-    ##  [46] "LmMale_popgrowth"                                       
-    ##  [47] "MaintQB_popqb"                                          
-    ##  [48] "t0_popqb"                                               
-    ##  [49] "WeightMin_spawning"                                     
-    ##  [50] "RelFecundityMin_spawning"                               
-    ##  [51] "WeightMax_fecundity"                                    
-    ##  [52] "PoredScalesMin_morphology"                              
-    ##  [53] "PoredScalesMax_morphology"                              
-    ##  [54] "Palatine_morphology"                                    
-    ##  [55] "PharyngealTeethabsent_morphology"                       
-    ##  [56] "PharyngealTeethpresent_morphology"                      
-    ##  [57] "tm_popgrowth"                                           
-    ##  [58] "LmLooMale_popgrowth"                                    
-    ##  [59] "LmFemale_popgrowth"                                     
-    ##  [60] "Rm_popgrowth"                                           
-    ##  [61] "Rd1_ration"                                             
-    ##  [62] "TBW_ration"                                             
-    ##  [63] "Water_ration"                                           
-    ##  [64] "FoodInekton_ration"                                     
-    ##  [65] "FoodIothers_ration"                                     
-    ##  [66] "FoodIzoobenthos_ration"                                 
-    ##  [67] "WeightMax_spawning"                                     
-    ##  [68] "a_spawning"                                             
-    ##  [69] "b_spawning"                                             
-    ##  [70] "SpeedLS_speed"                                          
-    ##  [71] "Speedms_speed"                                          
-    ##  [72] "Modeburst_speed"                                        
-    ##  [73] "Modeother_speed"                                        
-    ##  [74] "Modesustained_speed"                                    
-    ##  [75] "RelFecundityMean_fecundity"                             
-    ##  [76] "ScalesPeduncMin_morphology"                             
-    ##  [77] "ScalesPeduncMax_morphology"                             
-    ##  [78] "MandibleTeethT1bicuspidate_morphology"                  
-    ##  [79] "MandibleTeethT1canine.like_morphology"                  
-    ##  [80] "MandibleTeethT1conical_morphology"                      
-    ##  [81] "MandibleTeethT1tricuspidate_morphology"                 
-    ##  [82] "LmLooFemale_popgrowth"                                  
-    ##  [83] "Salinitybrackish_ration"                                
-    ##  [84] "Salinityfreshwater_ration"                              
-    ##  [85] "Salinityseawater_ration"                                
-    ##  [86] "RelFecundityMax_spawning"                               
-    ##  [87] "SLa_speed"                                              
-    ##  [88] "SLb_speed"                                              
-    ##  [89] "EcolEffno.data_introductions"                           
-    ##  [90] "EcolEffnone_introductions"                              
-    ##  [91] "EcolEffprobably.none_introductions"                     
-    ##  [92] "EcolEffprobably.some_introductions"                     
-    ##  [93] "EcolEffsome_introductions"                              
-    ##  [94] "EcolEffunknown_introductions"                           
-    ##  [95] "EcolEffyes_introductions"                               
-    ##  [96] "SocioEffno.data_introductions"                          
-    ##  [97] "SocioEffnone_introductions"                             
-    ##  [98] "SocioEffprobably.none_introductions"                    
-    ##  [99] "SocioEffprobably.some_introductions"                    
-    ## [100] "SocioEffsome_introductions"                             
-    ## [101] "SocioEffunknown_introductions"                          
-    ## [102] "GillCleftsNo_morphology"                                
-    ## [103] "MaxillaTeethT1canine.like_morphology"                   
-    ## [104] "MaxillaTeethT1conical_morphology"                       
-    ## [105] "MaxillaTeethT1tricuspidate_morphology"                  
-    ## [106] "Spiracle_morphology"                                    
-    ## [107] "SwimmingSpeed_oxygen"                                   
-    ## [108] "SE_Loo_popgrowth"                                       
-    ## [109] "SE_K_popgrowth"                                         
-    ## [110] "SE_to_popgrowth"                                        
-    ## [111] "C_popgrowth"                                            
-    ## [112] "DeltaT_popgrowth"                                       
-    ## [113] "GCE_ration"                                             
-    ## [114] "SEa_fecundity"                                          
-    ## [115] "SEb_fecundity"                                          
-    ## [116] "ComAquanever.used_introductions"                        
-    ## [117] "ComAquano.data_introductions"                           
-    ## [118] "ComAquararely.used_introductions"                       
-    ## [119] "ComAquaunknown_introductions"                           
-    ## [120] "ComAquawidely.used_introductions"                       
-    ## [121] "ReproModeassisted.artificial.reproduction_introductions"
-    ## [122] "ReproModecontinuous.imports_introductions"              
-    ## [123] "ReproModenatural.reproduction_introductions"            
-    ## [124] "ReproModeno.data_introductions"                         
-    ## [125] "ReproModeunassisted.reproduction_introductions"         
-    ## [126] "ReproModeunknown_introductions"                         
-    ## [127] "MandibleRowsMin_morphology"                             
-    ## [128] "MandibleRowsMax_morphology"                             
-    ## [129] "MaxillaRowsMin_morphology"                              
-    ## [130] "MaxillaRowsMax_morphology"                              
-    ## [131] "Forklength_morphology"                                  
-    ## [132] "Totallength_morphology"                                 
-    ## [133] "PostHeadDepth_morphology"                               
-    ## [134] "PostTrunkDepth_morphology"                              
-    ## [135] "PeduncleDepth_morphology"                               
-    ## [136] "CaudalHeight_morphology"                                
-    ## [137] "TeethonTongue_morphology"                               
-    ## [138] "LCL_K_popgrowth"                                        
-    ## [139] "UCL_K_popgrowth"                                        
-    ## [140] "LCL_to_popgrowth"                                       
-    ## [141] "UCL_to_popgrowth"                                       
-    ## [142] "GestationMin_spawning"                                  
-    ## [143] "RelFecundityMean_spawning"                              
-    ## [144] "SchoolingFrequencyalways_ecology"                       
-    ## [145] "SchoolingFrequencysometimes_ecology"                    
-    ## [146] "FecundityMean_fecundity"                                
-    ## [147] "LCLa_fecundity"                                         
-    ## [148] "UCLa_fecundity"                                         
-    ## [149] "LCLb_fecundity"                                         
-    ## [150] "UCLb_fecundity"                                         
-    ## [151] "OtherReasonaccidental_introductions"                    
-    ## [152] "OtherReasonaccidental.with.ships_introductions"         
-    ## [153] "OtherReasonangling.sport_introductions"                 
-    ## [154] "OtherReasonaquaculture_introductions"                   
-    ## [155] "OtherReasondiffused.from.other.countries_introductions" 
-    ## [156] "OtherReasonfill.ecological.niche_introductions"         
-    ## [157] "OtherReasonfisheries_introductions"                     
-    ## [158] "OtherReasonforage_introductions"                        
-    ## [159] "OtherReasonmosquito.control_introductions"              
-    ## [160] "OtherReasonno.data_introductions"                       
-    ## [161] "OtherReasonornamental_introductions"                    
-    ## [162] "OtherReasonother.reasons_introductions"                 
-    ## [163] "OtherReasonresearch_introductions"                      
-    ## [164] "OtherReasonunknown_introductions"                       
-    ## [165] "OtherReasonweed.control_introductions"                  
-    ## [166] "SD_Loo_popgrowth"                                       
-    ## [167] "SD_K_popgrowth"                                         
-    ## [168] "SD_to_popgrowth"                                        
-    ## [169] "Number_M_popgrowth"                                     
-    ## [170] "GestationMax_spawning"                                  
-    ## [171] "Dailyspawnmin_spawning"                                 
-    ## [172] "Dailyspawnmax_spawning"
+    ##  [11] "LengthMin_fecundity"                                    
+    ##  [12] "LengthMax_fecundity"                                    
+    ##  [13] "LmLoo_popgrowth"                                        
+    ##  [14] "Salinitybrackish_popqb"                                 
+    ##  [15] "Salinityfreshwater_popqb"                               
+    ##  [16] "Salinityseawater_popqb"                                 
+    ##  [17] "LengthFecunMin_spawning"                                
+    ##  [18] "LengthFecunMax_spawning"                                
+    ##  [19] "AspectRatio_swimming"                                   
+    ##  [20] "SL_brains"                                              
+    ##  [21] "prior_r_estimate"                                       
+    ##  [22] "lcl_r_estimate"                                         
+    ##  [23] "ucl_r_estimate"                                         
+    ##  [24] "n_r_estimate"                                           
+    ##  [25] "RelFecundityMin_fecundity"                              
+    ##  [26] "ScaleRowsBelowMin_morphology"                           
+    ##  [27] "ScaleRowsBelowMax_morphology"                           
+    ##  [28] "EncIndex_brains"                                        
+    ##  [29] "TL_brains"                                              
+    ##  [30] "a_fecundity"                                            
+    ##  [31] "b_fecundity"                                            
+    ##  [32] "SEa_length_weight"                                      
+    ##  [33] "VomerineTeeth_morphology"                               
+    ##  [34] "Mortality_popqb"                                        
+    ##  [35] "b_popqb"                                                
+    ##  [36] "DietP_predators"                                        
+    ##  [37] "MaxLength_predators"                                    
+    ##  [38] "LengthMin_spawning"                                     
+    ##  [39] "LengthMax_spawning"                                     
+    ##  [40] "CorrCoeff_spawning"                                     
+    ##  [41] "IUCN_Assessmenta1bd_stocks"                             
+    ##  [42] "IUCN_Assessmenta1ce.2ce..b1.2abc..c2a_stocks"           
+    ##  [43] "IUCN_Assessmenta2ace_stocks"                            
+    ##  [44] "IUCN_Assessmenta2b_stocks"                              
+    ##  [45] "IUCN_Assessmenta2bd.4bcd_stocks"                        
+    ##  [46] "IUCN_Assessmenta2bd.4bd_stocks"                         
+    ##  [47] "IUCN_Assessmenta4cd_stocks"                             
+    ##  [48] "IUCN_Assessmentb2ab.iii._stocks"                        
+    ##  [49] "WeightMin_fecundity"                                    
+    ##  [50] "RelFecundityMax_fecundity"                              
+    ##  [51] "MaximumDepth_morphology"                                
+    ##  [52] "to_popgrowth"                                           
+    ##  [53] "LmMale_popgrowth"                                       
+    ##  [54] "MaintQB_popqb"                                          
+    ##  [55] "t0_popqb"                                               
+    ##  [56] "WeightMin_spawning"                                     
+    ##  [57] "RelFecundityMin_spawning"                               
+    ##  [58] "WeightMax_fecundity"                                    
+    ##  [59] "PoredScalesMin_morphology"                              
+    ##  [60] "PoredScalesMax_morphology"                              
+    ##  [61] "Palatine_morphology"                                    
+    ##  [62] "PharyngealTeethabsent_morphology"                       
+    ##  [63] "PharyngealTeethpresent_morphology"                      
+    ##  [64] "tm_popgrowth"                                           
+    ##  [65] "LmLooMale_popgrowth"                                    
+    ##  [66] "LmFemale_popgrowth"                                     
+    ##  [67] "Rm_popgrowth"                                           
+    ##  [68] "Rd1_ration"                                             
+    ##  [69] "TBW_ration"                                             
+    ##  [70] "Water_ration"                                           
+    ##  [71] "FoodInekton_ration"                                     
+    ##  [72] "FoodIothers_ration"                                     
+    ##  [73] "FoodIzoobenthos_ration"                                 
+    ##  [74] "WeightMax_spawning"                                     
+    ##  [75] "a_spawning"                                             
+    ##  [76] "b_spawning"                                             
+    ##  [77] "Length_speed"                                           
+    ##  [78] "SpeedLS_speed"                                          
+    ##  [79] "Speedms_speed"                                          
+    ##  [80] "Modeburst_speed"                                        
+    ##  [81] "Modeother_speed"                                        
+    ##  [82] "Modesustained_speed"                                    
+    ##  [83] "RelFecundityMean_fecundity"                             
+    ##  [84] "ScalesPeduncMin_morphology"                             
+    ##  [85] "ScalesPeduncMax_morphology"                             
+    ##  [86] "MandibleTeethT1bicuspidate_morphology"                  
+    ##  [87] "MandibleTeethT1canine.like_morphology"                  
+    ##  [88] "MandibleTeethT1conical_morphology"                      
+    ##  [89] "MandibleTeethT1tricuspidate_morphology"                 
+    ##  [90] "LmLooFemale_popgrowth"                                  
+    ##  [91] "Salinitybrackish_ration"                                
+    ##  [92] "Salinityfreshwater_ration"                              
+    ##  [93] "Salinityseawater_ration"                                
+    ##  [94] "RelFecundityMax_spawning"                               
+    ##  [95] "SLa_speed"                                              
+    ##  [96] "SLb_speed"                                              
+    ##  [97] "EcolEffno.data_introductions"                           
+    ##  [98] "EcolEffnone_introductions"                              
+    ##  [99] "EcolEffprobably.none_introductions"                     
+    ## [100] "EcolEffprobably.some_introductions"                     
+    ## [101] "EcolEffsome_introductions"                              
+    ## [102] "EcolEffunknown_introductions"                           
+    ## [103] "EcolEffyes_introductions"                               
+    ## [104] "SocioEffno.data_introductions"                          
+    ## [105] "SocioEffnone_introductions"                             
+    ## [106] "SocioEffprobably.none_introductions"                    
+    ## [107] "SocioEffprobably.some_introductions"                    
+    ## [108] "SocioEffsome_introductions"                             
+    ## [109] "SocioEffunknown_introductions"                          
+    ## [110] "GillCleftsNo_morphology"                                
+    ## [111] "HeadLength_morphology"                                  
+    ## [112] "MaxillaTeethT1canine.like_morphology"                   
+    ## [113] "MaxillaTeethT1conical_morphology"                       
+    ## [114] "MaxillaTeethT1tricuspidate_morphology"                  
+    ## [115] "Spiracle_morphology"                                    
+    ## [116] "SwimmingSpeed_oxygen"                                   
+    ## [117] "SE_Loo_popgrowth"                                       
+    ## [118] "SE_K_popgrowth"                                         
+    ## [119] "SE_to_popgrowth"                                        
+    ## [120] "C_popgrowth"                                            
+    ## [121] "DeltaT_popgrowth"                                       
+    ## [122] "GCE_ration"                                             
+    ## [123] "SEa_fecundity"                                          
+    ## [124] "SEb_fecundity"                                          
+    ## [125] "ComAquanever.used_introductions"                        
+    ## [126] "ComAquano.data_introductions"                           
+    ## [127] "ComAquararely.used_introductions"                       
+    ## [128] "ComAquaunknown_introductions"                           
+    ## [129] "ComAquawidely.used_introductions"                       
+    ## [130] "ReproModeassisted.artificial.reproduction_introductions"
+    ## [131] "ReproModecontinuous.imports_introductions"              
+    ## [132] "ReproModenatural.reproduction_introductions"            
+    ## [133] "ReproModeno.data_introductions"                         
+    ## [134] "ReproModeunassisted.reproduction_introductions"         
+    ## [135] "ReproModeunknown_introductions"                         
+    ## [136] "SDa_length_weight"                                      
+    ## [137] "MandibleRowsMin_morphology"                             
+    ## [138] "MandibleRowsMax_morphology"                             
+    ## [139] "MaxillaRowsMin_morphology"                              
+    ## [140] "MaxillaRowsMax_morphology"                              
+    ## [141] "Forklength_morphology"                                  
+    ## [142] "Totallength_morphology"                                 
+    ## [143] "PreDorsalLength_morphology"                             
+    ## [144] "PrePelvicsLength_morphology"                            
+    ## [145] "PreAnalLength_morphology"                               
+    ## [146] "PostHeadDepth_morphology"                               
+    ## [147] "PostTrunkDepth_morphology"                              
+    ## [148] "PeduncleDepth_morphology"                               
+    ## [149] "PeduncleLength_morphology"                              
+    ## [150] "CaudalHeight_morphology"                                
+    ## [151] "PreorbitalLength_morphology"                            
+    ## [152] "EyeLength_morphology"                                   
+    ## [153] "TeethonTongue_morphology"                               
+    ## [154] "LCL_K_popgrowth"                                        
+    ## [155] "UCL_K_popgrowth"                                        
+    ## [156] "LCL_to_popgrowth"                                       
+    ## [157] "UCL_to_popgrowth"                                       
+    ## [158] "GestationMin_spawning"                                  
+    ## [159] "RelFecundityMean_spawning"                              
+    ## [160] "SchoolingFrequencyalways_ecology"                       
+    ## [161] "SchoolingFrequencysometimes_ecology"                    
+    ## [162] "FecundityMean_fecundity"                                
+    ## [163] "LCLa_fecundity"                                         
+    ## [164] "UCLa_fecundity"                                         
+    ## [165] "LCLb_fecundity"                                         
+    ## [166] "UCLb_fecundity"                                         
+    ## [167] "OtherReasonaccidental_introductions"                    
+    ## [168] "OtherReasonaccidental.with.ships_introductions"         
+    ## [169] "OtherReasonangling.sport_introductions"                 
+    ## [170] "OtherReasonaquaculture_introductions"                   
+    ## [171] "OtherReasondiffused.from.other.countries_introductions" 
+    ## [172] "OtherReasonfill.ecological.niche_introductions"         
+    ## [173] "OtherReasonfisheries_introductions"                     
+    ## [174] "OtherReasonforage_introductions"                        
+    ## [175] "OtherReasonmosquito.control_introductions"              
+    ## [176] "OtherReasonno.data_introductions"                       
+    ## [177] "OtherReasonornamental_introductions"                    
+    ## [178] "OtherReasonother.reasons_introductions"                 
+    ## [179] "OtherReasonresearch_introductions"                      
+    ## [180] "OtherReasonunknown_introductions"                       
+    ## [181] "OtherReasonweed.control_introductions"                  
+    ## [182] "SD_Loo_popgrowth"                                       
+    ## [183] "SD_K_popgrowth"                                         
+    ## [184] "SD_to_popgrowth"                                        
+    ## [185] "GestationMax_spawning"                                  
+    ## [186] "LengthOffspringMin_spawning"                            
+    ## [187] "Dailyspawnmin_spawning"                                 
+    ## [188] "Dailyspawnmax_spawning"
 
 ``` r
 print(DF_fields_rm[str_which(names_rm, "oxygen"),])
 ```
 
     ##                    field non_na_frac
-    ## 408 SwimmingSpeed_oxygen  0.04166667
+    ## 431 SwimmingSpeed_oxygen  0.04166667
 
 ``` r
 keep = setdiff(names(out), names_rm)
@@ -9225,7 +9409,7 @@ out = out[, keep]
 dim(out)
 ```
 
-    ## [1]  72 487
+    ## [1]  72 502
 
 ``` r
 save(out, file = "out.Rdata")
@@ -9272,7 +9456,7 @@ okay_inds = which(nzv$nzv == FALSE)
 length(okay_inds)
 ```
 
-    ## [1] 338
+    ## [1] 353
 
 ``` r
 DF = DF[,okay_inds]#include only the columns that have variation
@@ -9290,19 +9474,18 @@ source("compare_fields.R")
 ```
 
     ## character(0)
-    ##  [1] "Weight_oxygen"                      "Number_oxygen"                     
-    ##  [3] "Temp_oxygen"                        "Salinity_oxygen"                   
-    ##  [5] "Oxygen_oxygen"                      "Oxygenmgl_oxygen"                  
-    ##  [7] "OxygenCons_oxygen"                  "AppliedStresshigh.ph_oxygen"       
-    ##  [9] "AppliedStresshypercapnia_oxygen"    "AppliedStresshypoxia_oxygen"       
-    ## [11] "AppliedStresslow.ph_oxygen"         "AppliedStressnone.specified_oxygen"
-    ## [13] "AppliedStressother_oxygen"          "AppliedStressother.stress_oxygen"  
-    ## [15] "AppliedStresstemperature_oxygen"    "record_count_species_oxygen"       
+    ##  [1] "Weight_oxygen"                      "Temp_oxygen"                       
+    ##  [3] "Salinity_oxygen"                    "Oxygen_oxygen"                     
+    ##  [5] "Oxygenmgl_oxygen"                   "OxygenCons_oxygen"                 
+    ##  [7] "AppliedStresshigh.ph_oxygen"        "AppliedStresshypercapnia_oxygen"   
+    ##  [9] "AppliedStresshypoxia_oxygen"        "AppliedStresslow.ph_oxygen"        
+    ## [11] "AppliedStressnone.specified_oxygen" "AppliedStressother_oxygen"         
+    ## [13] "AppliedStressother.stress_oxygen"   "AppliedStresstemperature_oxygen"   
+    ## [15] "record_count_species_oxygen"       
     ## character(0)
     ## character(0)
-    ## [1] "Number_brains"               "BodyWeight_brains"          
-    ## [3] "BrainWeight_brains"          "EncCoeff_brains"            
-    ## [5] "record_count_species_brains"
+    ## [1] "BodyWeight_brains"           "EncCoeff_brains"            
+    ## [3] "record_count_species_brains"
     ## character(0)
     ## character(0)
     ## character(0)
@@ -9371,9 +9554,9 @@ source("compare_fields.R")
     ## [13] "OtherItems_diet"               "PercentEmpty_diet"            
     ## [15] "Troph_diet"                    "seTroph_diet"                 
     ## [17] "SizeMin_diet"                  "SizeMax_diet"                 
-    ## [19] "SampleStageadults_diet"        "SampleStagejuv..adults_diet"  
-    ## [21] "SampleStagelarvae_diet"        "SampleStagerecruits.juv._diet"
-    ## [23] "record_count_species_diet"    
+    ## [19] "FishLength_diet"               "SampleStageadults_diet"       
+    ## [21] "SampleStagejuv..adults_diet"   "SampleStagelarvae_diet"       
+    ## [23] "SampleStagerecruits.juv._diet" "record_count_species_diet"    
     ##  [1] "FoodIdetritus_fooditems"          "FoodInekton_fooditems"           
     ##  [3] "FoodIothers_fooditems"            "FoodIplants_fooditems"           
     ##  [5] "FoodIzoobenthos_fooditems"        "FoodIzooplankton_fooditems"      
@@ -9385,6 +9568,15 @@ source("compare_fields.R")
     ## [1] "FoodIdetritus_fooditems"    "FoodInekton_fooditems"     
     ## [3] "FoodIothers_fooditems"      "FoodIplants_fooditems"     
     ## [5] "FoodIzoobenthos_fooditems"  "FoodIzooplankton_fooditems"
+    ## [1] "PreyStageeggs_fooditems" "PreyStageeggs_predators"
+    ## character(0)
+    ## [1] "BodyWeight_brains"
+    ## [1] "BodyWeight_brains"           "EncCoeff_brains"            
+    ## [3] "record_count_species_brains"
+    ## [1] "MaxLengthTL_estimate"    "MaxLengthSL_estimate"   
+    ## [3] "LengthMin_length_weight" "LengthMax_length_weight"
+    ## [5] "LengthWeight_stocks"     "LengthRelations_stocks" 
+    ## [7] "LengthFrequency_stocks"  "FishLength_diet"
 
 \#\#add field with AA position 30
 
@@ -9400,6 +9592,7 @@ AA_30_positive[i_pos] = 1
 A$AA_30_positive = AA_30_positive
 
 ACE2 = read.csv("ACE2_sequences_fixed.csv")
+#which(ACE2$Species =="Astatotilapia burtoni")
 
 intersect(A$Parsed.325.sequences,ACE2$AccessionNumProtein)
 ```
@@ -9506,6 +9699,61 @@ A = merge(A, DF)
 
 write.csv(A, file = "docking_results_AA_30_83.csv")
 # glm(haddock_score_mean ~ AA_30_positive, family=binomial, data=A)
+```
+
+\#\#add AA value to rest of fishbase data
+
+``` r
+A <- read.csv("docking_results_AA_30_83.csv")
+
+keep = c("Species", "AA_30_positive", "Order", "Class")
+
+A = A[,keep]
+Species = A$Species
+sp_ind = which(names(A)=="Species")
+dmy <- dummyVars(" ~ .", data = A[,-sp_ind])
+A <- data.frame(predict(dmy, newdata = A))
+A$Species = Species
+
+load("fishbase_HADDOCK_biological.Rdata")
+
+DF = fishbase_HADDOCK_biological
+dim(DF)
+```
+
+    ## [1]  72 356
+
+``` r
+dim(A)
+```
+
+    ## [1] 287  87
+
+``` r
+DF_m = merge(DF, A, by = "Species")
+dim(DF_m)#lose two species
+```
+
+    ## [1]  70 442
+
+``` r
+setdiff(DF$Species, DF_m$Species)
+```
+
+    ## [1] "Astatotilapia burtoni" "Haplochromis nyererei"
+
+``` r
+DF = DF_m
+
+write.csv(names(DF), file = "names_fishbase.csv")
+
+rm = NULL
+rm = c(rm, str_which(names(DF), "record_count"))
+rm = c(rm, "LengthMin_length_weight" ,"LengthMax_length_weight", "Weight_oxygen")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+
+save(DF, file = "DF_fish.Rdata")
 ```
 
 \#\#try to source from

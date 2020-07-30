@@ -537,6 +537,7 @@ head(tmp)
 
 ```
 
+
 ##length_length: conversion of length types
 
 ##length_weight: The LENGTH-WEIGHT table presents the a and b values of over 5,000 length-weight relationships of the form W = a x Lb, pertaining to about over 2,000 fish species.
@@ -544,21 +545,69 @@ head(tmp)
 ##seems like this may only be useful in combination with length_length
 ##https://www.fishbase.de/manual/FishbaseThe_LENGTH_WEIGHT_Table.htm
 ```{r}
-load("DF_intro.Rdata")
-DF= DF_intro
-a = 1
-species = DF$Species
-for (a in 1:length(species)){
-  tmp = data.frame(length_weight(species_list = DF$Species[a]))
-  # print(a)
-  print(dim(tmp)[1])
-}
-#see what the other fields are
-names(tmp)
+#"Length1"
+T = length_weight()
 
-a = 1
-tmp = data.frame(length_weight(species_list = DF$Species[a]))
-head(tmp)
+length(which(is.na(T$Type)))#mostly this is empty
+
+table(T$LmaxCompare)
+
+table(T$Type)
+
+#see what's in this table
+T = length_length()
+table(T$Length1)#different types of length measures
+
+table(T$Length2)#different types of length measures
+#can't tell which length type is being measured
+
+table(T$Type)#mostly this is empty
+
+rm(table_out)
+T = length_weight()
+
+#can't take out these rows because it will remove species we need
+# ok = NULL
+# ok = c(ok, which(is.na(T$Type)))#assume if it's empty it's standard
+# ok = c(ok, which(T$Type == "SL"))
+# T = T[ok,]
+
+ok = NULL
+ok = c(ok, which(is.na(T$Type)))#assume if it's empty it's standard
+ok = c(ok, which(T$Type == "SL"))
+T$LengthMax[-ok]=NA
+T$LengthMin[-ok]=NA
+
+table_name = "length_weight"
+
+load("DF.Rdata")
+
+load("process_table.Rdata")
+load("sum_or_mean.Rdata")
+load("keep_real_binary.Rdata")
+load("non_biological.Rdata")
+table_out = process_table(T = T, DF = DF,exclude = non_biological, threshold_frac= 0,table_name = table_name, part = "part")
+dim(table_out)[1]==dim(DF)[1]#check this is true
+
+save(table_out, file =paste0(table_name, ".Rdata"))
+
+str_which(names(table_out),"Species")
+
+load("out.Rdata")
+
+dim(table_out)[1]==dim(out)[1]
+
+sp_ind = which(names(table_out)=="Species")
+out = cbind(out, table_out[,-sp_ind])
+length(str_which(names(out),"Species"))
+
+names(out)[str_which(names(out),table_name)]
+summary(out[,str_which(names(out),table_name)])
+
+save(out, file = "out.Rdata")
+
+save(out, file = paste0("out", "_", table_name, ".Rdata"))
+
 ```
 
 ##maturity
@@ -1376,6 +1425,7 @@ AA_30_positive[i_pos] = 1
 A$AA_30_positive = AA_30_positive
 
 ACE2 = read.csv("ACE2_sequences_fixed.csv")
+#which(ACE2$Species =="Astatotilapia burtoni")
 
 intersect(A$Parsed.325.sequences,ACE2$AccessionNumProtein)
 
@@ -1398,6 +1448,41 @@ A = merge(A, DF)
 
 write.csv(A, file = "docking_results_AA_30_83.csv")
 # glm(haddock_score_mean ~ AA_30_positive, family=binomial, data=A)
+```
+
+##add AA value to rest of fishbase data
+```{r}
+A <- read.csv("docking_results_AA_30_83.csv")
+
+keep = c("Species", "AA_30_positive", "Order", "Class")
+
+A = A[,keep]
+Species = A$Species
+sp_ind = which(names(A)=="Species")
+dmy <- dummyVars(" ~ .", data = A[,-sp_ind])
+A <- data.frame(predict(dmy, newdata = A))
+A$Species = Species
+
+load("fishbase_HADDOCK_biological.Rdata")
+
+DF = fishbase_HADDOCK_biological
+dim(DF)
+dim(A)
+DF_m = merge(DF, A, by = "Species")
+dim(DF_m)#lose two species
+setdiff(DF$Species, DF_m$Species)
+
+DF = DF_m
+
+write.csv(names(DF), file = "names_fishbase.csv")
+
+rm = NULL
+rm = c(rm, str_which(names(DF), "record_count"))
+rm = c(rm, "LengthMin_length_weight" ,"LengthMax_length_weight", "Weight_oxygen")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+
+save(DF, file = "DF_fish.Rdata")
 ```
 
 
