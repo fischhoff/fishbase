@@ -320,12 +320,12 @@ Ilya Fischhoff, Adrian Castellanos
 
     ## Warning: package 'tidyverse' was built under R version 4.0.2
 
-    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ──────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ tibble  3.0.1     ✓ purrr   0.3.4
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ─────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x purrr::accumulate()      masks foreach::accumulate()
     ## x dplyr::arrange()         masks plyr::arrange()
     ## x dplyr::between()         masks data.table::between()
@@ -9756,6 +9756,370 @@ DF = DF[,keep]
 save(DF, file = "DF_fish.Rdata")
 ```
 
+\#\#remove fields with near-zero variation again
+
+``` r
+load("DF_fish.Rdata")
+
+##remove variables with zero variation
+sp_ind = which(names(DF)=="Species")
+nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
+okay_inds = which(nzv$nzv == FALSE)
+length(okay_inds)
+```
+
+    ## [1] 357
+
+``` r
+DF = DF[,okay_inds]#include only the columns that have variation
+
+save(DF, file = "DF_fish.Rdata")
+```
+
+\#\#set up function gridSearch.R
+
+``` r
+source("gridSearch.R")
+```
+
+\#\#combine data Adrian made with rest of fields from fish
+
+``` r
+V <- read.csv("verttraits_30072020_continuousforage.csv")
+str_which(names(V), "brain")#nope
+```
+
+    ## integer(0)
+
+``` r
+str_which(names(V), "habitat")#nope
+```
+
+    ## integer(0)
+
+``` r
+str_which(names(V), "diet")#nope
+```
+
+    ## [1] 36
+
+``` r
+str_which(names(V), "length")#nope
+```
+
+    ## integer(0)
+
+``` r
+F <- read.csv("fishbase_haddock_vert 2.csv")#check what I'd shared with Adrian before
+names(F)  
+```
+
+    ## [1] "Oxygenmgl_oxygen"   "EncCoeff_brains"    "habitat_breadth"   
+    ## [4] "range_area"         "diet_breadth"       "Species"           
+    ## [7] "haddock_score_mean"
+
+``` r
+intersect(names(V), names(F))
+```
+
+    ## [1] "Species"            "haddock_score_mean" "diet_breadth"
+
+``` r
+intersect(V$Species, F$Species)#check that this is okay
+```
+
+    ##  [1] "Acanthochromis polyacanthus"   "Amblyraja radiata"            
+    ##  [3] "Amphiprion ocellaris"          "Anabas testudineus"           
+    ##  [5] "Anarrhichthys ocellatus"       "Archocentrus centrarchus"     
+    ##  [7] "Astatotilapia calliptera"      "Astyanax mexicanus"           
+    ##  [9] "Austrofundulus limnaeus"       "Betta splendens"              
+    ## [11] "Boleophthalmus pectinirostris" "Callorhinchus milii"          
+    ## [13] "Carassius auratus"             "Chanos chanos"                
+    ## [15] "Clupea harengus"               "Cottoperca gobio"             
+    ## [17] "Cynoglossus semilaevis"        "Cyprinodon variegatus"        
+    ## [19] "Danio rerio"                   "Denticeps clupeoides"         
+    ## [21] "Echeneis naucrates"            "Electrophorus electricus"     
+    ## [23] "Erpetoichthys calabaricus"     "Esox lucius"                  
+    ## [25] "Etheostoma spectabile"         "Fundulus heteroclitus"        
+    ## [27] "Gadus morhua"                  "Gouania willdenowi"           
+    ## [29] "Hippocampus comes"             "Ictalurus punctatus"          
+    ## [31] "Kryptolebias marmoratus"       "Labrus bergylta"              
+    ## [33] "Larimichthys crocea"           "Lates calcarifer"             
+    ## [35] "Lepisosteus oculatus"          "Mastacembelus armatus"        
+    ## [37] "Maylandia zebra"               "Monopterus albus"             
+    ## [39] "Myripristis murdjan"           "Neolamprologus brichardi"     
+    ## [41] "Nothobranchius furzeri"        "Notothenia coriiceps"         
+    ## [43] "Oncorhynchus mykiss"           "Oreochromis aureus"           
+    ## [45] "Oreochromis niloticus"         "Oryzias melastigma"           
+    ## [47] "Pangasianodon hypophthalmus"   "Paralichthys olivaceus"       
+    ## [49] "Parambassis ranga"             "Paramormyrops kingsleyae"     
+    ## [51] "Perca flavescens"              "Poecilia formosa"             
+    ## [53] "Poecilia latipinna"            "Poecilia mexicana"            
+    ## [55] "Poecilia reticulata"           "Pygocentrus nattereri"        
+    ## [57] "Salarias fasciatus"            "Sander lucioperca"            
+    ## [59] "Scleropages formosus"          "Seriola dumerili"             
+    ## [61] "Seriola lalandi"               "Sinocyclocheilus anshuiensis" 
+    ## [63] "Sinocyclocheilus rhinocerous"  "Sparus aurata"                
+    ## [65] "Stegastes partitus"            "Tachysurus fulvidraco"        
+    ## [67] "Takifugu rubripes"             "Xiphophorus couchianus"       
+    ## [69] "Xiphophorus hellerii"          "Xiphophorus maculatus"
+
+``` r
+load("DF_fish.Rdata")
+F = DF
+
+summary(V$log_adult_body_mass_g)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+    ##  0.8981  3.9224  6.9267  7.1443  9.6727 16.1281      76
+
+``` r
+summary(V$adult_svl_cm)
+```
+
+    ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.     NA's 
+    ##    4.971   19.750   54.250  113.568  127.000 1098.769      154
+
+``` r
+names(F)[str_which(names(F), "length")]
+```
+
+    ##  [1] "a_length_weight"                                                  
+    ##  [2] "aTL_length_weight"                                                
+    ##  [3] "b_length_weight"                                                  
+    ##  [4] "CoeffDetermination_length_weight"                                 
+    ##  [5] "SEb_length_weight"                                                
+    ##  [6] "LCLa_length_weight"                                               
+    ##  [7] "UCLa_length_weight"                                               
+    ##  [8] "LCLb_length_weight"                                               
+    ##  [9] "UCLb_length_weight"                                               
+    ## [10] "record_count_species_length_weight"                               
+    ## [11] "DorsalAttributesextending.over.most.of.the.back.length_morphology"
+    ## [12] "LengthAve_length_weight"
+
+``` r
+#need to add these for fish
+ufish = unique(F$Species)
+for (a in 1:length(ufish)){
+  v_ind = which(V$Species == ufish[a])#find index of fish in verts
+  F_tmp = subset(F, Species == ufish[a])#find temp records for this fish
+  V$log_adult_body_mass_g[v_ind] = log(F_tmp$BodyWeight_brains)
+  V$adult_svl_cm[v_ind] = F_tmp$LengthAve_length_weight
+}
+summary(V$log_adult_body_mass_g)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+    ##  -1.792   3.670   6.585   6.780   9.192  16.128      66
+
+``` r
+summary(V$adult_svl_cm)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+    ##    2.20   16.99   44.25  101.95  104.59 1098.77     134
+
+``` r
+save(V, file = "V.Rdata")
+write.csv(V, file = "verttraits_30072020_continuousforage_v2.csv")
+```
+
+\#\#add AA value to rest of vert data
+
+``` r
+A <- read.csv("docking_results_AA_30_83.csv")
+
+keep = c("Species", "AA_30_positive", "Order", "Class")
+
+A = A[,keep]
+Species = A$Species
+sp_ind = which(names(A)=="Species")
+dmy <- dummyVars(" ~ .", data = A[,-sp_ind])
+A <- data.frame(predict(dmy, newdata = A))
+A$Species = Species
+
+load("V.Rdata")
+DF = V
+dim(DF)
+```
+
+    ## [1] 298  36
+
+``` r
+dim(A)
+```
+
+    ## [1] 287  87
+
+``` r
+DF_m = merge(DF, A, by = "Species")
+dim(DF_m)#lose two species
+```
+
+    ## [1] 277 122
+
+``` r
+print("these species we have trait data on for vertebrates but not for AA")
+```
+
+    ## [1] "these species we have trait data on for vertebrates but not for AA"
+
+``` r
+setdiff(DF$Species, DF_m$Species)
+```
+
+    ##  [1] "Anser cygnoides domesticus"    "Aquila chrysaetos chrysaetos" 
+    ##  [3] "Bos indicus x Bos taurus"      "Bos indicus"                  
+    ##  [5] "Buceros rhinoceros silvestris" "Canis lupus dingo"            
+    ##  [7] "Canis lupus familiaris"        "Tarsius syrichta"             
+    ##  [9] "Corvus cornix cornix"          "Cricetulus barabensis"        
+    ## [11] "Cryptomys damarensis"          "Grammomys dolichurus"         
+    ## [13] "Homo sapiens"                  "Spermophilus tridecemlineatus"
+    ## [15] "Spalax ehrenbergi"             "Monachus schauinslandi"       
+    ## [17] "Rousettus leschenaultii"       "Cebus apella"                 
+    ## [19] "Struthio camelus australis"    "Tupaia belangeri"             
+    ## [21] "Spermophilus parryii"
+
+``` r
+DF = DF_m
+
+rm = NULL
+rm = c(rm, str_which(names(DF), "record_count"))
+rm = c(rm, "LengthMin_length_weight" ,"LengthMax_length_weight", "Weight_oxygen")
+keep = setdiff(names(DF), rm)
+DF = DF[,keep]
+
+save(V, file = "V.Rdata")
+```
+
+\#\#use function gridSearch with all verts
+
+``` r
+cores = 4
+  cl <- makeCluster(cores, "SOCK", timeout = 60)
+  # stopCluster(cl)
+  registerDoSNOW(cl)
+load("V.Rdata")
+
+out = V
+Species = out$V
+sp_ind = which(names(out)=="Species")
+dmy <- dummyVars(" ~ .", data = out[,-sp_ind])
+out <- data.frame(predict(dmy, newdata = out))
+out$Species = Species
+V = out
+
+
+V$adult_svl_cm[is.nan(V$adult_svl_cm)] <- NA
+V$log_adult_body_mass_g[is.nan(V$log_adult_body_mass_g)] <- NA
+DF = V
+# A<- read.csv(file = "docking_results_AA_30_83.csv")
+#find out what haddock_score_median is across all species
+haddock_median = median(V$haddock_score_mean)
+
+above_haddock_median = rep(0, dim(DF)[1])
+inds = which(DF$haddock_score_mean > haddock_median)
+above_haddock_median[inds]= 1
+DF$above_haddock_median = above_haddock_median
+label = "above_haddock_median"
+
+rm = which(names(DF) %in% c("haddock_score_mean", "Order", "Species", "nchar", "haddock_score_sd"))
+
+DF = DF[,-rm]
+
+eta = c(0.001, 0.01, 0.1)
+# eta = c(0.1)
+max_depth = c(2,3)
+k = 5
+nrounds = 10000
+n.minobsinnode = c(2,5,10)
+# n.minobsinnode = c(2)
+k_split = 0.8
+distribution = "bernoulli"
+
+label_col_ind = which(names(DF)==label)
+x_col = seq(1:dim(DF)[2])
+x_col = setdiff(x_col, label_col_ind)
+vars = colnames(DF)[x_col]
+
+
+hyper_grid <- gridSearch(DF = DF, label = label, vars = vars, k_split = k_split, 
+                         distribution = distribution, 
+                         eta = eta, 
+                         max_depth = max_depth, 
+                         n.minobsinnode = n.minobsinnode,
+                         nrounds = nrounds, 
+                         method = "cv", 
+                         cv.folds = 5)
+
+print(hyper_grid)
+```
+
+    ##      eta max_depth n.minobsinnode n.trees eval_train eval_test
+    ## 1  0.001         2              2    4281  0.9311458 0.8513674
+    ## 2  0.001         2              5    5166  0.9366319 0.8513674
+    ## 3  0.001         2             10    7123  0.9481597 0.8454221
+    ## 4  0.001         3              2    5434  0.9538542 0.8418549
+    ## 5  0.001         3              5    4584  0.9480903 0.8525565
+    ## 6  0.001         3             10    5122  0.9511458 0.8466112
+    ## 7  0.010         2              2     583  0.9419444 0.8472057
+    ## 8  0.010         2              5     453  0.9311111 0.8513674
+    ## 9  0.010         2             10     397  0.9284375 0.8466112
+    ## 10 0.010         3              2     509  0.9515625 0.8376932
+    ## 11 0.010         3              5     437  0.9462500 0.8412604
+    ## 12 0.010         3             10     398  0.9407292 0.8507729
+    ## 13 0.100         2              2      48  0.9231250 0.8335315
+    ## 14 0.100         2              5     103  0.9498611 0.8252081
+    ## 15 0.100         2             10      55  0.9359722 0.8537455
+    ## 16 0.100         3              2      51  0.9439236 0.8263971
+    ## 17 0.100         3              5      68  0.9574306 0.8573127
+    ## 18 0.100         3             10      52  0.9514583 0.8204518
+
+\#\#use function gridSearch with just fish
+
+``` r
+# A<- read.csv(file = "docking_results_AA_30_83.csv")
+# #find out what haddock_score_median is across all species
+# haddock_median = median(A$haddock_score_mean)
+# 
+# above_haddock_median = rep(0, dim(DF)[1])
+# inds = which(DF$haddock_score_mean > haddock_median)
+# above_haddock_median[inds]= 1
+# DF$above_haddock_median = above_haddock_median
+# label = "above_haddock_median"
+# rm = str_which(names(DF) %in% c("haddock_score_mean", "Order", "Species"))
+# DF = DF[,-rm]
+# 
+# # eta = c(0.001, 0.01, 0.1)
+# eta = c(0.1)
+# max_depth = c(3)
+# k = 5
+# nrounds = 10000
+# # n.minobsinnode = c(2,5,10)
+# n.minobsinnode = c(2)
+# k_split = 0.8
+# distribution = "bernoulli"
+# 
+# label_col_ind = which(names(DF)==label)
+# x_col = seq(1:dim(DF)[2])
+# x_col = setdiff(x_col, label_col_ind)
+# vars = colnames(DF)[x_col]
+# 
+# source("gridSearch_fish.R")
+```
+
+``` r
+# source("../../functions/bootstrapGBM_v2.R")
+```
+
+\#\#function to do grid search with
+gbm
+
+``` r
+# source("../../functions/R_function_grid_search_bootstrap_null_gbm_foreach.R")
+```
+
 \#\#try to source from
 github
 
@@ -9768,18 +10132,18 @@ github
 # 
 # devtools::source_url("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R?raw=TRUE")
 
-source_https <- function(u, unlink.tmp.certs = FALSE) {
-  # load package
-  require(RCurl)
-
-  # read script lines from website using a security certificate
-  if(!file.exists("cacert.pem")) download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile = "cacert.pem")
-  script <- getURL(u, followlocation = TRUE, cainfo = "cacert.pem")
-  if(unlink.tmp.certs) unlink("cacert.pem")
-
-  # parase lines and evealuate in the global environement
-  eval(parse(text = script), envir= .GlobalEnv)
-}
+# source_https <- function(u, unlink.tmp.certs = FALSE) {
+#   # load package
+#   require(RCurl)
+# 
+#   # read script lines from website using a security certificate
+#   if(!file.exists("cacert.pem")) download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile = "cacert.pem")
+#   script <- getURL(u, followlocation = TRUE, cainfo = "cacert.pem")
+#   if(unlink.tmp.certs) unlink("cacert.pem")
+# 
+#   # parase lines and evealuate in the global environement
+#   eval(parse(text = script), envir= .GlobalEnv)
+# }
 
 # source_https("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R")
 # source_https("https://github.com/fischhoff/gbm/tree/master/code/gridSearch.R")
