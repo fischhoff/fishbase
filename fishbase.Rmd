@@ -1567,13 +1567,31 @@ print("these species we have trait data on for vertebrates but not for AA")
 setdiff(DF$Species, DF_m$Species)
 
 DF = DF_m
+T = DF
+  names = names(T)
+  binary = NULL
+  for (a in 1:length(names)){
+    vals = unique(T[,names[a]])
+    vals = vals[!is.na(vals)]
+    if (length(which(vals==0)) + length(which(vals == -1)) == 2){
+      T[,names[a]]=factor(T[,names[a]])
+      # binary = c(binary, names[a])
+      #change to 1 and 0
+      # inds0 = which(T[,names[a]]==0)
+      # T[inds0,names[a]]=0
+      # inds1 = which(T[,names[a]]==-1)
+      # T[inds1,names[a]]=1
+    }
+  }
+DF = T
+
 
 rm = NULL
 rm = c(rm, str_which(names(DF), "record_count"))
 rm = c(rm, "LengthMin_length_weight" ,"LengthMax_length_weight", "Weight_oxygen")
 keep = setdiff(names(DF), rm)
 DF = DF[,keep]
-
+V = DF
 save(V, file = "V.Rdata")
 ```
 
@@ -1595,7 +1613,7 @@ save(V, file = "V.Rdata")
 ```{r gridSearch_verts_median}
 print(Sys.time())
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200731_1857"
+output_name = "vert_haddock_20200803_1857"
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
   # stopCluster(cl)
@@ -1610,9 +1628,27 @@ out <- data.frame(predict(dmy, newdata = out))
 out$Species = Species
 V = out
 
+names = names(V)
+T = V
+names = names(T)
+binary = NULL
+  for (a in 1:length(names)){
+    vals = unique(T[,names[a]])
+    vals = vals[!is.na(vals)]
+    if (length(which(vals==0)) + length(which(vals == -1)) == 2){
+      binary = c(binary, names[a])
+      #change to 1 and 0
+      inds0 = which(T[,names[a]]==0)
+      T[inds0,names[a]]=0
+      inds1 = which(T[,names[a]]==-1)
+      T[inds1,names[a]]=1
+    }
+  }
+V = T
 
 V$adult_svl_cm[is.nan(V$adult_svl_cm)] <- NA
 V$log_adult_body_mass_g[is.nan(V$log_adult_body_mass_g)] <- NA
+
 DF = V
 # A<- read.csv(file = "docking_results_AA_30_83.csv")
 #find out what haddock_score_median is across all species
@@ -1636,8 +1672,8 @@ nrounds = 100000
 
 #for real
 eta = c(0.001, 0.01, 0.1)
-max_depth = c(1,2,3)
-n.minobsinnode = c(2,5,10)
+max_depth = c(2,3,4)
+n.minobsinnode = c(2,5)
 nrounds = 100000
 
 # n.minobsinnode = c(2)
@@ -1684,7 +1720,7 @@ save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
 
 ##make deviance plot just for the "best" parameters
 ```{r dev_best}
-min_trees = 1000
+# min_trees = 1000
 min_trees = 0
 buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
 max_trees = nrounds - buffer

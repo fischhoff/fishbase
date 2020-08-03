@@ -320,12 +320,12 @@ Han lab
 
     ## Warning: package 'tidyverse' was built under R version 4.0.2
 
-    ## ── Attaching packages ──────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ tibble  3.0.1     ✓ purrr   0.3.4
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ─────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ───────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x purrr::accumulate()      masks foreach::accumulate()
     ## x dplyr::arrange()         masks plyr::arrange()
     ## x dplyr::between()         masks data.table::between()
@@ -2015,11 +2015,11 @@ output to add to datasets from other verts
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-01 12:41:24 EDT"
+    ## [1] "2020-08-03 11:42:50 EDT"
 
 ``` r
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200731_1857"
+output_name = "vert_haddock_20200803_1857"
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
   # stopCluster(cl)
@@ -2034,9 +2034,27 @@ out <- data.frame(predict(dmy, newdata = out))
 out$Species = Species
 V = out
 
+names = names(V)
+T = V
+names = names(T)
+binary = NULL
+  for (a in 1:length(names)){
+    vals = unique(T[,names[a]])
+    vals = vals[!is.na(vals)]
+    if (length(which(vals==0)) + length(which(vals == -1)) == 2){
+      binary = c(binary, names[a])
+      #change to 1 and 0
+      inds0 = which(T[,names[a]]==0)
+      T[inds0,names[a]]=0
+      inds1 = which(T[,names[a]]==-1)
+      T[inds1,names[a]]=1
+    }
+  }
+V = T
 
 V$adult_svl_cm[is.nan(V$adult_svl_cm)] <- NA
 V$log_adult_body_mass_g[is.nan(V$log_adult_body_mass_g)] <- NA
+
 DF = V
 # A<- read.csv(file = "docking_results_AA_30_83.csv")
 #find out what haddock_score_median is across all species
@@ -2060,8 +2078,8 @@ nrounds = 100000
 
 #for real
 eta = c(0.001, 0.01, 0.1)
-max_depth = c(1,2,3)
-n.minobsinnode = c(2,5,10)
+max_depth = c(2,3,4)
+n.minobsinnode = c(2,5)
 nrounds = 100000
 
 # n.minobsinnode = c(2)
@@ -2091,7 +2109,7 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-01 12:56:16 EDT"
+    ## [1] "2020-08-03 12:15:32 EDT"
 
 \#\#make deviance
 plots
@@ -2117,7 +2135,7 @@ save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
 \#\#make deviance plot just for the “best” parameters
 
 ``` r
-min_trees = 1000
+# min_trees = 1000
 min_trees = 0
 buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
 max_trees = nrounds - buffer
@@ -2157,7 +2175,7 @@ source("bootstrapGBM.R")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-01 13:02:19 EDT"
+    ## [1] "2020-08-03 12:19:34 EDT"
 
 ``` r
 # nruns = 1
@@ -2182,7 +2200,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-01 13:10:58 EDT"
+    ## [1] "2020-08-03 12:51:51 EDT"
 
 \#\#look at performance
 
@@ -2198,7 +2216,7 @@ print("observed data, eval train")
 mean(I$auc_train)
 ```
 
-    ## [1] 0.9138368
+    ## [1] 0.948007
 
 ``` r
 print("observed data, eval test")
@@ -2210,7 +2228,7 @@ print("observed data, eval test")
 mean(I$auc_test)
 ```
 
-    ## [1] 0.8061831
+    ## [1] 0.8308206
 
 ``` r
 R <- OUT_rand[[1]]
@@ -2218,7 +2236,7 @@ R <- OUT_rand[[1]]
 mean(R$auc_train)
 ```
 
-    ## [1] 0.6546667
+    ## [1] 0.7004058
 
 ``` r
 print("null data, eval test")
@@ -2230,7 +2248,7 @@ print("null data, eval test")
 mean(R$auc_test)
 ```
 
-    ## [1] 0.5238407
+    ## [1] 0.5584904
 
 \#\#plot importance
 
