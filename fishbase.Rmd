@@ -1,7 +1,7 @@
 ---
 title: "fishbase"
 author: "Han lab"
-date: "7/27/2020"
+date: "8/3/2020"
 output: github_document
 ---
 
@@ -14,9 +14,8 @@ pkgTest <- function(x)
   }
   library(x, character.only = TRUE)
 }
-neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW", "data.table", "rsample", "tidyverse", "sf", "raster", "mapview", "rnaturalearth", "fasterize", "tidyr", "patchwork", "gtable", "magrittr")
+neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", "remotes", "Biostrings", "stringr", "phylotools", "data.table", "rfishbase", "Hmisc", "caret", "tidyr", "ggforce", "broom", "gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "dismo", "doSNOW", "data.table", "rsample", "tidyverse", "sf", "raster", "mapview", "rnaturalearth", "fasterize", "tidyr", "patchwork", "gtable", "magrittr",  "fulltext")
 for (package in neededPackages){pkgTest(package)}
-
 ```
 
 ##function to take the same across rows of categorical variables that have been 1/0 encoded, where a species may have 1 for more than one condition of a variable
@@ -99,6 +98,25 @@ for (a in 1:length(species)){
 
 DF_distribution = out
 save(DF_distribution, file = "DF_distribution_simple.Rdata")
+load("DF_distribution_simple.Rdata")
+
+DF = DF_distribution
+str_which(names(DF), "Sub")#doesn't include subarea
+test = subset(DF_distribution, Species == "Acanthochromis polyacanthus")
+test$FAO_distribution
+
+FAO <- st_read("FAO_AREAS/Marine/FAO_AREAS.shp")
+FAO_test= subset(FAO, NAME_EN == "Indian Ocean, Eastern")
+plot(FAO_test)
+
+keep = c("NorthernLatitude_distribution" ,  "NorthernLatitudeNS_distribution" ,"SouthernLatitude_distribution"  ,
+ "SouthernLatitudeNS_distribution", "WesternLongitude_distribution" ,  "WesternLongitudeEW_distribution"
+, "EasternLongitude_distribution" ,  "EasternLongitudeEW_distribution")
+keep = c(keep, "Species", "FAO_distribution")
+test = test[, keep]
+
+#looked at map and figured out that bounding box encompasses FAO area
+
 ```
 
 ```{r, include = FALSE}
@@ -148,7 +166,7 @@ dist = data.frame(Species = species,
                   range_area = area)
 save(dist, file = "dist.Rdata")
 #convert to km2
-
+load("dist.Rdata")
 ```
 
 ##check out some tables in fishbase
@@ -1313,11 +1331,8 @@ fishbase_HADDOCK = out
 write.csv(fishbase_HADDOCK, file = "fishbase_HADDOCK.csv")
 ```
 
-
-
-
 ##see what coverage is
-```{r}
+```{r, include = FALSE}
 
 load("out.Rdata")
 save(out, file = "out_allfields.Rdata")
@@ -1500,8 +1515,6 @@ DF = DF[,okay_inds]#include only the columns that have variation
 save(DF, file = "DF_fish.Rdata")
 ```
 
-
-
 ##set up function gridSearch.R
 ```{r, include = FALSE}
 source("gridSearch.R")
@@ -1567,23 +1580,6 @@ print("these species we have trait data on for vertebrates but not for AA")
 setdiff(DF$Species, DF_m$Species)
 
 DF = DF_m
-T = DF
-  names = names(T)
-  binary = NULL
-  for (a in 1:length(names)){
-    vals = unique(T[,names[a]])
-    vals = vals[!is.na(vals)]
-    if (length(which(vals==0)) + length(which(vals == -1)) == 2){
-      T[,names[a]]=factor(T[,names[a]])
-      # binary = c(binary, names[a])
-      #change to 1 and 0
-      # inds0 = which(T[,names[a]]==0)
-      # T[inds0,names[a]]=0
-      # inds1 = which(T[,names[a]]==-1)
-      # T[inds1,names[a]]=1
-    }
-  }
-DF = T
 
 
 rm = NULL
@@ -1608,12 +1604,34 @@ save(V, file = "V.Rdata")
 
 ```
 
+#make and use function for getting hits from fulltext from plos
+```{r}
+get_hits_fulltext <- function(search_terms){
+  out = rep(NA, length(search_terms))
+  for (a in 1:length(search_terms)){
+    tmp = ft_search(query = search_terms[a], from = "plos")#get the search results across only PLOS because otherwise hit rate limits 
+    out[a] = tmp$plos$found
+    Sys.sleep(1)
+  }
+  out
+}
 
-##use function gridSearch with all verts
+load("V.Rdata")
+search_terms = V$Species
+out <- get_hits_fulltext(search_terms)
+out = data.frame(hits = out,
+                 Species = search_terms)
+vert_haddock_plos = out
+V = merge(V, vert_haddock_plos, by = "Species")
+save(V, file = "V.Rdata")
+save(vert_haddock_plos, file = "vert_haddock_plos.Rdata")
+```
+
+##use function gridSearch with all verts. output: "haddock_vert_for_gbm.csv"
 ```{r gridSearch_verts_median}
 print(Sys.time())
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200803_1857"
+output_name = "vert_haddock_20200803_2142"
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
   # stopCluster(cl)
@@ -1629,19 +1647,24 @@ out$Species = Species
 V = out
 
 names = names(V)
-T = V
+DF = V
+##remove variables with zero variation
+sp_ind = which(names(DF)=="Species")
+nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
+okay_inds = which(nzv$nzv == FALSE)
+length(okay_inds)
+DF = DF[,okay_inds]#include only the columns that have variation
+
+T = DF
 names = names(T)
 binary = NULL
   for (a in 1:length(names)){
     vals = unique(T[,names[a]])
     vals = vals[!is.na(vals)]
     if (length(which(vals==0)) + length(which(vals == -1)) == 2){
+      T[,names[a]]=factor(T[,names[a]])
       binary = c(binary, names[a])
       #change to 1 and 0
-      inds0 = which(T[,names[a]]==0)
-      T[inds0,names[a]]=0
-      inds1 = which(T[,names[a]]==-1)
-      T[inds1,names[a]]=1
     }
   }
 V = T
@@ -1660,6 +1683,7 @@ above_haddock_median[inds]= 1
 DF$above_haddock_median = above_haddock_median
 label = "above_haddock_median"
 
+write.csv(DF, file = "haddock_vert_for_gbm.csv")
 rm = which(names(DF) %in% c("haddock_score_mean", "Order", "Species", "nchar", "haddock_score_sd"))
 
 DF = DF[,-rm]
@@ -1667,11 +1691,11 @@ DF = DF[,-rm]
 #testing out
 eta = c(0.0001)
 max_depth = c(3)
-n.minobsinnode = c(10)
+n.minobsinnode = c(2)
 nrounds = 100000
 
 #for real
-eta = c(0.001, 0.01, 0.1)
+eta = c(0.0001, 0.001, 0.01, 0.1)
 max_depth = c(2,3,4)
 n.minobsinnode = c(2,5)
 nrounds = 100000
@@ -1718,10 +1742,41 @@ patchwork::wrap_plots(PLTS)
 save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
 ```
 
-##make deviance plot just for the "best" parameters
-```{r dev_best}
-# min_trees = 1000
+##find out what happens if we set no lower limit on number of trees
+```{r}
 min_trees = 0
+buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
+max_trees = nrounds - buffer
+hyper_grid = GRID[[1]]
+hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
+hyper_grid = subset(hyper_grid, n.trees >=min_trees)
+hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
+hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
+
+DEV = GRID[[2]]
+DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
+GRID[[2]]=DEV
+
+PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS)
+# , nrow = length(PLTS), heights= 5
+save(PLTS, file = paste0("PLTS", ".", "deviance.best.no.lower", output_name, ".Rdata"))
+
+```
+
+
+##make deviance plot just for the "best" parameters requiring at least 10000 trees as optimal number of trees
+```{r dev_best}
+
+load(paste0("GRID", ".", output_name, ".Rdata"))
+min_trees = 10000
+hyper_grid = GRID[[1]]
 buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
 max_trees = nrounds - buffer
 hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
@@ -1742,7 +1797,7 @@ PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filte
 
 patchwork::wrap_plots(PLTS)
 # , nrow = length(PLTS), heights= 5
-save(PLTS, file = paste0("PLTS", ".", "deviance.best", output_name, ".Rdata"))
+save(PLTS, file = paste0("PLTS", ".", "deviance.best.1000", output_name, ".Rdata"))
 
 
 ```
