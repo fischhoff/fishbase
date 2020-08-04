@@ -320,12 +320,12 @@ Han lab
 
     ## Warning: package 'tidyverse' was built under R version 4.0.2
 
-    ## ── Attaching packages ─────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ───────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ tibble  3.0.1     ✓ purrr   0.3.4
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ──────────────────────────────────────────── tidyverse_conflicts() ──
     ## x purrr::accumulate()      masks foreach::accumulate()
     ## x dplyr::arrange()         masks plyr::arrange()
     ## x dplyr::between()         masks data.table::between()
@@ -627,7 +627,7 @@ save(vert_haddock_plos, file = "vert_haddock_plos.Rdata")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-03 21:51:44 EDT"
+    ## [1] "2020-08-03 23:50:35 EDT"
 
 ``` r
 load("gridSearch.Rdata")
@@ -732,7 +732,7 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-03 22:09:59 EDT"
+    ## [1] "2020-08-04 00:07:52 EDT"
 
 \#\#make deviance
 plots
@@ -833,12 +833,12 @@ source("bootstrapGBM.R")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-03 22:13:46 EDT"
+    ## [1] "2020-08-04 00:11:39 EDT"
 
 ``` r
 # nruns = 1
 
-nruns = 10
+nruns = 25
 
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
                         n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
@@ -858,7 +858,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-03 22:31:54 EDT"
+    ## [1] "2020-08-04 00:54:48 EDT"
 
 \#\#look at performance
 
@@ -874,7 +874,7 @@ print("observed data, eval train")
 mean(I$auc_train)
 ```
 
-    ## [1] 0.9614685
+    ## [1] 0.9555574
 
 ``` r
 print("observed data, eval test")
@@ -886,7 +886,7 @@ print("observed data, eval test")
 mean(I$auc_test)
 ```
 
-    ## [1] 0.827353
+    ## [1] 0.8336106
 
 ``` r
 R <- OUT_rand[[1]]
@@ -894,7 +894,7 @@ R <- OUT_rand[[1]]
 mean(R$auc_train)
 ```
 
-    ## [1] 0.7796844
+    ## [1] 0.7753279
 
 ``` r
 print("null data, eval test")
@@ -906,7 +906,7 @@ print("null data, eval test")
 mean(R$auc_test)
 ```
 
-    ## [1] 0.5703776
+    ## [1] 0.5759225
 
 \#\#plot importance
 

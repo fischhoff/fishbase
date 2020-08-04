@@ -1813,7 +1813,7 @@ print(Sys.time())
 
 # nruns = 1
 
-nruns = 10
+nruns = 25
 
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
                         n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
