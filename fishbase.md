@@ -320,12 +320,12 @@ Han lab
 
     ## Warning: package 'tidyverse' was built under R version 4.0.2
 
-    ## ── Attaching packages ───────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ tibble  3.0.1     ✓ purrr   0.3.4
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ──────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x purrr::accumulate()      masks foreach::accumulate()
     ## x dplyr::arrange()         masks plyr::arrange()
     ## x dplyr::between()         masks data.table::between()
@@ -597,27 +597,28 @@ output to add to datasets from other verts
 \#\#remove order
 
 \#make and use function for getting hits from fulltext from plos
+\#\#commenting out while we try to figure out how to get WOS
 
 ``` r
-get_hits_fulltext <- function(search_terms){
-  out = rep(NA, length(search_terms))
-  for (a in 1:length(search_terms)){
-    tmp = ft_search(query = search_terms[a], from = "plos")#get the search results across only PLOS because otherwise hit rate limits 
-    out[a] = tmp$plos$found
-    Sys.sleep(1)
-  }
-  out
-}
-
-load("V.Rdata")
-search_terms = V$Species
-out <- get_hits_fulltext(search_terms)
-out = data.frame(hits = out,
-                 Species = search_terms)
-vert_haddock_plos = out
-V = merge(V, vert_haddock_plos, by = "Species")
-save(V, file = "V.Rdata")
-save(vert_haddock_plos, file = "vert_haddock_plos.Rdata")
+# get_hits_fulltext <- function(search_terms){
+#   out = rep(NA, length(search_terms))
+#   for (a in 1:length(search_terms)){
+#     tmp = ft_search(query = search_terms[a], from = "plos")#get the search results across only PLOS because otherwise hit rate limits 
+#     out[a] = tmp$plos$found
+#     Sys.sleep(1)
+#   }
+#   out
+# }
+# 
+# load("V.Rdata")
+# search_terms = V$Species
+# out <- get_hits_fulltext(search_terms)
+# out = data.frame(hits = out,
+#                  Species = search_terms)
+# vert_haddock_plos = out
+# V = merge(V, vert_haddock_plos, by = "Species")
+# save(V, file = "V.Rdata")
+# save(vert_haddock_plos, file = "vert_haddock_plos.Rdata")
 ```
 
 \#\#use function gridSearch with all verts. output:
@@ -627,7 +628,7 @@ save(vert_haddock_plos, file = "vert_haddock_plos.Rdata")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-03 23:50:35 EDT"
+    ## [1] "2020-08-04 13:12:41 EDT"
 
 ``` r
 load("gridSearch.Rdata")
@@ -655,7 +656,7 @@ okay_inds = which(nzv$nzv == FALSE)
 length(okay_inds)
 ```
 
-    ## [1] 48
+    ## [1] 47
 
 ``` r
 DF = DF[,okay_inds]#include only the columns that have variation
@@ -732,7 +733,7 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 00:07:52 EDT"
+    ## [1] "2020-08-04 13:34:24 EDT"
 
 \#\#make deviance
 plots
@@ -771,21 +772,21 @@ DEV = GRID[[2]]
 DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
 GRID[[2]]=DEV
 
-PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+PLTS_no_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
   geom_line(aes(x = index, y = train), color = "black", size = 1) +
   geom_line(aes(x = index, y = valid), color = "green", size = 1) +
     geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
   labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
   theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
 
-patchwork::wrap_plots(PLTS)
+patchwork::wrap_plots(PLTS_no_min)
 ```
 
 ![](fishbase_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 # , nrow = length(PLTS), heights= 5
-save(PLTS, file = paste0("PLTS", ".", "deviance.best.no.lower", output_name, ".Rdata"))
+save(PLTS_no_min, file = paste0("PLTS", ".", "deviance.best.no.lower", output_name, ".Rdata"))
 ```
 
 \#\#make deviance plot just for the “best” parameters requiring at least
@@ -806,21 +807,21 @@ DEV = GRID[[2]]
 DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
 GRID[[2]]=DEV
 
-PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+PLTS_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
   geom_line(aes(x = index, y = train), color = "black", size = 1) +
   geom_line(aes(x = index, y = valid), color = "green", size = 1) +
     geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
   labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
   theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
 
-patchwork::wrap_plots(PLTS)
+patchwork::wrap_plots(PLTS_min)
 ```
 
 ![](fishbase_files/figure-gfm/dev_best-1.png)<!-- -->
 
 ``` r
 # , nrow = length(PLTS), heights= 5
-save(PLTS, file = paste0("PLTS", ".", "deviance.best.1000", output_name, ".Rdata"))
+save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_trees), output_name, ".Rdata"))
 ```
 
 ``` r
@@ -833,12 +834,12 @@ source("bootstrapGBM.R")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 00:11:39 EDT"
+    ## [1] "2020-08-04 13:38:33 EDT"
 
 ``` r
 # nruns = 1
 
-nruns = 25
+nruns = 10
 
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
                         n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
@@ -858,7 +859,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 00:54:48 EDT"
+    ## [1] "2020-08-04 13:56:39 EDT"
 
 \#\#look at performance
 
@@ -874,7 +875,7 @@ print("observed data, eval train")
 mean(I$auc_train)
 ```
 
-    ## [1] 0.9555574
+    ## [1] 0.963161
 
 ``` r
 print("observed data, eval test")
@@ -886,7 +887,7 @@ print("observed data, eval test")
 mean(I$auc_test)
 ```
 
-    ## [1] 0.8336106
+    ## [1] 0.8319234
 
 ``` r
 R <- OUT_rand[[1]]
@@ -894,7 +895,7 @@ R <- OUT_rand[[1]]
 mean(R$auc_train)
 ```
 
-    ## [1] 0.7753279
+    ## [1] 0.7825615
 
 ``` r
 print("null data, eval test")
@@ -906,7 +907,7 @@ print("null data, eval test")
 mean(R$auc_test)
 ```
 
-    ## [1] 0.5759225
+    ## [1] 0.5644447
 
 \#\#plot importance
 
@@ -946,6 +947,7 @@ source("partial_plotR.R")
 for now, because getting error
 
 ``` r
+bootstrap = "observed"
 load(paste0(bootstrap, "hist_", file_label,".Rdata"))
 
 # cut =12#choose some number so there aren't too many
@@ -960,10 +962,10 @@ load(paste0(bootstrap, "hist_", file_label,".Rdata"))
 # inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
 # out_hist = out_hist[inds_keep,]
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
-
-hist.data = out_hist
-
-pd_out = OUT_obs[[2]]
+# 
+# hist.data = out_hist
+# 
+# pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
 # partial_plot(data = DF, hist.data, vars, type = c("mean", "all"), histogram = T) 
 # partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE) 
