@@ -628,11 +628,11 @@ output to add to datasets from other verts
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 13:12:41 EDT"
+    ## [1] "2020-08-05 13:00:20 EDT"
 
 ``` r
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200803_2142"
+output_name = "vert_haddock_20200805_1257"
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
   # stopCluster(cl)
@@ -656,7 +656,7 @@ okay_inds = which(nzv$nzv == FALSE)
 length(okay_inds)
 ```
 
-    ## [1] 47
+    ## [1] 51
 
 ``` r
 DF = DF[,okay_inds]#include only the columns that have variation
@@ -733,12 +733,12 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 13:34:24 EDT"
+    ## [1] "2020-08-05 13:27:07 EDT"
 
-\#\#make deviance
-plots
+\#\#make deviance plots
 
 ``` r
+load(paste0("GRID", ".", output_name, ".Rdata"))
 PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
   geom_line(aes(x = index, y = train), color = "black", size = 1) +
   geom_line(aes(x = index, y = valid), color = "green", size = 1) +
@@ -834,11 +834,9 @@ source("bootstrapGBM.R")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 13:38:33 EDT"
+    ## [1] "2020-08-05 13:31:06 EDT"
 
 ``` r
-# nruns = 1
-
 nruns = 10
 
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -859,11 +857,13 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-04 13:56:39 EDT"
+    ## [1] "2020-08-05 13:51:40 EDT"
 
 \#\#look at performance
 
 ``` r
+load(paste0("OUT_observed_", output_name, ".Rdata"))
+load(paste0("OUT_rand_", output_name, ".Rdata"))
 I <- OUT_obs[[1]]
 
 print("observed data, eval train")
@@ -875,7 +875,7 @@ print("observed data, eval train")
 mean(I$auc_train)
 ```
 
-    ## [1] 0.963161
+    ## [1] 0.9685888
 
 ``` r
 print("observed data, eval test")
@@ -887,7 +887,7 @@ print("observed data, eval test")
 mean(I$auc_test)
 ```
 
-    ## [1] 0.8319234
+    ## [1] 0.8352926
 
 ``` r
 R <- OUT_rand[[1]]
@@ -895,7 +895,7 @@ R <- OUT_rand[[1]]
 mean(R$auc_train)
 ```
 
-    ## [1] 0.7825615
+    ## [1] 0.7329779
 
 ``` r
 print("null data, eval test")
@@ -907,7 +907,7 @@ print("null data, eval test")
 mean(R$auc_test)
 ```
 
-    ## [1] 0.5644447
+    ## [1] 0.5514143
 
 \#\#plot importance
 
@@ -921,6 +921,25 @@ data_long <- gather(I, key = "var", value = "value", c(2:dim(I)[2]), factor_key=
 data_long_sum <- data_long %>% group_by(var) %>%
   summarize(mean_importance = mean(value))
 
+print(data_long_sum)
+```
+
+    ## # A tibble: 48 x 2
+    ##    var                 mean_importance
+    ##    <fct>                         <dbl>
+    ##  1 ClassActinopterygii          1.65  
+    ##  2 ClassAves                    0.490 
+    ##  3 ClassMammalia                0.0750
+    ##  4 ClassReptilia                0.0814
+    ##  5 ForStrat.ground              1.07  
+    ##  6 ForStrat.understory          0.851 
+    ##  7 ForStrat.arboreal            2.49  
+    ##  8 ForStrat.aerial              1.75  
+    ##  9 ForStrat.marine              1.50  
+    ## 10 Activity.Nocturnal           0.121 
+    ## # … with 38 more rows
+
+``` r
 data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
 
 data_long_nonzero = subset(data_long, var %in% data_long_sum_nonzero$var)
@@ -947,9 +966,9 @@ source("partial_plotR.R")
 for now, because getting error
 
 ``` r
-bootstrap = "observed"
-load(paste0(bootstrap, "hist_", file_label,".Rdata"))
-
+# bootstrap = "observed"
+# load(paste0(bootstrap, "hist_", file_label,".Rdata"))
+# 
 # cut =12#choose some number so there aren't too many
 # data_long_sum=data.frame(data_long_sum)
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
@@ -964,9 +983,10 @@ load(paste0(bootstrap, "hist_", file_label,".Rdata"))
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
 # 
 # hist.data = out_hist
+# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
 # 
 # pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
-# partial_plot(data = DF, hist.data, vars, type = c("mean", "all"), histogram = T) 
+# partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
 # partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE) 
 ```

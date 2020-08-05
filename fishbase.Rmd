@@ -290,8 +290,6 @@ save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
 ```
 
-
-
 ##ecosystem -- couldn't find description of this online
 ##multiple rows per species, one for each ecosystem
 ```{r ecosystem, include = FALSE}
@@ -1522,7 +1520,11 @@ source("gridSearch.R")
 
 ##combine data Adrian made with rest of fields from fish
 ```{r, include = FALSE}
-V <- read.csv("verttraits_30072020_continuousforage.csv")
+V_old <- read.csv("verttraits_30072020_continuousforage.csv")
+V <- read.csv("verttraits_05082020.csv")
+
+setdiff(names(V_old), names(V))
+setdiff(names(V), names(V_old))
 str_which(names(V), "brain")#nope
 str_which(names(V), "habitat")#nope
 str_which(names(V), "diet")#nope
@@ -1634,7 +1636,7 @@ save(V, file = "V.Rdata")
 ```{r gridSearch_verts_median}
 print(Sys.time())
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200803_2142"
+output_name = "vert_haddock_20200805_1257"
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
   # stopCluster(cl)
@@ -1733,6 +1735,7 @@ print(Sys.time())
 
 ##make deviance plots
 ```{r dev_all}
+load(paste0("GRID", ".", output_name, ".Rdata"))
 PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
   geom_line(aes(x = index, y = train), color = "black", size = 1) +
   geom_line(aes(x = index, y = valid), color = "green", size = 1) +
@@ -1813,8 +1816,6 @@ source("bootstrapGBM.R")
 ```{r bootstrapGBM_vert_median}
 print(Sys.time())
 
-# nruns = 1
-
 nruns = 10
 
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -1837,6 +1838,8 @@ print(Sys.time())
 
 ##look at performance 
 ```{r perf}
+load(paste0("OUT_observed_", output_name, ".Rdata"))
+load(paste0("OUT_rand_", output_name, ".Rdata"))
 I <- OUT_obs[[1]]
 
 print("observed data, eval train")
@@ -1863,6 +1866,8 @@ data_long <- gather(I, key = "var", value = "value", c(2:dim(I)[2]), factor_key=
 data_long_sum <- data_long %>% group_by(var) %>%
   summarize(mean_importance = mean(value))
 
+print(data_long_sum)
+
 data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
 
 data_long_nonzero = subset(data_long, var %in% data_long_sum_nonzero$var)
@@ -1886,9 +1891,10 @@ source("partial_plotR.R")
 ##use partial_plotR.R to make PD plots
 ##note this commented out for now, because getting error
 ```{r partial_run}
-bootstrap = "observed"
-load(paste0(bootstrap, "hist_", file_label,".Rdata"))
 
+# bootstrap = "observed"
+# load(paste0(bootstrap, "hist_", file_label,".Rdata"))
+# 
 # cut =12#choose some number so there aren't too many
 # data_long_sum=data.frame(data_long_sum)
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
@@ -1903,10 +1909,11 @@ load(paste0(bootstrap, "hist_", file_label,".Rdata"))
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
 # 
 # hist.data = out_hist
+# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
 # 
 # pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
-# partial_plot(data = DF, hist.data, vars, type = c("mean", "all"), histogram = T) 
+# partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
 # partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE) 
 
 ```
