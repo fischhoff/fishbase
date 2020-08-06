@@ -1326,7 +1326,7 @@ save(out, file = paste0("out", "_", table_name, ".Rdata"))
 
 
 fishbase_HADDOCK = out
-write.csv(fishbase_HADDOCK, file = "fishbase_HADDOCK.csv")
+write.csv(fishbase_HADDOCK, file = "fishbase_HADDOCK.csv", row.names = FALSE)
 ```
 
 ##see what coverage is
@@ -1459,7 +1459,7 @@ names(DF)[names(DF)=="species"]="Species"
 A = merge(A, DF)
 #rename field to merge
 
-write.csv(A, file = "docking_results_AA_30_83.csv")
+write.csv(A, file = "docking_results_AA_30_83.csv", row.names = FALSE)
 # glm(haddock_score_mean ~ AA_30_positive, family=binomial, data=A)
 ```
 
@@ -1487,7 +1487,7 @@ setdiff(DF$Species, DF_m$Species)
 
 DF = DF_m
 
-write.csv(names(DF), file = "names_fishbase.csv")
+write.csv(names(DF), file = "names_fishbase.csv", row.names = FALSE)
 
 rm = NULL
 rm = c(rm, str_which(names(DF), "record_count"))
@@ -1518,11 +1518,13 @@ save(DF, file = "DF_fish.Rdata")
 source("gridSearch.R")
 ```
 
-##combine data Adrian made with rest of fields from fish
+##combine data Adrian made with rest of fields from fish. remove Order field
 ```{r, include = FALSE}
+v_file_name = "verttraits_05082020.csv"
 V_old <- read.csv("verttraits_30072020_continuousforage.csv")
-V <- read.csv("verttraits_05082020.csv")
-
+V <- read.csv(v_file_name)
+ind = which(names(V)=="Order")
+V = V[,-ind]
 setdiff(names(V_old), names(V))
 setdiff(names(V), names(V_old))
 str_which(names(V), "brain")#nope
@@ -1554,7 +1556,7 @@ for (a in 1:length(ufish)){
 summary(V$log_adult_body_mass_g)
 summary(V$adult_svl_cm)
 save(V, file = "V.Rdata")
-write.csv(V, file = "verttraits_30072020_continuousforage_v2.csv")
+write.csv(V, file = paste0("fish", v_file_name))
 ```
 
 
@@ -1562,14 +1564,14 @@ write.csv(V, file = "verttraits_30072020_continuousforage_v2.csv")
 ```{r, include = FALSE}
 A <- read.csv("docking_results_AA_30_83.csv")
 
-keep = c("Species", "AA_30_positive", "Order", "Class")
+keep = c("Species", "AA_30_positive")
 
 A = A[,keep]
-Species = A$Species
-sp_ind = which(names(A)=="Species")
-dmy <- dummyVars(" ~ .", data = A[,-sp_ind])
-A <- data.frame(predict(dmy, newdata = A))
-A$Species = Species
+# Species = A$Species
+# sp_ind = which(names(A)=="Species")
+# dmy <- dummyVars(" ~ .", data = A[,-sp_ind])
+# A <- data.frame(predict(dmy, newdata = A))
+# A$Species = Species
 
 load("V.Rdata")
 DF = V
@@ -1593,18 +1595,6 @@ V = DF
 save(V, file = "V.Rdata")
 ```
 
-##remove order
-```{r order_rm, include = FALSE}
-
-load("V.Rdata")
-#let's remove the Order fields, because they are many!
-rm = str_which(names(V), "Order")
-names(V)[rm]
-keep = setdiff(names(V), "Order")
-V = V[,keep]
-save(V, file = "V.Rdata")
-
-```
 
 #make and use function for getting hits from fulltext from plos
 ##commenting out while we try to figure out how to get WOS
@@ -1632,11 +1622,31 @@ save(V, file = "V.Rdata")
 
 ```
 
+##add WOS hits from R package wosr
+```{r wosr_add}
+load("V.Rdata")
+dim(V)
+W <- read.csv("wos_species_hits.csv")
+names(W)[names(W)=="query"]="Species"
+names(W)[names(W)=="rec_cnt"]="WOS_hits"
+
+W$Species = str_replace(W$Species, "TS", "")
+W$Species = str_replace(W$Species, " = ", "")
+
+W$Species = str_sub(W$Species, 2, -2)
+# W$Species = sub('.', '', W$Species)
+V = merge(V, W)
+dim(V)
+save(V, file = "V.Rdata")
+```
+
+
 ##use function gridSearch with all verts. output: "haddock_vert_for_gbm.csv"
 ```{r gridSearch_verts_median}
 print(Sys.time())
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200805_1257"
+output_name = "vert_haddock_20200805_1713"
+save(output_name, file = "output_name.Rdata")
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
   # stopCluster(cl)
@@ -1653,10 +1663,15 @@ V = out
 
 names = names(V)
 DF = V
-##remove variables with zero variation
+##remove variables with near zero variation
 sp_ind = which(names(DF)=="Species")
 nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
 okay_inds = which(nzv$nzv == FALSE)
+
+near_zero_inds =which(nzv$nzv == FALSE)
+print("near zero variation fields")
+names[near_zero_inds]
+
 length(okay_inds)
 DF = DF[,okay_inds]#include only the columns that have variation
 
@@ -1678,7 +1693,6 @@ V$adult_svl_cm[is.nan(V$adult_svl_cm)] <- NA
 V$log_adult_body_mass_g[is.nan(V$log_adult_body_mass_g)] <- NA
 
 DF = V
-# A<- read.csv(file = "docking_results_AA_30_83.csv")
 #find out what haddock_score_median is across all species
 haddock_median = median(V$haddock_score_mean)
 
@@ -1688,7 +1702,7 @@ above_haddock_median[inds]= 1
 DF$above_haddock_median = above_haddock_median
 label = "above_haddock_median"
 
-write.csv(DF, file = "haddock_vert_for_gbm.csv")
+write.csv(DF, file = "haddock_vert_for_gbm.csv", row.names = FALSE)
 rm = which(names(DF) %in% c("haddock_score_mean", "Order", "Species", "nchar", "haddock_score_sd"))
 
 DF = DF[,-rm]
@@ -1812,7 +1826,7 @@ save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_
 source("bootstrapGBM.R")
 ```
 
-#bootstrapGBM -- run with all vertebrates
+#bootstrapGBM -- run with all vertebrates and all fields
 ```{r bootstrapGBM_vert_median}
 print(Sys.time())
 
@@ -1870,6 +1884,15 @@ print(data_long_sum)
 
 data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
 
+#find the variables that have importance at least 1
+data_long_sum_one = subset(data_long_sum, mean_importance >=1)
+var_one = data_long_sum_one$var
+var_one = c(as.character(var_one),"above_haddock_median")#add back label
+V = read.csv("haddock_vert_for_gbm.csv")
+col_keep = which(names(V) %in% var_one)
+V = V[,col_keep]
+write.csv(V, "haddock_vert_for_gbm_importance_over_one.csv", row.names = FALSE)
+
 data_long_nonzero = subset(data_long, var %in% data_long_sum_nonzero$var)
 
 plot <- ggplot(data = data_long_nonzero, aes(x = reorder(var, -value), y = value))+
@@ -1880,6 +1903,7 @@ plot <- ggplot(data = data_long_nonzero, aes(x = reorder(var, -value), y = value
 
 
 plot
+ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height = 8, width = 8)
 
 ```
 
@@ -1895,27 +1919,241 @@ source("partial_plotR.R")
 # bootstrap = "observed"
 # load(paste0(bootstrap, "hist_", file_label,".Rdata"))
 # 
-# cut =12#choose some number so there aren't too many
 # data_long_sum=data.frame(data_long_sum)
+# cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# 
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
 # sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
 # 
 # data_long_sum = data_long_sum[sorted_inds$ix,]
 # 
 # data_long_sum_low = data_long_sum[c(1:cut),]
-# 
+# write.csv(data_long_sum_low, file = paste0( "importance", output_name, ".csv"))
 # inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
 # out_hist = out_hist[inds_keep,]
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
 # 
 # hist.data = out_hist
 # # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
-# 
+# #middle 12
 # pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
-# partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
-# partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE) 
+# plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
+# # partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE)
+# ggsave(filename = paste0("PD.", output_name, ".jpg"), plot = plot, height = 20, width = 20)
+# plot
 
 ```
 
+##redo analysis with only features that have importance greater than one
 
+##grid search
+```{r grid_one}
+print(Sys.time())
+output_name = paste0(output_name, "importance_over_one")
+load("gridSearch.Rdata")
+V = read.csv("haddock_vert_for_gbm_importance_over_one.csv")
+
+label = "above_haddock_median"
+DF <- V
+# rm = which(names(DF) == "X")
+# DF = DF[,-rm]
+label_col_ind = which(names(DF)==label)
+x_col = seq(1:dim(DF)[2])
+x_col = setdiff(x_col, label_col_ind)
+vars = colnames(DF)[x_col]
+
+GRID <- gridSearch(DF = DF, label = label, vars = vars, k_split = k_split, 
+                         distribution = distribution, 
+                         eta = eta, 
+                         max_depth = max_depth, 
+                         n.minobsinnode = n.minobsinnode,
+                         nrounds = nrounds, 
+                         method = "cv", 
+                         cv.folds = 5)
+
+hyper_grid = GRID[[1]]
+print(hyper_grid)
+dev <- GRID[[2]]
+save(GRID, file = paste0("GRID", ".", output_name, ".Rdata"))
+save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
+print(Sys.time())
+
+
+```
+
+##make deviance plots
+```{r dev_all_one}
+load(paste0("GRID", ".", output_name, ".Rdata"))
+PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS)
+# , nrow = length(PLTS), heights= 5
+save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
+```
+
+##find out what happens if we set no lower limit on number of trees -- importance over one
+```{r}
+min_trees = 0
+buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
+max_trees = nrounds - buffer
+hyper_grid = GRID[[1]]
+hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
+hyper_grid = subset(hyper_grid, n.trees >=min_trees)
+hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
+hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
+
+DEV = GRID[[2]]
+DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
+GRID[[2]]=DEV
+
+PLTS_no_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS_no_min)
+# , nrow = length(PLTS), heights= 5
+save(PLTS_no_min, file = paste0("PLTS", ".", "deviance.best.no.lower", output_name, ".Rdata"))
+
+```
+
+##make deviance plot just for the "best" parameters requiring at least 10000 trees as optimal number of trees
+```{r dev_best_one}
+
+load(paste0("GRID", ".", output_name, ".Rdata"))
+min_trees = 10000
+hyper_grid = GRID[[1]]
+buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
+max_trees = nrounds - buffer
+hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
+hyper_grid = subset(hyper_grid, n.trees >=min_trees)
+hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
+hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
+
+DEV = GRID[[2]]
+DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
+GRID[[2]]=DEV
+
+PLTS_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS_min)
+# , nrow = length(PLTS), heights= 5
+save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_trees), output_name, ".Rdata"))
+
+```
+
+#bootstrapGBM -- run with all vertebrates
+```{r bootstrapGBM_vert_median_one}
+print(Sys.time())
+
+nruns = 10
+
+OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
+                        n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
+bootstrap_label = "observed"
+
+load(paste0(bootstrap_label, "hist_", output_name, ".Rdata"))
+
+save(OUT_obs, file = paste0("OUT_observed_", output_name, ".Rdata"))
+
+OUT_rand <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "null", method = "cv", cv.folds = 5,
+                        n.minobsinnode = hyper_grid$n.minobsinnode, file_label = "null")
+
+save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
+
+print(Sys.time())
+```
+
+##look at performance -- importance over one
+```{r perf_one}
+load(paste0("OUT_observed_", output_name, ".Rdata"))
+load(paste0("OUT_rand_", output_name, ".Rdata"))
+I <- OUT_obs[[1]]
+
+print("observed data, eval train")
+mean(I$auc_train)
+print("observed data, eval test")
+mean(I$auc_test)
+
+R <- OUT_rand[[1]]
+
+mean(R$auc_train)
+print("null data, eval test")
+mean(R$auc_test)
+
+```
+
+##plot importance (over one)
+```{r importance_one}
+rm = c("eta", "max_depth", "n.trees", "auc_train", "auc_test")
+keep = setdiff(names(I),rm)
+I = I[,keep]
+
+data_long <- gather(I, key = "var", value = "value", c(2:dim(I)[2]), factor_key=TRUE)
+
+data_long_sum <- data_long %>% group_by(var) %>%
+  summarize(mean_importance = mean(value))
+
+print(data_long_sum)
+
+data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
+
+#find the variables that have importance at least 1
+data_long_sum_one = subset(data_long_sum, mean_importance >=1)
+var_one = data_long_sum_one$var
+
+data_long_nonzero = subset(data_long, var %in% data_long_sum_nonzero$var)
+
+plot <- ggplot(data = data_long_nonzero, aes(x = reorder(var, -value), y = value))+
+  geom_boxplot()+
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = NA, color = "black", size = 1), axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2), panel.grid.major.y = element_line(color = "grey80"), panel.grid.major.x = element_line(color = "transparent"))+
+  xlab("variable")+
+  ylab("importance")
+
+plot
+ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height = 8, width = 8)
+```
+
+##use partial_plotR.R to make PD plots
+##note this commented out for now, because getting error
+```{r partial_run_one}
+
+# bootstrap = "observed"
+# load(paste0(bootstrap, "hist_", file_label,redo, ".Rdata"))
+# 
+# data_long_sum=data.frame(data_long_sum)
+# cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# 
+# data_long_sum = subset(data_long_sum, mean_importance >0 )
+# sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
+# 
+# data_long_sum = data_long_sum[sorted_inds$ix,]
+# 
+# data_long_sum_low = data_long_sum[c(1:cut),]
+# write.csv(data_long_sum_low, file = paste0( "importance", output_name,redo,  ".csv"))
+# inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
+# out_hist = out_hist[inds_keep,]
+# vars_plot = data_long_sum_low$var#these are the vars we're keeping
+# 
+# hist.data = out_hist
+# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
+# #middle 12
+# pd_out = OUT_obs[[2]]
+# pd_out = subset(pd_out, variable.name %in% vars_plot)
+# plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
+# ggsave(filename = paste0("PD.", output_name,redo, ".jpg"), plot = plot, height = 20, width = 20)
+# plot
+```
