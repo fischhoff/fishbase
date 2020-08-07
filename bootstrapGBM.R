@@ -32,6 +32,19 @@ bootstrapGBM <- function(DF, label, vars, k_split, distribution = c("bernoulli",
                           paste(vars, collapse = "+"),
                           sep = ""))
   out_hist = NULL
+  #get histogram
+  fields = vars
+  for (a in 1:length(fields)){
+    i.var = which(names(DF)==fields[a])
+    h = hist(DF[,i.var], plot = FALSE)
+    tmp = data.frame(variable.value = h$mids,
+                     value=h$counts/sum(h$counts),#normalize
+                     variable.name=fields[a],
+                     var = "frequency")
+    out_hist = rbind(out_hist, tmp)
+  }
+  save(out_hist, file = paste0(bootstrap, "hist_", file_label,".Rdata"))#save the histogram outputs
+  
   OUT2 <- foreach(i = 1:nruns, .packages = c("gbm", "foreach", "dismo", "caTools", "caret")) %dopar% {
     set.seed(i)
     DP <- createDataPartition(DF[, label], p = k_split)[[1]]
@@ -63,19 +76,6 @@ bootstrapGBM <- function(DF, label, vars, k_split, distribution = c("bernoulli",
         colnames(m)[1:2] <- c("x", "yhat")
         m}))
       
-      #get histogram
-      fields = vars
-      for (a in 1:length(fields)){
-        i.var = which(names(DF)==fields[a])
-        h = hist(DF[,i.var], plot = FALSE)
-        tmp = data.frame(variable.value = h$mids,
-                         value=h$counts/sum(h$counts),#normalize
-                         variable.name=fields[a],
-                         var = "frequency",
-                         bootstrap_run = i)
-        out_hist = rbind(out_hist, tmp)
-      }
-      save(out_hist, file = paste0(bootstrap, "hist_", file_label,".Rdata"))#save the histogram outputs
       
       out1 <- cbind.data.frame(eta = eta, max_depth = max_depth, n.trees = best.iter, auc_train = mean(auc_train), auc_test = mean(auc_test), bootstrap_run = i, df_importance)
       OUT <- list(out1, pd_out)

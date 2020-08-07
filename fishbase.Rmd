@@ -18,6 +18,11 @@ neededPackages <- c( "ggplot2", "rentrez", "plyr", "seqinr", "foreach","broom", 
 for (package in neededPackages){pkgTest(package)}
 ```
 
+
+```{r}
+output_name = "vert_haddock_20200807_1013"
+```
+
 ##function to take the same across rows of categorical variables that have been 1/0 encoded, where a species may have 1 for more than one condition of a variable
 ```{r sum_or_mean, include = FALSE}
 source("R_function_sum_or_mean.R")
@@ -1436,7 +1441,7 @@ AA_30_positive[i_blank]=NA
 i_pos = which(A$X %in% c("d", "e"))
 AA_30_positive[i_pos] = 1
 A$AA_30_positive = AA_30_positive
-
+# names(A)[names(A)=="X.1"]="AA83"
 ACE2 = read.csv("ACE2_sequences_fixed.csv")
 #which(ACE2$Species =="Astatotilapia burtoni")
 
@@ -1448,6 +1453,9 @@ A = merge(A, ACE2)
 names(A)[names(A)=="X"]="AA30"
 
 names(A)[names(A)=="X.1"]="AA83"
+
+i_blank = str_which(A$AA83, "-")
+A$AA83[i_blank]=NA
 
 DF = read.csv("docking-results.csv")
 
@@ -1467,7 +1475,7 @@ write.csv(A, file = "docking_results_AA_30_83.csv", row.names = FALSE)
 ```{r, include = FALSE}
 A <- read.csv("docking_results_AA_30_83.csv")
 
-keep = c("Species", "AA_30_positive", "Order", "Class")
+keep = c("Species", "AA_30_positive", "AA83", "Order", "Class")
 
 A = A[,keep]
 Species = A$Species
@@ -1502,7 +1510,7 @@ save(DF, file = "DF_fish.Rdata")
 ##remove fields with near-zero variation again
 ```{r, include = FALSE}
 load("DF_fish.Rdata")
-
+names(DF)[str_which(names(DF), "83")]
 ##remove variables with zero variation
 sp_ind = which(names(DF)=="Species")
 nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
@@ -1564,7 +1572,7 @@ write.csv(V, file = paste0("fish", v_file_name))
 ```{r, include = FALSE}
 A <- read.csv("docking_results_AA_30_83.csv")
 
-keep = c("Species", "AA_30_positive")
+keep = c("Species", "AA83", "AA_30_positive")
 
 A = A[,keep]
 # Species = A$Species
@@ -1645,7 +1653,6 @@ save(V, file = "V.Rdata")
 ```{r gridSearch_verts_median}
 print(Sys.time())
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200805_1713"
 save(output_name, file = "output_name.Rdata")
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
@@ -1668,7 +1675,7 @@ sp_ind = which(names(DF)=="Species")
 nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
 okay_inds = which(nzv$nzv == FALSE)
 
-near_zero_inds =which(nzv$nzv == FALSE)
+near_zero_inds =which(nzv$nzv == TRUE)
 print("near zero variation fields")
 names[near_zero_inds]
 
@@ -1915,27 +1922,25 @@ source("partial_plotR.R")
 ##use partial_plotR.R to make PD plots
 ##note this commented out for now, because getting error
 ```{r partial_run}
-
-# bootstrap = "observed"
-# load(paste0(bootstrap, "hist_", file_label,".Rdata"))
+# file_label = output_name
+# bootstrap_label = "observed"
+# load(paste0(bootstrap_label, "hist_", file_label,".Rdata"))
 # 
 # data_long_sum=data.frame(data_long_sum)
-# cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# #cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
 # 
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
 # sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
 # 
 # data_long_sum = data_long_sum[sorted_inds$ix,]
 # 
-# data_long_sum_low = data_long_sum[c(1:cut),]
+# data_long_sum_low = data_long_sum#[c(1:cut),]
 # write.csv(data_long_sum_low, file = paste0( "importance", output_name, ".csv"))
 # inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
 # out_hist = out_hist[inds_keep,]
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
 # 
 # hist.data = out_hist
-# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
-# #middle 12
 # pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
 # plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
@@ -2131,29 +2136,35 @@ ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height
 ##note this commented out for now, because getting error
 ```{r partial_run_one}
 
+# load(paste0("OUT_observed_", output_name, ".Rdata"))
+# pd_out = OUT_obs[[2]]
+# 
 # bootstrap = "observed"
-# load(paste0(bootstrap, "hist_", file_label,redo, ".Rdata"))
+# load(paste0(bootstrap, "hist_", output_name, ".Rdata"))
 # 
 # data_long_sum=data.frame(data_long_sum)
-# cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# # cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
 # 
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
 # sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
 # 
 # data_long_sum = data_long_sum[sorted_inds$ix,]
 # 
-# data_long_sum_low = data_long_sum[c(1:cut),]
-# write.csv(data_long_sum_low, file = paste0( "importance", output_name,redo,  ".csv"))
+# data_long_sum_low = data_long_sum#[c(1:cut),]
+# write.csv(data_long_sum_low, file = paste0( "importance", output_name,  ".csv"))
 # inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
 # out_hist = out_hist[inds_keep,]
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
 # 
 # hist.data = out_hist
-# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
-# #middle 12
-# pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
+# intersect(unique(pd_out$variable.name),unique(hist.data$variable.name))
+# setdiff(unique(pd_out$variable.name),unique(hist.data$variable.name))
+# #should be empty
+# setdiff(unique(hist.data$variable.name),unique(pd_out$variable.name))
+# #should be empty
 # plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
-# ggsave(filename = paste0("PD.", output_name,redo, ".jpg"), plot = plot, height = 20, width = 20)
+# ggsave(filename = paste0("PD.", output_name, ".jpg"), plot = plot, height = 20, width = 20)
 # plot
+
 ```

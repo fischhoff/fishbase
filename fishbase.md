@@ -414,6 +414,10 @@ Han lab
     ## 
     ##     collect
 
+``` r
+output_name = "vert_haddock_20200807_1013"
+```
+
 \#\#function to take the same across rows of categorical variables that
 have been 1/0 encoded, where a species may have 1 for more than one
 condition of a variable
@@ -627,7 +631,7 @@ load("V.Rdata")
 dim(V)
 ```
 
-    ## [1] 277  39
+    ## [1] 277  40
 
 ``` r
 W <- read.csv("wos_species_hits.csv")
@@ -643,7 +647,7 @@ V = merge(V, W)
 dim(V)
 ```
 
-    ## [1] 277  40
+    ## [1] 277  41
 
 ``` r
 save(V, file = "V.Rdata")
@@ -656,11 +660,10 @@ save(V, file = "V.Rdata")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-06 15:23:32 EDT"
+    ## [1] "2020-08-07 10:18:25 EDT"
 
 ``` r
 load("gridSearch.Rdata")
-output_name = "vert_haddock_20200805_1713"
 save(output_name, file = "output_name.Rdata")
 cores = 4
   cl <- makeCluster(cores, "SOCK", timeout = 60)
@@ -683,7 +686,7 @@ sp_ind = which(names(DF)=="Species")
 nzv = nearZeroVar(DF, freqCut = 95/5, saveMetrics = TRUE)
 okay_inds = which(nzv$nzv == FALSE)
 
-near_zero_inds =which(nzv$nzv == FALSE)
+near_zero_inds =which(nzv$nzv == TRUE)
 print("near zero variation fields")
 ```
 
@@ -693,33 +696,13 @@ print("near zero variation fields")
 names[near_zero_inds]
 ```
 
-    ##  [1] "ClassActinopterygii"              "ClassAves"                       
-    ##  [3] "ClassMammalia"                    "ClassReptilia"                   
-    ##  [5] "nchar"                            "haddock_score_mean"              
-    ##  [7] "haddock_score_sd"                 "ForStrat.ground"                 
-    ##  [9] "ForStrat.understory"              "ForStrat.arboreal"               
-    ## [11] "ForStrat.aerial"                  "ForStrat.marine"                 
-    ## [13] "Activity.Nocturnal"               "Activity.Crepuscular"            
-    ## [15] "Activity.Diurnal"                 "female_maturity_d"               
-    ## [17] "male_maturity_d"                  "incubation_d"                    
-    ## [19] "weaning_d"                        "log_litterclutch_size_n"         
-    ## [21] "litters_or_clutches_per_y"        "log_inter_litterbirth_interval_y"
-    ## [23] "log_birthhatching_weight_g"       "log_weaning_weight_g"            
-    ## [25] "log_adult_body_mass_g"            "maximum_longevity_y"             
-    ## [27] "infantMortalityRate_per_year"     "mortalityRateDoublingTime_y"     
-    ## [29] "metabolicRate_W"                  "temperature_K"                   
-    ## [31] "gestation_d"                      "longevity_y"                     
-    ## [33] "log_female_body_mass_g"           "log_male_body_mass_g"            
-    ## [35] "log_no_sex_body_mass"             "adult_svl_cm"                    
-    ## [37] "diet_breadth"                     "range_size"                      
-    ## [39] "major_habitat_type_breadth"       "tnc_ecoregion_breadth"           
-    ## [41] "AA_30_positive"                   "WOS_hits"
+    ## [1] "ClassAmphibia"       "ClassElasmobranchii" "ClassHolocephali"
 
 ``` r
 length(okay_inds)
 ```
 
-    ## [1] 42
+    ## [1] 44
 
 ``` r
 DF = DF[,okay_inds]#include only the columns that have variation
@@ -795,7 +778,7 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-06 15:48:34 EDT"
+    ## [1] "2020-08-07 10:41:17 EDT"
 
 \#\#make deviance plots
 
@@ -819,377 +802,6 @@ save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
 ```
 
 \#\#find out what happens if we set no lower limit on number of trees
-
-``` r
-min_trees = 0
-buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
-max_trees = nrounds - buffer
-hyper_grid = GRID[[1]]
-hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
-hyper_grid = subset(hyper_grid, n.trees >=min_trees)
-hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
-hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
-
-DEV = GRID[[2]]
-DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
-GRID[[2]]=DEV
-
-PLTS_no_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
-  geom_line(aes(x = index, y = train), color = "black", size = 1) +
-  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
-    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
-  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
-  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
-
-patchwork::wrap_plots(PLTS_no_min)
-```
-
-![](fishbase_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
-
-``` r
-# , nrow = length(PLTS), heights= 5
-save(PLTS_no_min, file = paste0("PLTS", ".", "deviance.best.no.lower", output_name, ".Rdata"))
-```
-
-\#\#make deviance plot just for the “best” parameters requiring at least
-10000 trees as optimal number of trees
-
-``` r
-load(paste0("GRID", ".", output_name, ".Rdata"))
-min_trees = 10000
-hyper_grid = GRID[[1]]
-buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
-max_trees = nrounds - buffer
-hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
-hyper_grid = subset(hyper_grid, n.trees >=min_trees)
-hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
-hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
-
-DEV = GRID[[2]]
-DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
-GRID[[2]]=DEV
-
-PLTS_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
-  geom_line(aes(x = index, y = train), color = "black", size = 1) +
-  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
-    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
-  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
-  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
-
-patchwork::wrap_plots(PLTS_min)
-```
-
-![](fishbase_files/figure-gfm/dev_best-1.png)<!-- -->
-
-``` r
-# , nrow = length(PLTS), heights= 5
-save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_trees), output_name, ".Rdata"))
-```
-
-``` r
-source("bootstrapGBM.R")
-```
-
-\#bootstrapGBM – run with all vertebrates and all fields
-
-``` r
-print(Sys.time())
-```
-
-    ## [1] "2020-08-06 15:52:29 EDT"
-
-``` r
-nruns = 10
-
-OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
-                        n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
-bootstrap = "observed"
-file_label = output_name
-
-load(paste0(bootstrap, "hist_", file_label,".Rdata"))
-# ,
-#                         file_label=output_name
-save(OUT_obs, file = paste0("OUT_observed_", output_name, ".Rdata"))
-
-OUT_rand <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "null", method = "cv", cv.folds = 5,
-                        n.minobsinnode = hyper_grid$n.minobsinnode, file_label = "null")
-
-save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
-
-print(Sys.time())
-```
-
-    ## [1] "2020-08-06 16:28:17 EDT"
-
-\#\#look at performance
-
-``` r
-load(paste0("OUT_observed_", output_name, ".Rdata"))
-load(paste0("OUT_rand_", output_name, ".Rdata"))
-I <- OUT_obs[[1]]
-
-print("observed data, eval train")
-```
-
-    ## [1] "observed data, eval train"
-
-``` r
-mean(I$auc_train)
-```
-
-    ## [1] 0.9811761
-
-``` r
-print("observed data, eval test")
-```
-
-    ## [1] "observed data, eval test"
-
-``` r
-mean(I$auc_test)
-```
-
-    ## [1] 0.8207583
-
-``` r
-R <- OUT_rand[[1]]
-
-mean(R$auc_train)
-```
-
-    ## [1] 0.7476761
-
-``` r
-print("null data, eval test")
-```
-
-    ## [1] "null data, eval test"
-
-``` r
-mean(R$auc_test)
-```
-
-    ## [1] 0.5539612
-
-\#\#plot importance
-
-``` r
-rm = c("eta", "max_depth", "n.trees", "auc_train", "auc_test")
-keep = setdiff(names(I),rm)
-I = I[,keep]
-
-data_long <- gather(I, key = "var", value = "value", c(2:dim(I)[2]), factor_key=TRUE)
-
-data_long_sum <- data_long %>% group_by(var) %>%
-  summarize(mean_importance = mean(value))
-
-print(data_long_sum)
-```
-
-    ## # A tibble: 39 x 2
-    ##    var                 mean_importance
-    ##    <fct>                         <dbl>
-    ##  1 ClassActinopterygii          1.62  
-    ##  2 ClassAves                    0.449 
-    ##  3 ClassMammalia                0.0822
-    ##  4 ClassReptilia                0.0155
-    ##  5 ForStrat.ground              1.79  
-    ##  6 ForStrat.understory          0.923 
-    ##  7 ForStrat.arboreal            2.76  
-    ##  8 ForStrat.aerial              1.10  
-    ##  9 ForStrat.marine              2.09  
-    ## 10 Activity.Nocturnal           0.239 
-    ## # … with 29 more rows
-
-``` r
-data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
-
-#find the variables that have importance at least 1
-data_long_sum_one = subset(data_long_sum, mean_importance >=1)
-var_one = data_long_sum_one$var
-var_one = c(as.character(var_one),"above_haddock_median")#add back label
-V = read.csv("haddock_vert_for_gbm.csv")
-col_keep = which(names(V) %in% var_one)
-V = V[,col_keep]
-write.csv(V, "haddock_vert_for_gbm_importance_over_one.csv", row.names = FALSE)
-
-data_long_nonzero = subset(data_long, var %in% data_long_sum_nonzero$var)
-
-plot <- ggplot(data = data_long_nonzero, aes(x = reorder(var, -value), y = value))+
-  geom_boxplot()+
-  theme(panel.background = element_blank(), panel.border = element_rect(fill = NA, color = "black", size = 1), axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2), panel.grid.major.y = element_line(color = "grey80"), panel.grid.major.x = element_line(color = "transparent"))+
-  xlab("variable")+
-  ylab("importance")
-
-
-plot
-```
-
-![](fishbase_files/figure-gfm/importance-1.png)<!-- -->
-
-``` r
-ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height = 8, width = 8)
-```
-
-\#\#partial\_plotR.R – define
-
-``` r
-source("partial_plotR.R")
-```
-
-\#\#use partial\_plotR.R to make PD plots \#\#note this commented out
-for now, because getting error
-
-``` r
-# bootstrap = "observed"
-# load(paste0(bootstrap, "hist_", file_label,".Rdata"))
-# 
-# data_long_sum=data.frame(data_long_sum)
-# cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
-# 
-# data_long_sum = subset(data_long_sum, mean_importance >0 )
-# sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
-# 
-# data_long_sum = data_long_sum[sorted_inds$ix,]
-# 
-# data_long_sum_low = data_long_sum[c(1:cut),]
-# write.csv(data_long_sum_low, file = paste0( "importance", output_name, ".csv"))
-# inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
-# out_hist = out_hist[inds_keep,]
-# vars_plot = data_long_sum_low$var#these are the vars we're keeping
-# 
-# hist.data = out_hist
-# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
-# #middle 12
-# pd_out = OUT_obs[[2]]
-# pd_out = subset(pd_out, variable.name %in% vars_plot)
-# plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
-# # partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE)
-# ggsave(filename = paste0("PD.", output_name, ".jpg"), plot = plot, height = 20, width = 20)
-# plot
-```
-
-\#\#redo analysis with only features that have importance greater than
-one
-
-\#\#grid search
-
-``` r
-print(Sys.time())
-```
-
-    ## [1] "2020-08-06 16:28:21 EDT"
-
-``` r
-output_name = paste0(output_name, "importance_over_one")
-load("gridSearch.Rdata")
-V = read.csv("haddock_vert_for_gbm_importance_over_one.csv")
-
-label = "above_haddock_median"
-DF <- V
-# rm = which(names(DF) == "X")
-# DF = DF[,-rm]
-label_col_ind = which(names(DF)==label)
-x_col = seq(1:dim(DF)[2])
-x_col = setdiff(x_col, label_col_ind)
-vars = colnames(DF)[x_col]
-
-GRID <- gridSearch(DF = DF, label = label, vars = vars, k_split = k_split, 
-                         distribution = distribution, 
-                         eta = eta, 
-                         max_depth = max_depth, 
-                         n.minobsinnode = n.minobsinnode,
-                         nrounds = nrounds, 
-                         method = "cv", 
-                         cv.folds = 5)
-
-hyper_grid = GRID[[1]]
-print(hyper_grid)
-```
-
-    ##      eta max_depth n.minobsinnode n.trees eval_train eval_test
-    ## 1  1e-04         2              2   83153  0.9789254 0.8353909
-    ## 2  1e-04         2              5   81345  0.9784427 0.8340192
-    ## 3  1e-04         3              2   79967  0.9916345 0.8422497
-    ## 4  1e-04         3              5   43449  0.9731338 0.8326475
-    ## 5  1e-04         4              2   60595  0.9911519 0.8436214
-    ## 6  1e-04         4              5   57635  0.9896236 0.8367627
-    ## 7  1e-03         2              2    7541  0.9762709 0.8395062
-    ## 8  1e-03         2              5    8243  0.9792471 0.8353909
-    ## 9  1e-03         3              2    7442  0.9900257 0.8422497
-    ## 10 1e-03         3              5    5040  0.9774775 0.8381344
-    ## 11 1e-03         4              2    6702  0.9936454 0.8422497
-    ## 12 1e-03         4              5    5885  0.9907497 0.8395062
-    ## 13 1e-02         2              2     713  0.9753861 0.8353909
-    ## 14 1e-02         2              5     722  0.9753057 0.8381344
-    ## 15 1e-02         3              2     853  0.9931628 0.8381344
-    ## 16 1e-02         3              5     923  0.9941281 0.8395062
-    ## 17 1e-02         4              2     646  0.9925997 0.8504801
-    ## 18 1e-02         4              5     661  0.9932432 0.8436214
-    ## 19 1e-01         2              2      90  0.9798906 0.8257888
-    ## 20 1e-01         2              5     109  0.9876126 0.8518519
-    ## 21 1e-01         3              2      35  0.9443774 0.8134431
-    ## 22 1e-01         3              5      82  0.9920367 0.8422497
-    ## 23 1e-01         4              2      30  0.9465894 0.8285322
-    ## 24 1e-01         4              5      64  0.9881757 0.8381344
-    ##                                        group
-    ## 1  eta:1e-04, max depth:2, min obs in node:2
-    ## 2  eta:1e-04, max depth:2, min obs in node:5
-    ## 3  eta:1e-04, max depth:3, min obs in node:2
-    ## 4  eta:1e-04, max depth:3, min obs in node:5
-    ## 5  eta:1e-04, max depth:4, min obs in node:2
-    ## 6  eta:1e-04, max depth:4, min obs in node:5
-    ## 7  eta:0.001, max depth:2, min obs in node:2
-    ## 8  eta:0.001, max depth:2, min obs in node:5
-    ## 9  eta:0.001, max depth:3, min obs in node:2
-    ## 10 eta:0.001, max depth:3, min obs in node:5
-    ## 11 eta:0.001, max depth:4, min obs in node:2
-    ## 12 eta:0.001, max depth:4, min obs in node:5
-    ## 13  eta:0.01, max depth:2, min obs in node:2
-    ## 14  eta:0.01, max depth:2, min obs in node:5
-    ## 15  eta:0.01, max depth:3, min obs in node:2
-    ## 16  eta:0.01, max depth:3, min obs in node:5
-    ## 17  eta:0.01, max depth:4, min obs in node:2
-    ## 18  eta:0.01, max depth:4, min obs in node:5
-    ## 19   eta:0.1, max depth:2, min obs in node:2
-    ## 20   eta:0.1, max depth:2, min obs in node:5
-    ## 21   eta:0.1, max depth:3, min obs in node:2
-    ## 22   eta:0.1, max depth:3, min obs in node:5
-    ## 23   eta:0.1, max depth:4, min obs in node:2
-    ## 24   eta:0.1, max depth:4, min obs in node:5
-
-``` r
-dev <- GRID[[2]]
-save(GRID, file = paste0("GRID", ".", output_name, ".Rdata"))
-save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
-print(Sys.time())
-```
-
-    ## [1] "2020-08-06 16:55:23 EDT"
-
-\#\#make deviance plots
-
-``` r
-load(paste0("GRID", ".", output_name, ".Rdata"))
-PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
-  geom_line(aes(x = index, y = train), color = "black", size = 1) +
-  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
-    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
-  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
-  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
-
-patchwork::wrap_plots(PLTS)
-```
-
-![](fishbase_files/figure-gfm/dev_all_one-1.png)<!-- -->
-
-``` r
-# , nrow = length(PLTS), heights= 5
-save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
-```
-
-\#\#find out what happens if we set no lower limit on number of trees –
-importance over one
 
 ``` r
 min_trees = 0
@@ -1250,6 +862,376 @@ PLTS_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% f
 patchwork::wrap_plots(PLTS_min)
 ```
 
+![](fishbase_files/figure-gfm/dev_best-1.png)<!-- -->
+
+``` r
+# , nrow = length(PLTS), heights= 5
+save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_trees), output_name, ".Rdata"))
+```
+
+``` r
+source("bootstrapGBM.R")
+```
+
+\#bootstrapGBM – run with all vertebrates and all fields
+
+``` r
+print(Sys.time())
+```
+
+    ## [1] "2020-08-07 10:45:13 EDT"
+
+``` r
+nruns = 10
+
+OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
+                        n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
+bootstrap = "observed"
+file_label = output_name
+
+load(paste0(bootstrap, "hist_", file_label,".Rdata"))
+# ,
+#                         file_label=output_name
+save(OUT_obs, file = paste0("OUT_observed_", output_name, ".Rdata"))
+
+OUT_rand <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "null", method = "cv", cv.folds = 5,
+                        n.minobsinnode = hyper_grid$n.minobsinnode, file_label = "null")
+
+save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
+
+print(Sys.time())
+```
+
+    ## [1] "2020-08-07 11:15:31 EDT"
+
+\#\#look at performance
+
+``` r
+load(paste0("OUT_observed_", output_name, ".Rdata"))
+load(paste0("OUT_rand_", output_name, ".Rdata"))
+I <- OUT_obs[[1]]
+
+print("observed data, eval train")
+```
+
+    ## [1] "observed data, eval train"
+
+``` r
+mean(I$auc_train)
+```
+
+    ## [1] 0.9852604
+
+``` r
+print("observed data, eval test")
+```
+
+    ## [1] "observed data, eval test"
+
+``` r
+mean(I$auc_test)
+```
+
+    ## [1] 0.8515996
+
+``` r
+R <- OUT_rand[[1]]
+
+mean(R$auc_train)
+```
+
+    ## [1] 0.7461574
+
+``` r
+print("null data, eval test")
+```
+
+    ## [1] "null data, eval test"
+
+``` r
+mean(R$auc_test)
+```
+
+    ## [1] 0.5528952
+
+\#\#plot importance
+
+``` r
+rm = c("eta", "max_depth", "n.trees", "auc_train", "auc_test")
+keep = setdiff(names(I),rm)
+I = I[,keep]
+
+data_long <- gather(I, key = "var", value = "value", c(2:dim(I)[2]), factor_key=TRUE)
+
+data_long_sum <- data_long %>% group_by(var) %>%
+  summarize(mean_importance = mean(value))
+
+print(data_long_sum)
+```
+
+    ## # A tibble: 41 x 2
+    ##    var                 mean_importance
+    ##    <fct>                         <dbl>
+    ##  1 ClassActinopterygii         1.77   
+    ##  2 ClassAves                   0.232  
+    ##  3 ClassMammalia               0.0568 
+    ##  4 ClassReptilia               0.00988
+    ##  5 ForStrat.ground             1.70   
+    ##  6 ForStrat.understory         0.873  
+    ##  7 ForStrat.arboreal           3.47   
+    ##  8 ForStrat.aerial             1.42   
+    ##  9 ForStrat.marine             1.81   
+    ## 10 Activity.Nocturnal          0.199  
+    ## # … with 31 more rows
+
+``` r
+data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
+
+#find the variables that have importance at least 1
+data_long_sum_one = subset(data_long_sum, mean_importance >=1)
+var_one = data_long_sum_one$var
+var_one = c(as.character(var_one),"above_haddock_median")#add back label
+V = read.csv("haddock_vert_for_gbm.csv")
+col_keep = which(names(V) %in% var_one)
+V = V[,col_keep]
+write.csv(V, "haddock_vert_for_gbm_importance_over_one.csv", row.names = FALSE)
+
+data_long_nonzero = subset(data_long, var %in% data_long_sum_nonzero$var)
+
+plot <- ggplot(data = data_long_nonzero, aes(x = reorder(var, -value), y = value))+
+  geom_boxplot()+
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = NA, color = "black", size = 1), axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2), panel.grid.major.y = element_line(color = "grey80"), panel.grid.major.x = element_line(color = "transparent"))+
+  xlab("variable")+
+  ylab("importance")
+
+
+plot
+```
+
+![](fishbase_files/figure-gfm/importance-1.png)<!-- -->
+
+``` r
+ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height = 8, width = 8)
+```
+
+\#\#partial\_plotR.R – define
+
+``` r
+source("partial_plotR.R")
+```
+
+\#\#use partial\_plotR.R to make PD plots \#\#note this commented out
+for now, because getting error
+
+``` r
+# file_label = output_name
+# bootstrap_label = "observed"
+# load(paste0(bootstrap_label, "hist_", file_label,".Rdata"))
+# 
+# data_long_sum=data.frame(data_long_sum)
+# #cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# 
+# data_long_sum = subset(data_long_sum, mean_importance >0 )
+# sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
+# 
+# data_long_sum = data_long_sum[sorted_inds$ix,]
+# 
+# data_long_sum_low = data_long_sum#[c(1:cut),]
+# write.csv(data_long_sum_low, file = paste0( "importance", output_name, ".csv"))
+# inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
+# out_hist = out_hist[inds_keep,]
+# vars_plot = data_long_sum_low$var#these are the vars we're keeping
+# 
+# hist.data = out_hist
+# pd_out = OUT_obs[[2]]
+# pd_out = subset(pd_out, variable.name %in% vars_plot)
+# plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
+# # partial_plot(data = pd_out, hist.data = hist.data, vars = vars, type = "all", histogram = TRUE)
+# ggsave(filename = paste0("PD.", output_name, ".jpg"), plot = plot, height = 20, width = 20)
+# plot
+```
+
+\#\#redo analysis with only features that have importance greater than
+one
+
+\#\#grid search
+
+``` r
+print(Sys.time())
+```
+
+    ## [1] "2020-08-07 11:15:36 EDT"
+
+``` r
+output_name = paste0(output_name, "importance_over_one")
+load("gridSearch.Rdata")
+V = read.csv("haddock_vert_for_gbm_importance_over_one.csv")
+
+label = "above_haddock_median"
+DF <- V
+# rm = which(names(DF) == "X")
+# DF = DF[,-rm]
+label_col_ind = which(names(DF)==label)
+x_col = seq(1:dim(DF)[2])
+x_col = setdiff(x_col, label_col_ind)
+vars = colnames(DF)[x_col]
+
+GRID <- gridSearch(DF = DF, label = label, vars = vars, k_split = k_split, 
+                         distribution = distribution, 
+                         eta = eta, 
+                         max_depth = max_depth, 
+                         n.minobsinnode = n.minobsinnode,
+                         nrounds = nrounds, 
+                         method = "cv", 
+                         cv.folds = 5)
+
+hyper_grid = GRID[[1]]
+print(hyper_grid)
+```
+
+    ##      eta max_depth n.minobsinnode n.trees eval_train eval_test
+    ## 1  1e-04         2              2   68305  0.9664575 0.9245542
+    ## 2  1e-04         2              5   75503  0.9699163 0.9231824
+    ## 3  1e-04         3              2   57246  0.9773970 0.9218107
+    ## 4  1e-04         3              5   62907  0.9809363 0.9245542
+    ## 5  1e-04         4              2   94014  0.9968629 0.9176955
+    ## 6  1e-04         4              5   66981  0.9903475 0.9190672
+    ## 7  1e-03         2              2    7490  0.9699968 0.9218107
+    ## 8  1e-03         2              5    9217  0.9775579 0.9245542
+    ## 9  1e-03         3              2    7002  0.9839929 0.9204390
+    ## 10 1e-03         3              5    4074  0.9644466 0.9286694
+    ## 11 1e-03         4              2    6049  0.9879344 0.9163237
+    ## 12 1e-03         4              5    5445  0.9842342 0.9259259
+    ## 13 1e-02         2              2    1052  0.9810167 0.9300412
+    ## 14 1e-02         2              5     730  0.9680663 0.9204390
+    ## 15 1e-02         3              2     512  0.9720077 0.9218107
+    ## 16 1e-02         3              5     711  0.9827864 0.9300412
+    ## 17 1e-02         4              2     621  0.9882561 0.9108368
+    ## 18 1e-02         4              5     640  0.9869691 0.9300412
+    ## 19 1e-01         2              2      76  0.9687098 0.8792867
+    ## 20 1e-01         2              5      79  0.9706403 0.8888889
+    ## 21 1e-01         3              2      71  0.9763514 0.9026063
+    ## 22 1e-01         3              5      36  0.9372989 0.9410151
+    ## 23 1e-01         4              2      41  0.9666988 0.8930041
+    ## 24 1e-01         4              5      37  0.9653314 0.9135802
+    ##                                        group
+    ## 1  eta:1e-04, max depth:2, min obs in node:2
+    ## 2  eta:1e-04, max depth:2, min obs in node:5
+    ## 3  eta:1e-04, max depth:3, min obs in node:2
+    ## 4  eta:1e-04, max depth:3, min obs in node:5
+    ## 5  eta:1e-04, max depth:4, min obs in node:2
+    ## 6  eta:1e-04, max depth:4, min obs in node:5
+    ## 7  eta:0.001, max depth:2, min obs in node:2
+    ## 8  eta:0.001, max depth:2, min obs in node:5
+    ## 9  eta:0.001, max depth:3, min obs in node:2
+    ## 10 eta:0.001, max depth:3, min obs in node:5
+    ## 11 eta:0.001, max depth:4, min obs in node:2
+    ## 12 eta:0.001, max depth:4, min obs in node:5
+    ## 13  eta:0.01, max depth:2, min obs in node:2
+    ## 14  eta:0.01, max depth:2, min obs in node:5
+    ## 15  eta:0.01, max depth:3, min obs in node:2
+    ## 16  eta:0.01, max depth:3, min obs in node:5
+    ## 17  eta:0.01, max depth:4, min obs in node:2
+    ## 18  eta:0.01, max depth:4, min obs in node:5
+    ## 19   eta:0.1, max depth:2, min obs in node:2
+    ## 20   eta:0.1, max depth:2, min obs in node:5
+    ## 21   eta:0.1, max depth:3, min obs in node:2
+    ## 22   eta:0.1, max depth:3, min obs in node:5
+    ## 23   eta:0.1, max depth:4, min obs in node:2
+    ## 24   eta:0.1, max depth:4, min obs in node:5
+
+``` r
+dev <- GRID[[2]]
+save(GRID, file = paste0("GRID", ".", output_name, ".Rdata"))
+save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
+print(Sys.time())
+```
+
+    ## [1] "2020-08-07 11:35:48 EDT"
+
+\#\#make deviance plots
+
+``` r
+load(paste0("GRID", ".", output_name, ".Rdata"))
+PLTS <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS)
+```
+
+![](fishbase_files/figure-gfm/dev_all_one-1.png)<!-- -->
+
+``` r
+# , nrow = length(PLTS), heights= 5
+save(PLTS, file = paste0("PLTS", ".", "deviance.", output_name, ".Rdata"))
+```
+
+\#\#find out what happens if we set no lower limit on number of trees –
+importance over one
+
+``` r
+min_trees = 0
+buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
+max_trees = nrounds - buffer
+hyper_grid = GRID[[1]]
+hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
+hyper_grid = subset(hyper_grid, n.trees >=min_trees)
+hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
+hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
+
+DEV = GRID[[2]]
+DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
+GRID[[2]]=DEV
+
+PLTS_no_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS_no_min)
+```
+
+![](fishbase_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+
+``` r
+# , nrow = length(PLTS), heights= 5
+save(PLTS_no_min, file = paste0("PLTS", ".", "deviance.best.no.lower", output_name, ".Rdata"))
+```
+
+\#\#make deviance plot just for the “best” parameters requiring at least
+10000 trees as optimal number of trees
+
+``` r
+load(paste0("GRID", ".", output_name, ".Rdata"))
+min_trees = 10000
+hyper_grid = GRID[[1]]
+buffer= nrounds*0.33#buffer to make sure there are enough rounds when it comes to making null model
+max_trees = nrounds - buffer
+hyper_grid = subset(hyper_grid, n.trees < (max_trees))#make sure the best iteration was reached before we ran out of trees
+hyper_grid = subset(hyper_grid, n.trees >=min_trees)
+hyper_grid = subset(hyper_grid, eval_test == max(hyper_grid$eval_test)) 
+hyper_grid = subset(hyper_grid, eval_train == min(hyper_grid$eval_train))#take the one with the lowest train
+
+DEV = GRID[[2]]
+DEV = subset(DEV, group == hyper_grid$group)#get just this winning set of hyperparameters
+GRID[[2]]=DEV
+
+PLTS_min <-lapply(1:length(unique(GRID[[2]]$group)), function(i) GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% ggplot() +
+  geom_line(aes(x = index, y = train), color = "black", size = 1) +
+  geom_line(aes(x = index, y = valid), color = "green", size = 1) +
+    geom_vline(xintercept = GRID[[2]] %>% filter(group == unique(GRID[[2]]$group)[i]) %>% dplyr::select(best.iter) %>% unique %>% as.numeric, color = "blue", linetype = "dashed", size = 1) +
+  labs(x = "Iteration", y = "Bernoulli deviance", title = unique(GRID[[2]]$group[i])) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = "transparent", color = "black", size = 1), panel.grid.major = element_line(color = "grey90")))
+
+patchwork::wrap_plots(PLTS_min)
+```
+
 ![](fishbase_files/figure-gfm/dev_best_one-1.png)<!-- -->
 
 ``` r
@@ -1263,7 +1245,7 @@ save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-06 16:59:42 EDT"
+    ## [1] "2020-08-07 11:39:42 EDT"
 
 ``` r
 nruns = 10
@@ -1284,7 +1266,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-06 17:25:41 EDT"
+    ## [1] "2020-08-07 11:58:36 EDT"
 
 \#\#look at performance – importance over one
 
@@ -1302,7 +1284,7 @@ print("observed data, eval train")
 mean(I$auc_train)
 ```
 
-    ## [1] 0.9855055
+    ## [1] 0.9784395
 
 ``` r
 print("observed data, eval test")
@@ -1314,7 +1296,7 @@ print("observed data, eval test")
 mean(I$auc_test)
 ```
 
-    ## [1] 0.8251163
+    ## [1] 0.8513264
 
 ``` r
 R <- OUT_rand[[1]]
@@ -1322,7 +1304,7 @@ R <- OUT_rand[[1]]
 mean(R$auc_train)
 ```
 
-    ## [1] 0.8127266
+    ## [1] 0.7331674
 
 ``` r
 print("null data, eval test")
@@ -1334,7 +1316,7 @@ print("null data, eval test")
 mean(R$auc_test)
 ```
 
-    ## [1] 0.5551087
+    ## [1] 0.5487044
 
 \#\#plot importance (over one)
 
@@ -1354,16 +1336,16 @@ print(data_long_sum)
     ## # A tibble: 27 x 2
     ##    var                     mean_importance
     ##    <fct>                             <dbl>
-    ##  1 ClassActinopterygii                1.56
-    ##  2 ForStrat.ground                    1.32
-    ##  3 ForStrat.arboreal                  2.41
-    ##  4 ForStrat.aerial                    1.65
-    ##  5 ForStrat.marine                    1.60
-    ##  6 female_maturity_d                  2.68
-    ##  7 male_maturity_d                    2.20
-    ##  8 incubation_d                       5.44
-    ##  9 weaning_d                          2.06
-    ## 10 log_litterclutch_size_n            5.35
+    ##  1 ClassActinopterygii                2.11
+    ##  2 ForStrat.ground                    1.35
+    ##  3 ForStrat.arboreal                  4.13
+    ##  4 ForStrat.aerial                    1.68
+    ##  5 ForStrat.marine                    1.78
+    ##  6 female_maturity_d                  2.17
+    ##  7 male_maturity_d                    1.91
+    ##  8 incubation_d                       4.92
+    ##  9 weaning_d                          1.28
+    ## 10 log_litterclutch_size_n            5.29
     ## # … with 17 more rows
 
 ``` r
@@ -1394,29 +1376,34 @@ ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height
 for now, because getting error
 
 ``` r
+# load(paste0("OUT_observed_", output_name, ".Rdata"))
+# pd_out = OUT_obs[[2]]
+# 
 # bootstrap = "observed"
-# load(paste0(bootstrap, "hist_", file_label,redo, ".Rdata"))
+# load(paste0(bootstrap, "hist_", output_name, ".Rdata"))
 # 
 # data_long_sum=data.frame(data_long_sum)
-# cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# # cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
 # 
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
 # sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
 # 
 # data_long_sum = data_long_sum[sorted_inds$ix,]
 # 
-# data_long_sum_low = data_long_sum[c(1:cut),]
-# write.csv(data_long_sum_low, file = paste0( "importance", output_name,redo,  ".csv"))
+# data_long_sum_low = data_long_sum#[c(1:cut),]
+# write.csv(data_long_sum_low, file = paste0( "importance", output_name,  ".csv"))
 # inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
 # out_hist = out_hist[inds_keep,]
 # vars_plot = data_long_sum_low$var#these are the vars we're keeping
 # 
 # hist.data = out_hist
-# # hist.data = subset(hist.data, bootstrap_run == 1)#doesn't show histogram if I do this.
-# #middle 12
-# pd_out = OUT_obs[[2]]
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
+# intersect(unique(pd_out$variable.name),unique(hist.data$variable.name))
+# setdiff(unique(pd_out$variable.name),unique(hist.data$variable.name))
+# #should be empty
+# setdiff(unique(hist.data$variable.name),unique(pd_out$variable.name))
+# #should be empty
 # plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
-# ggsave(filename = paste0("PD.", output_name,redo, ".jpg"), plot = plot, height = 20, width = 20)
+# ggsave(filename = paste0("PD.", output_name, ".jpg"), plot = plot, height = 20, width = 20)
 # plot
 ```
