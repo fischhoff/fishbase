@@ -1,7 +1,7 @@
 ---
 title: "fishbase"
 author: "Han lab"
-date: "8/3/2020"
+date: "8/10/2020"
 output: github_document
 ---
 
@@ -20,7 +20,16 @@ for (package in neededPackages){pkgTest(package)}
 
 
 ```{r}
-output_name = "vert_haddock_20200807_1013"
+output_name = "vert_haddock_20200810_1138"
+save(output_name, file = "output_name.Rdata")
+```
+
+##cores
+```{r}
+cores = 4
+  cl <- makeCluster(cores, "SOCK", timeout = 60)  
+  # stopCluster(cl)
+  registerDoSNOW(cl)
 ```
 
 ##function to take the same across rows of categorical variables that have been 1/0 encoded, where a species may have 1 for more than one condition of a variable
@@ -1434,14 +1443,22 @@ source("compare_fields.R")
 ```{r, include = FALSE}
 A <- read.csv("promal3d_30_83.csv")
 
-AA_30_positive = rep(0, dim(A)[1])
+AA_30_negative = rep(0, dim(A)[1])
 i_blank = str_which(A$X, "-")
-AA_30_positive[i_blank]=NA
+AA_30_negative[i_blank]=NA
 
-i_pos = which(A$X %in% c("d", "e"))
-AA_30_positive[i_pos] = 1
-A$AA_30_positive = AA_30_positive
-# names(A)[names(A)=="X.1"]="AA83"
+i_neg = which(A$X %in% c("d", "e"))#D and E are negative, everything else is neutral or positive 
+AA_30_negative[i_neg] = 1
+A$AA_30_negative = AA_30_negative
+
+AA_83_Y = rep(0, dim(A)[1])
+i_blank = str_which(A$X.1, "-")
+AA_83_Y[i_blank]=NA
+
+i_y = which(A$X.1 =="y")# 
+AA_83_Y[i_y] = 1
+A$AA_83_Y = AA_83_Y
+
 ACE2 = read.csv("ACE2_sequences_fixed.csv")
 #which(ACE2$Species =="Astatotilapia burtoni")
 
@@ -1468,14 +1485,14 @@ A = merge(A, DF)
 #rename field to merge
 
 write.csv(A, file = "docking_results_AA_30_83.csv", row.names = FALSE)
-# glm(haddock_score_mean ~ AA_30_positive, family=binomial, data=A)
+# glm(haddock_score_mean ~ AA_30_negative, family=binomial, data=A)
 ```
 
 ##add AA value to rest of fishbase data
 ```{r, include = FALSE}
 A <- read.csv("docking_results_AA_30_83.csv")
 
-keep = c("Species", "AA_30_positive", "AA83", "Order", "Class")
+keep = c("Species", "AA_30_negative", "AA_83_Y", "Order", "Class")
 
 A = A[,keep]
 Species = A$Species
@@ -1564,7 +1581,14 @@ for (a in 1:length(ufish)){
 summary(V$log_adult_body_mass_g)
 summary(V$adult_svl_cm)
 save(V, file = "V.Rdata")
+dim(V)
 write.csv(V, file = paste0("fish", v_file_name))
+```
+
+```{r}
+V %>%
+  mutate(mass_specific_production = (exp(log_birthhatching_weight_g)/exp(log_adult_body_mass_g))*exp(log_litterclutch_size_n)*litters_or_clutches_per_y, log_range_size = log(range_size)) %>%
+  dplyr::select(-range_size, -log_no_sex_body_mass)
 ```
 
 
@@ -1572,7 +1596,7 @@ write.csv(V, file = paste0("fish", v_file_name))
 ```{r, include = FALSE}
 A <- read.csv("docking_results_AA_30_83.csv")
 
-keep = c("Species", "AA83", "AA_30_positive")
+keep = c("Species", "AA_83_Y", "AA_30_negative")
 
 A = A[,keep]
 # Species = A$Species
@@ -1600,50 +1624,41 @@ rm = c(rm, "LengthMin_length_weight" ,"LengthMax_length_weight", "Weight_oxygen"
 keep = setdiff(names(DF), rm)
 DF = DF[,keep]
 V = DF
+dim(V)
 save(V, file = "V.Rdata")
-```
-
-
-#make and use function for getting hits from fulltext from plos
-##commenting out while we try to figure out how to get WOS
-```{r}
-
-# get_hits_fulltext <- function(search_terms){
-#   out = rep(NA, length(search_terms))
-#   for (a in 1:length(search_terms)){
-#     tmp = ft_search(query = search_terms[a], from = "plos")#get the search results across only PLOS because otherwise hit rate limits 
-#     out[a] = tmp$plos$found
-#     Sys.sleep(1)
-#   }
-#   out
-# }
-# 
-# load("V.Rdata")
-# search_terms = V$Species
-# out <- get_hits_fulltext(search_terms)
-# out = data.frame(hits = out,
-#                  Species = search_terms)
-# vert_haddock_plos = out
-# V = merge(V, vert_haddock_plos, by = "Species")
-# save(V, file = "V.Rdata")
-# save(vert_haddock_plos, file = "vert_haddock_plos.Rdata")
-
 ```
 
 ##add WOS hits from R package wosr
 ```{r wosr_add}
 load("V.Rdata")
 dim(V)
-W <- read.csv("wos_species_hits.csv")
+
+W <- read.csv("wos_species_hits.csv")#this version has results only from exact matches
 names(W)[names(W)=="query"]="Species"
 names(W)[names(W)=="rec_cnt"]="WOS_hits"
 
 W$Species = str_replace(W$Species, "TS", "")
 W$Species = str_replace(W$Species, " = ", "")
-
 W$Species = str_sub(W$Species, 2, -2)
-# W$Species = sub('.', '', W$Species)
-V = merge(V, W)
+
+W2 <- read.csv("query_hits_synonyms.csv")#this includes synonyms
+names(W2)[names(W2)=="query"]="Species"
+names(W2)[names(W2)=="rec_cnt"]="WOS_hits_synonyms"
+
+a = 18
+# hits_synonyms = rep(NA, dim(W2)[1])
+out = NULL
+species = unique(W$Species)
+for (a in 1:length(species)){
+  ind_W2 = str_which(W2$Species, species[a])#find the index in W2 that includes the a'th species
+  tmp = data.frame(WOS_hits_synonyms = sum(W2$WOS_hits_synonyms[ind_W2]),
+                   Species = species[a]) 
+  # print("a")
+  # print(a)
+  # print(dim(tmp)[1])
+  out = rbind(out, tmp)
+}
+V = merge(V, out)
 dim(V)
 save(V, file = "V.Rdata")
 ```
@@ -1653,11 +1668,7 @@ save(V, file = "V.Rdata")
 ```{r gridSearch_verts_median}
 print(Sys.time())
 load("gridSearch.Rdata")
-save(output_name, file = "output_name.Rdata")
-cores = 4
-  cl <- makeCluster(cores, "SOCK", timeout = 60)
-  # stopCluster(cl)
-  registerDoSNOW(cl)
+# save(output_name, file = "output_name.Rdata")
 load("V.Rdata")
 
 out = V
@@ -1919,21 +1930,22 @@ ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height
 source("partial_plotR.R")
 ```
 
+
 ##use partial_plotR.R to make PD plots
 ##note this commented out for now, because getting error
 ```{r partial_run}
 # file_label = output_name
 # bootstrap_label = "observed"
 # load(paste0(bootstrap_label, "hist_", file_label,".Rdata"))
-# 
+# #
 # data_long_sum=data.frame(data_long_sum)
-# #cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
-# 
+# # #cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
+# #
 # data_long_sum = subset(data_long_sum, mean_importance >0 )
 # sorted_inds = sort.int(data_long_sum$mean_importance, decreasing = TRUE, index.return = TRUE)
-# 
+# #
 # data_long_sum = data_long_sum[sorted_inds$ix,]
-# 
+# #
 # data_long_sum_low = data_long_sum#[c(1:cut),]
 # write.csv(data_long_sum_low, file = paste0( "importance", output_name, ".csv"))
 # inds_keep = which(out_hist$variable.name %in% data_long_sum_low$var)
@@ -2064,8 +2076,6 @@ save(PLTS_min, file = paste0("PLTS_min", ".", "deviance.best", as.character(min_
 ```{r bootstrapGBM_vert_median_one}
 print(Sys.time())
 
-nruns = 10
-
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
                         n.minobsinnode = hyper_grid$n.minobsinnode,file_label=output_name)
 bootstrap_label = "observed"
@@ -2099,6 +2109,8 @@ mean(R$auc_train)
 print("null data, eval test")
 mean(R$auc_test)
 
+corrected_test_AUC = mean(I$auc_test) - (mean(R$auc_test) - 0.5)
+corrected_test_AUC
 ```
 
 ##plot importance (over one)
@@ -2138,10 +2150,15 @@ ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height
 
 # load(paste0("OUT_observed_", output_name, ".Rdata"))
 # pd_out = OUT_obs[[2]]
-# 
+# save(pd_out, file = "pd_out.Rdata")
+# load("pd_out.Rdata")
+# # 
 # bootstrap = "observed"
 # load(paste0(bootstrap, "hist_", output_name, ".Rdata"))
-# 
+# hist.data = out_hist
+# save(hist.data, file = "hist.data.Rdata")
+# load("hist.data.Rdata")
+# # 
 # data_long_sum=data.frame(data_long_sum)
 # # cut =dim(data_long_sum)[1]#choose some number so there aren't too many, default choose all of them
 # 
@@ -2160,10 +2177,12 @@ ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height
 # pd_out = subset(pd_out, variable.name %in% vars_plot)
 # intersect(unique(pd_out$variable.name),unique(hist.data$variable.name))
 # setdiff(unique(pd_out$variable.name),unique(hist.data$variable.name))
-# #should be empty
+# # #should be empty
 # setdiff(unique(hist.data$variable.name),unique(pd_out$variable.name))
-# #should be empty
-# plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
+# # # #should be empty
+# vars_plot = unique(pd_out$variable.name)
+# # plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "mean", histogram = T)
+# plot <- partial_plot(data = pd_out, hist.data = hist.data, vars = vars_plot, type = "all", histogram = T)
 # ggsave(filename = paste0("PD.", output_name, ".jpg"), plot = plot, height = 20, width = 20)
 # plot
 
