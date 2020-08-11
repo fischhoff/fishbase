@@ -44,49 +44,20 @@ bootstrapGBM <- function(DF, label, vars, k_split, distribution = c("bernoulli",
     out_hist = rbind(out_hist, tmp)
   }
   save(out_hist, file = paste0(bootstrap, "hist_", file_label,".Rdata"))#save the histogram outputs
-  
   OUT2 <- foreach(i = 1:nruns, .packages = c("gbm", "foreach", "dismo", "caTools", "caret")) %dopar% {
     set.seed(i)
-    DP <- createDataPartition(DF[, label], p = k_split)[[1]]
+    if(distribution == "bernoulli") {
+      DP <- createDataPartition(as.factor(DF[, label]), p = k_split)[[1]]
+    } else DP <- createDataPartition(DF[, label], p = k_split)[[1]]
     if(bootstrap == "observed") {
       TRAIN <- DF[DP, ]
       TEST <- DF[-DP, ]
-      case.gbm <- gbm(data=TRAIN,
-                      model,
-                      distribution = distribution,
-                      n.trees = nrounds,
-                      shrinkage = eta,
-                      cv.folds = cv.folds,
-                      interaction.depth = max_depth,
-                      bag.fraction = 0.5,
-                      verbose = FALSE,
-                      n.minobsinnode=n.minobsinnode)
-      best.iter <- gbm.perf(case.gbm,method=method,plot.it=FALSE)
-      output2<-predict(case.gbm, newdata=TRAIN, n.trees=best.iter, type="response") 
-      output2<-cbind(output2, as.numeric(TRAIN[, label]))
-      auc_train <- colAUC(output2[,1],output2[,2])
-      output2 <- predict(case.gbm, newdata = TEST, n.trees=best.iter, type="response") 
-      output2 <- cbind(output2,as.numeric(TEST[, label]))
-      auc_test <- colAUC(output2[,1],output2[,2])
-      df_importance <- t(as.data.frame(summary(case.gbm)$rel.inf[match(vars, summary(case.gbm)$var)]))
-      colnames(df_importance) <- vars
-      rownames(df_importance) <- NULL
-      pd_out <- lapply(vars, function(m) dplyr::mutate(plot.gbm(case.gbm, i.var = m, return.grid = T), variable.name = m, effect = "marginal.effect", bootstrap_run = i))
-      pd_out <- do.call(rbind, lapply(pd_out, function(m) {
-        colnames(m)[1:2] <- c("x", "yhat")
-        m}))
-      
-      
-      out1 <- cbind.data.frame(eta = eta, max_depth = max_depth, n.trees = best.iter, auc_train = mean(auc_train), auc_test = mean(auc_test), bootstrap_run = i, df_importance)
-      OUT <- list(out1, pd_out)
-    }
-    else {
+    } else {
       TRAIN <- DF[DP, ]
-      # TRAIN <- subset(DF, DF$cluster != k)
       TRAIN[, label] <- sample(x = TRAIN[, label], size = nrow(TRAIN), replace = F)
       TEST <- DF[-DP, ]
-      # TEST <- subset(DF, DF$cluster == k)
       TEST[, label] <- sample(x = TEST[, label], size = nrow(TEST), replace = F)
+    }
       case.gbm <- gbm(data=TRAIN,
                       model,
                       distribution = distribution,
@@ -98,12 +69,17 @@ bootstrapGBM <- function(DF, label, vars, k_split, distribution = c("bernoulli",
                       verbose = FALSE,
                       n.minobsinnode=n.minobsinnode)
       best.iter <- gbm.perf(case.gbm,method=method,plot.it=FALSE)
-      output2<-predict(case.gbm, newdata=TRAIN, n.trees=best.iter, type="response") 
-      output2<-cbind(output2, as.numeric(TRAIN[, label]))
-      auc_train <- colAUC(output2[,1],output2[,2])
-      output2 <- predict(case.gbm, newdata = TEST, n.trees=best.iter, type="response") 
-      output2 <- cbind(output2,as.numeric(TEST[, label]))
-      auc_test <- colAUC(output2[,1],output2[,2])
+      if(distribution == "bernoulli") {
+        output2<-predict(case.gbm, newdata=TRAIN, n.trees=best.iter, type="response") 
+        output2<-cbind(output2, as.numeric(TRAIN[, label]))
+        eval_train <- colAUC(output2[,1],output2[,2])
+        output2 <- predict(case.gbm, newdata = TEST, n.trees=best.iter, type="response") 
+        output2 <- cbind(output2,as.numeric(TEST[, label]))
+        eval_test <- colAUC(output2[,1],output2[,2])
+      } else {
+        eval_train = 1-sum((TRAIN[, label] - predict(case.gbm, newdata=TRAIN, n.trees=best.iter, type="response"))^2)/sum((TRAIN[, label] - mean(TRAIN[, label]))^2)
+        eval_test = 1-sum((TEST[, label] - predict(case.gbm, newdata=TEST, n.trees =best.iter, type="response"))^2)/sum((TEST[, label] - mean(TEST[, label]))^2)
+      }
       df_importance <- t(as.data.frame(summary(case.gbm)$rel.inf[match(vars, summary(case.gbm)$var)]))
       colnames(df_importance) <- vars
       rownames(df_importance) <- NULL
@@ -111,11 +87,15 @@ bootstrapGBM <- function(DF, label, vars, k_split, distribution = c("bernoulli",
       pd_out <- do.call(rbind, lapply(pd_out, function(m) {
         colnames(m)[1:2] <- c("x", "yhat")
         m}))
-      out1 <- cbind.data.frame(eta = eta, max_depth = max_depth, n.trees = best.iter, auc_train = mean(auc_train), auc_test = mean(auc_test), bootstrap_run = i, df_importance)
+      out1 <- cbind.data.frame(eta = eta, max_depth = max_depth, n.trees = best.iter, eval_train = mean(eval_train), eval_test = mean(eval_test), bootstrap_run = i, df_importance)
       OUT <- list(out1, pd_out)
-    }
   }
   out1 <- do.call(rbind, lapply(OUT2, "[[", 1))
   pd_out <- do.call(rbind, lapply(OUT2, "[[", 2))
   list(out1, pd_out)
 }
+
+save(bootstrapGBM, file = "bootstrapGBM.Rdata")
+
+
+

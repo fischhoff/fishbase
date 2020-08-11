@@ -10,6 +10,7 @@
 #nrounds - max number of trees to set
 #method - set at cv, haven't played around with this much
 #cv.folds - number of folds to use with gbm
+#n.minobsinnode -
 ######
 ##Example
 #packages <- c("gbm", "caret", "Matrix", "pdp", "caTools", "ROCR", "dplyr", "foreach", "dismo", "doSNOW", "parallel")
