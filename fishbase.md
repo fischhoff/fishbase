@@ -7,13 +7,17 @@ Han lab
 
 ``` r
 date = "20200811"
-time = "1457"
+time = "1811"
 output_name = paste("vert_haddock", date, time, sep = "_")
 save(output_name, file = "output_name.Rdata")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 14:58:00 EDT"
+    ## [1] "2020-08-11 18:14:39 EDT"
+
+``` r
+nruns = 10
+```
 
 \#\#cores
 
@@ -281,7 +285,7 @@ save(V, file = "V.Rdata")
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 15:00:52 EDT"
+    ## [1] "2020-08-11 18:17:39 EDT"
 
 ``` r
 load("gridSearch.Rdata")
@@ -389,7 +393,7 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 15:22:47 EDT"
+    ## [1] "2020-08-11 18:40:01 EDT"
 
 \#\#make deviance plots
 
@@ -483,7 +487,7 @@ hyper_grid
 ```
 
     ##     eta max_depth n.minobsinnode n.trees eval_train eval_test
-    ## 5 1e-04         4              2   56486  0.9876126 0.8751715
+    ## 5 1e-04         4              2   64787  0.9914736 0.8326475
     ##                                       group
     ## 5 eta:1e-04, max depth:4, min obs in node:2
 
@@ -494,7 +498,7 @@ fields
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 15:23:27 EDT"
+    ## [1] "2020-08-11 18:40:39 EDT"
 
 ``` r
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -515,7 +519,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 15:40:09 EDT"
+    ## [1] "2020-08-11 19:07:58 EDT"
 
 \#\#look at performance
 
@@ -533,7 +537,7 @@ print("observed data, eval train")
 mean(I$eval_train)
 ```
 
-    ## [1] 0.991908
+    ## [1] 0.9908542
 
 ``` r
 print("observed data, eval test")
@@ -545,7 +549,7 @@ print("observed data, eval test")
 mean(I$eval_test)
 ```
 
-    ## [1] 0.8559671
+    ## [1] 0.8622771
 
 ``` r
 R <- OUT_rand[[1]]
@@ -553,7 +557,7 @@ R <- OUT_rand[[1]]
 mean(R$eval_train)
 ```
 
-    ## [1] 0.8675354
+    ## [1] 0.8509291
 
 ``` r
 print("null data, eval test")
@@ -565,20 +569,20 @@ print("null data, eval test")
 mean(R$eval_test)
 ```
 
-    ## [1] 0.5482853
+    ## [1] 0.5584362
 
 ``` r
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 ```
 
-    ## [1] "corrected test AUC"
+    ## [1] "corrected test AUC vert_haddock_20200811_1811"
 
 ``` r
 corrected_test_eval
 ```
 
-    ## [1] 0.8076818
+    ## [1] 0.8038409
 
 \#\#plot importance
 
@@ -598,16 +602,16 @@ print(data_long_sum)
     ## # A tibble: 39 x 2
     ##    var                 mean_importance
     ##    <fct>                         <dbl>
-    ##  1 ClassActinopterygii          2.03  
-    ##  2 ClassAves                    0.323 
-    ##  3 ClassMammalia                0.0432
-    ##  4 ClassReptilia                0.0410
-    ##  5 ForStrat.ground              0.941 
-    ##  6 ForStrat.understory          0.891 
-    ##  7 ForStrat.arboreal            3.03  
-    ##  8 ForStrat.aerial              1.67  
-    ##  9 ForStrat.marine              1.98  
-    ## 10 Activity.Nocturnal           0.210 
+    ##  1 ClassActinopterygii          1.97  
+    ##  2 ClassAves                    0.417 
+    ##  3 ClassMammalia                0.0378
+    ##  4 ClassReptilia                0.0345
+    ##  5 ForStrat.ground              1.06  
+    ##  6 ForStrat.understory          0.884 
+    ##  7 ForStrat.arboreal            2.99  
+    ##  8 ForStrat.aerial              1.59  
+    ##  9 ForStrat.marine              1.94  
+    ## 10 Activity.Nocturnal           0.247 
     ## # … with 29 more rows
 
 ``` r
@@ -694,7 +698,7 @@ vars = setdiff(names(DF), label)
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 15:40:13 EDT"
+    ## [1] "2020-08-11 19:08:02 EDT"
 
 ``` r
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -713,7 +717,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 15:55:09 EDT"
+    ## [1] "2020-08-11 19:25:38 EDT"
 
 \#\#look at performance – importance over one
 
@@ -731,7 +735,7 @@ print("observed data, eval train")
 mean(I$eval_train)
 ```
 
-    ## [1] 0.9920849
+    ## [1] 0.9913449
 
 ``` r
 print("observed data, eval test")
@@ -743,7 +747,7 @@ print("observed data, eval test")
 mean(I$eval_test)
 ```
 
-    ## [1] 0.8534979
+    ## [1] 0.8613169
 
 ``` r
 R <- OUT_rand[[1]]
@@ -751,7 +755,7 @@ R <- OUT_rand[[1]]
 mean(R$eval_train)
 ```
 
-    ## [1] 0.8635135
+    ## [1] 0.8655647
 
 ``` r
 print("null data, eval test")
@@ -763,20 +767,20 @@ print("null data, eval test")
 mean(R$eval_test)
 ```
 
-    ## [1] 0.5477366
+    ## [1] 0.5624829
 
 ``` r
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 ```
 
-    ## [1] "corrected test AUC"
+    ## [1] "corrected test AUC vert_haddock_20200811_1811importance_over_one"
 
 ``` r
 corrected_test_eval
 ```
 
-    ## [1] 0.8057613
+    ## [1] 0.798834
 
 \#\#plot importance (over one)
 
@@ -793,20 +797,20 @@ data_long_sum <- data_long %>% group_by(var) %>%
 print(data_long_sum)
 ```
 
-    ## # A tibble: 27 x 2
-    ##    var                        mean_importance
-    ##    <fct>                                <dbl>
-    ##  1 ClassActinopterygii                   2.22
-    ##  2 ForStrat.arboreal                     3.47
-    ##  3 ForStrat.aerial                       1.80
-    ##  4 ForStrat.marine                       2.19
-    ##  5 female_maturity_d                     3.09
-    ##  6 male_maturity_d                       2.81
-    ##  7 incubation_d                          6.83
-    ##  8 log_litterclutch_size_n               6.38
-    ##  9 litters_or_clutches_per_y             2.29
-    ## 10 log_birthhatching_weight_g            3.92
-    ## # … with 17 more rows
+    ## # A tibble: 28 x 2
+    ##    var                       mean_importance
+    ##    <fct>                               <dbl>
+    ##  1 ClassActinopterygii                  2.14
+    ##  2 ForStrat.ground                      1.12
+    ##  3 ForStrat.arboreal                    3.28
+    ##  4 ForStrat.aerial                      1.65
+    ##  5 ForStrat.marine                      1.99
+    ##  6 female_maturity_d                    3.09
+    ##  7 male_maturity_d                      2.93
+    ##  8 incubation_d                         6.88
+    ##  9 log_litterclutch_size_n              6.34
+    ## 10 litters_or_clutches_per_y            2.16
+    ## # … with 18 more rows
 
 ``` r
 data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
@@ -898,6 +902,19 @@ for (a in 1:length(species)){
 }  
 R$haddock = haddock
 R_highest = subset(R, haddock == max(R$haddock))
+print("infected species w/ conspecific transmission and highest haddock score")
+```
+
+    ## [1] "infected species w/ conspecific transmission and highest haddock score"
+
+``` r
+R_highest
+```
+
+    ##     transmission.to.conspecifics              Species   haddock
+    ## 362                            1 Mesocricetus auratus -129.4977
+
+``` r
 haddock_cutoff = R_highest$haddock
 
 haddock_infected_and_below = rep(0, dim(DF)[1])#default is that you have a haddock score that is above species infectable and w/ highest score
@@ -937,7 +954,7 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 16:18:53 EDT"
+    ## [1] "2020-08-11 19:43:32 EDT"
 
 \#\#make deviance plots
 
@@ -1031,7 +1048,7 @@ hyper_grid
 ```
 
     ##     eta max_depth n.minobsinnode n.trees eval_train eval_test
-    ## 4 1e-04         3              5   60544  0.9789206 0.8471248
+    ## 4 1e-04         3              5   52571  0.9719488 0.9312763
     ##                                       group
     ## 4 eta:1e-04, max depth:3, min obs in node:5
 
@@ -1042,7 +1059,7 @@ fields
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 16:19:39 EDT"
+    ## [1] "2020-08-11 19:44:15 EDT"
 
 ``` r
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -1063,7 +1080,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 16:34:00 EDT"
+    ## [1] "2020-08-11 20:02:57 EDT"
 
 \#\#look at performance
 
@@ -1081,7 +1098,7 @@ print("observed data, eval train")
 mean(I$eval_train)
 ```
 
-    ## [1] 0.9801509
+    ## [1] 0.9834974
 
 ``` r
 print("observed data, eval test")
@@ -1093,7 +1110,7 @@ print("observed data, eval test")
 mean(I$eval_test)
 ```
 
-    ## [1] 0.8931276
+    ## [1] 0.8725105
 
 ``` r
 R <- OUT_rand[[1]]
@@ -1101,7 +1118,7 @@ R <- OUT_rand[[1]]
 mean(R$eval_train)
 ```
 
-    ## [1] 0.6921506
+    ## [1] 0.7180241
 
 ``` r
 print("null data, eval test")
@@ -1113,20 +1130,20 @@ print("null data, eval test")
 mean(R$eval_test)
 ```
 
-    ## [1] 0.5774194
+    ## [1] 0.5704067
 
 ``` r
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 ```
 
-    ## [1] "corrected test AUC"
+    ## [1] "corrected test AUC vert_haddock_20200811_1811 haddock_infected"
 
 ``` r
 corrected_test_eval
 ```
 
-    ## [1] 0.8157083
+    ## [1] 0.8021038
 
 \#\#plot importance w all vars and get vars w importance over one
 
@@ -1146,16 +1163,16 @@ print(data_long_sum)
     ## # A tibble: 39 x 2
     ##    var                 mean_importance
     ##    <fct>                         <dbl>
-    ##  1 ClassActinopterygii         3.15   
-    ##  2 ClassAves                   0.290  
-    ##  3 ClassMammalia               0.0385 
-    ##  4 ClassReptilia               0.00443
-    ##  5 ForStrat.ground             1.29   
-    ##  6 ForStrat.understory         0.931  
-    ##  7 ForStrat.arboreal           4.29   
-    ##  8 ForStrat.aerial             1.75   
-    ##  9 ForStrat.marine             1.33   
-    ## 10 Activity.Nocturnal          0.295  
+    ##  1 ClassActinopterygii         3.30   
+    ##  2 ClassAves                   0.287  
+    ##  3 ClassMammalia               0.0306 
+    ##  4 ClassReptilia               0.00794
+    ##  5 ForStrat.ground             1.23   
+    ##  6 ForStrat.understory         0.791  
+    ##  7 ForStrat.arboreal           4.34   
+    ##  8 ForStrat.aerial             1.53   
+    ##  9 ForStrat.marine             1.39   
+    ## 10 Activity.Nocturnal          0.281  
     ## # … with 29 more rows
 
 ``` r
@@ -1209,7 +1226,7 @@ vars = setdiff(names(DF), label)
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 16:34:04 EDT"
+    ## [1] "2020-08-11 20:03:00 EDT"
 
 ``` r
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = "bernoulli", eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -1228,7 +1245,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 16:48:47 EDT"
+    ## [1] "2020-08-11 20:17:11 EDT"
 
 \#\#look at performance
 
@@ -1246,7 +1263,7 @@ print("observed data, eval train")
 mean(I$eval_train)
 ```
 
-    ## [1] 0.979101
+    ## [1] 0.9821194
 
 ``` r
 print("observed data, eval test")
@@ -1258,7 +1275,7 @@ print("observed data, eval test")
 mean(I$eval_test)
 ```
 
-    ## [1] 0.8942496
+    ## [1] 0.8712482
 
 ``` r
 R <- OUT_rand[[1]]
@@ -1266,7 +1283,7 @@ R <- OUT_rand[[1]]
 mean(R$eval_train)
 ```
 
-    ## [1] 0.632103
+    ## [1] 0.6962188
 
 ``` r
 print("null data, eval test")
@@ -1278,26 +1295,26 @@ print("null data, eval test")
 mean(R$eval_test)
 ```
 
-    ## [1] 0.5593268
+    ## [1] 0.5666199
 
 ``` r
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 ```
 
-    ## [1] "corrected test AUC"
+    ## [1] "corrected test AUC vert_haddock_20200811_1811import_over_one_haddock_infected"
 
 ``` r
 corrected_test_eval
 ```
 
-    ## [1] 0.8349229
+    ## [1] 0.8046283
 
 ``` r
  print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 16:48:47 EDT"
+    ## [1] "2020-08-11 20:17:11 EDT"
 
 \#\#plot importance w all vars and get vars w importance over one
 
@@ -1314,20 +1331,20 @@ data_long_sum <- data_long %>% group_by(var) %>%
 print(data_long_sum)
 ```
 
-    ## # A tibble: 25 x 2
-    ##    var                        mean_importance
-    ##    <fct>                                <dbl>
-    ##  1 ClassActinopterygii                   3.42
-    ##  2 ForStrat.ground                       1.40
-    ##  3 ForStrat.arboreal                     4.54
-    ##  4 ForStrat.aerial                       1.76
-    ##  5 ForStrat.marine                       1.38
-    ##  6 female_maturity_d                     1.95
-    ##  7 male_maturity_d                       3.25
-    ##  8 incubation_d                          5.37
-    ##  9 log_litterclutch_size_n               4.45
-    ## 10 log_birthhatching_weight_g            3.53
-    ## # … with 15 more rows
+    ## # A tibble: 26 x 2
+    ##    var                       mean_importance
+    ##    <fct>                               <dbl>
+    ##  1 ClassActinopterygii                  3.55
+    ##  2 ForStrat.ground                      1.34
+    ##  3 ForStrat.arboreal                    4.52
+    ##  4 ForStrat.aerial                      1.54
+    ##  5 ForStrat.marine                      1.45
+    ##  6 female_maturity_d                    1.88
+    ##  7 male_maturity_d                      2.71
+    ##  8 incubation_d                         4.78
+    ##  9 log_litterclutch_size_n              5.04
+    ## 10 litters_or_clutches_per_y            1.22
+    ## # … with 16 more rows
 
 ``` r
 data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
@@ -1389,37 +1406,37 @@ save(hyper_grid, file = paste0("hyper_grid", ".", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 17:17:51 EDT"
+    ## [1] "2020-08-11 20:34:56 EDT"
 
 ``` r
 hyper_grid
 ```
 
     ##      eta max_depth n.minobsinnode n.trees eval_train eval_test
-    ## 1  1e-04         2              2   65993  0.6246811 0.4256836
-    ## 2  1e-04         2              5   47566  0.5801399 0.4084144
-    ## 3  1e-04         3              2   57051  0.6630787 0.4191271
-    ## 4  1e-04         3              5   45142  0.6289861 0.4095591
-    ## 5  1e-04         4              2   40571  0.6465152 0.4024186
-    ## 6  1e-04         4              5   42402  0.6535766 0.4022835
-    ## 7  1e-03         2              2    6098  0.6131468 0.4185060
-    ## 8  1e-03         2              5    5871  0.6092309 0.4224076
-    ## 9  1e-03         3              2    4822  0.6376882 0.4104647
-    ## 10 1e-03         3              5    4630  0.6309221 0.4082681
-    ## 11 1e-03         4              2    3741  0.6355089 0.3997960
-    ## 12 1e-03         4              5    3884  0.6387400 0.3989501
-    ## 13 1e-02         2              2     720  0.6378092 0.4296601
-    ## 14 1e-02         2              5     810  0.6516342 0.4355220
-    ## 15 1e-02         3              2     623  0.6757950 0.4026184
-    ## 16 1e-02         3              5     322  0.5748718 0.3898560
-    ## 17 1e-02         4              2     388  0.6431007 0.3935541
-    ## 18 1e-02         4              5     420  0.6557265 0.4128228
-    ## 19 1e-01         2              2      69  0.6231178 0.4270916
-    ## 20 1e-01         2              5      47  0.5719998 0.3733882
-    ## 21 1e-01         3              2      48  0.6221528 0.3777162
-    ## 22 1e-01         3              5      33  0.5772207 0.3874777
-    ## 23 1e-01         4              2      49  0.6660585 0.3466647
-    ## 24 1e-01         4              5      48  0.6676048 0.4102524
+    ## 1  1e-04         2              2   49498  0.6192040 0.3033371
+    ## 2  1e-04         2              5   92539  0.7046381 0.3100099
+    ## 3  1e-04         3              2   52264  0.6803392 0.2974618
+    ## 4  1e-04         3              5   52142  0.6804813 0.2988123
+    ## 5  1e-04         4              2   59308  0.7302683 0.2971519
+    ## 6  1e-04         4              5   45620  0.6918698 0.2939305
+    ## 7  1e-03         2              2    6569  0.6590648 0.3068928
+    ## 8  1e-03         2              5    5913  0.6441668 0.3087470
+    ## 9  1e-03         3              2    5065  0.6756465 0.3015371
+    ## 10 1e-03         3              5    4487  0.6574575 0.3000540
+    ## 11 1e-03         4              2    5084  0.7070869 0.2936944
+    ## 12 1e-03         4              5    3916  0.6679886 0.2910888
+    ## 13 1e-02         2              2     555  0.6326272 0.2981471
+    ## 14 1e-02         2              5     797  0.6846813 0.3115201
+    ## 15 1e-02         3              2     662  0.7155931 0.3051209
+    ## 16 1e-02         3              5     482  0.6648419 0.2907033
+    ## 17 1e-02         4              2     443  0.6874911 0.3018133
+    ## 18 1e-02         4              5     544  0.7197051 0.2996019
+    ## 19 1e-01         2              2      49  0.6113322 0.2480761
+    ## 20 1e-01         2              5      36  0.5618522 0.2850105
+    ## 21 1e-01         3              2      44  0.6421896 0.2961339
+    ## 22 1e-01         3              5      33  0.6020373 0.2972701
+    ## 23 1e-01         4              2      51  0.6921560 0.2473987
+    ## 24 1e-01         4              5      64  0.7372099 0.3120463
     ##                                        group
     ## 1  eta:1e-04, max depth:2, min obs in node:2
     ## 2  eta:1e-04, max depth:2, min obs in node:5
@@ -1538,7 +1555,7 @@ hyper_grid
 ```
 
     ##     eta max_depth n.minobsinnode n.trees eval_train eval_test
-    ## 1 1e-04         2              2   65993  0.6246811 0.4256836
+    ## 1 1e-04         2              2   49498   0.619204 0.3033371
     ##                                       group
     ## 1 eta:1e-04, max depth:2, min obs in node:2
 
@@ -1549,7 +1566,7 @@ regression
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 17:18:34 EDT"
+    ## [1] "2020-08-11 20:35:28 EDT"
 
 ``` r
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = distribution, eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -1570,7 +1587,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 17:27:45 EDT"
+    ## [1] "2020-08-11 20:48:10 EDT"
 
 \#\#look at performance
 
@@ -1588,7 +1605,7 @@ print("observed data, eval train")
 mean(I$eval_train)
 ```
 
-    ## [1] 0.6441312
+    ## [1] 0.6896672
 
 ``` r
 print("observed data, eval test")
@@ -1600,7 +1617,7 @@ print("observed data, eval test")
 mean(I$eval_test)
 ```
 
-    ## [1] 0.4499346
+    ## [1] 0.4131019
 
 ``` r
 R <- OUT_rand[[1]]
@@ -1608,7 +1625,7 @@ R <- OUT_rand[[1]]
 mean(R$eval_train)
 ```
 
-    ## [1] 0.03480389
+    ## [1] 0.04027509
 
 ``` r
 print("null data, eval test")
@@ -1620,20 +1637,20 @@ print("null data, eval test")
 mean(R$eval_test)
 ```
 
-    ## [1] -0.007956698
+    ## [1] -0.007566972
 
 ``` r
-corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+corrected_test_eval = mean(I$eval_test) - mean(R$eval_test)
+print(paste("corrected test pseudo-R2", output_name))
 ```
 
-    ## [1] "corrected test AUC"
+    ## [1] "corrected test pseudo-R2 vert_haddock_20200811_1811 haddock_score"
 
 ``` r
 corrected_test_eval
 ```
 
-    ## [1] 0.9578913
+    ## [1] 0.4206689
 
 \#\#plot importance
 
@@ -1653,16 +1670,16 @@ print(data_long_sum)
     ## # A tibble: 39 x 2
     ##    var                 mean_importance
     ##    <fct>                         <dbl>
-    ##  1 ClassActinopterygii         7.84   
-    ##  2 ClassAves                   0.223  
-    ##  3 ClassMammalia               0.0846 
-    ##  4 ClassReptilia               0.00168
-    ##  5 ForStrat.ground             0.717  
-    ##  6 ForStrat.understory         0.283  
-    ##  7 ForStrat.arboreal           1.27   
-    ##  8 ForStrat.aerial             2.07   
-    ##  9 ForStrat.marine             0.920  
-    ## 10 Activity.Nocturnal          0.154  
+    ##  1 ClassActinopterygii         7.01   
+    ##  2 ClassAves                   0.256  
+    ##  3 ClassMammalia               0.0854 
+    ##  4 ClassReptilia               0.00436
+    ##  5 ForStrat.ground             0.831  
+    ##  6 ForStrat.understory         0.317  
+    ##  7 ForStrat.arboreal           1.51   
+    ##  8 ForStrat.aerial             2.01   
+    ##  9 ForStrat.marine             1.01   
+    ## 10 Activity.Nocturnal          0.148  
     ## # … with 29 more rows
 
 ``` r
@@ -1714,7 +1731,7 @@ vars = setdiff(names(DF), label)
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 17:27:49 EDT"
+    ## [1] "2020-08-11 20:48:14 EDT"
 
 ``` r
 OUT_obs <- bootstrapGBM(DF = DF, label = label, vars = vars, k_split = k_split, distribution = distribution, eta = hyper_grid$eta, max_depth = hyper_grid$max_depth, nrounds = nrounds, nruns = nruns, bootstrap = "observed", method = "cv", cv.folds = 5,
@@ -1733,7 +1750,7 @@ save(OUT_rand, file = paste0("OUT_rand_", output_name, ".Rdata"))
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 17:34:38 EDT"
+    ## [1] "2020-08-11 20:58:11 EDT"
 
 \#\#look at performance
 
@@ -1751,7 +1768,7 @@ print("observed data, eval train")
 mean(I$eval_train)
 ```
 
-    ## [1] 0.6604398
+    ## [1] 0.690348
 
 ``` r
 print("observed data, eval test")
@@ -1763,7 +1780,7 @@ print("observed data, eval test")
 mean(I$eval_test)
 ```
 
-    ## [1] 0.4547586
+    ## [1] 0.418883
 
 ``` r
 R <- OUT_rand[[1]]
@@ -1771,7 +1788,7 @@ R <- OUT_rand[[1]]
 mean(R$eval_train)
 ```
 
-    ## [1] 0.02804668
+    ## [1] 0.033495
 
 ``` r
 print("null data, eval test")
@@ -1783,20 +1800,20 @@ print("null data, eval test")
 mean(R$eval_test)
 ```
 
-    ## [1] -0.006306029
+    ## [1] -0.006505777
 
 ``` r
-corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+corrected_test_eval = mean(I$eval_test) - mean(R$eval_test)
+print(paste("corrected test pseudo-R2", output_name))
 ```
 
-    ## [1] "corrected test AUC"
+    ## [1] "corrected test pseudo-R2 vert_haddock_20200811_1811 haddock_score _importance_over_one"
 
 ``` r
 corrected_test_eval
 ```
 
-    ## [1] 0.9610647
+    ## [1] 0.4253888
 
 \#\#plot importance
 
@@ -1813,20 +1830,20 @@ data_long_sum <- data_long %>% group_by(var) %>%
 print(data_long_sum)
 ```
 
-    ## # A tibble: 26 x 2
+    ## # A tibble: 27 x 2
     ##    var                              mean_importance
     ##    <fct>                                      <dbl>
-    ##  1 ClassActinopterygii                         8.07
-    ##  2 ForStrat.arboreal                           1.72
-    ##  3 ForStrat.aerial                             2.44
-    ##  4 Activity.Crepuscular                        2.43
-    ##  5 male_maturity_d                             1.32
-    ##  6 incubation_d                                5.70
-    ##  7 log_litterclutch_size_n                     8.08
-    ##  8 log_inter_litterbirth_interval_y            1.13
-    ##  9 log_birthhatching_weight_g                  1.82
-    ## 10 log_weaning_weight_g                        2.47
-    ## # … with 16 more rows
+    ##  1 ClassActinopterygii                         7.16
+    ##  2 ForStrat.arboreal                           1.84
+    ##  3 ForStrat.aerial                             2.16
+    ##  4 ForStrat.marine                             1.08
+    ##  5 Activity.Crepuscular                        2.35
+    ##  6 male_maturity_d                             1.40
+    ##  7 incubation_d                                5.34
+    ##  8 log_litterclutch_size_n                     7.35
+    ##  9 log_inter_litterbirth_interval_y            1.21
+    ## 10 log_birthhatching_weight_g                  1.74
+    ## # … with 17 more rows
 
 ``` r
 data_long_sum_nonzero = subset(data_long_sum, mean_importance > 0)
@@ -1855,4 +1872,4 @@ ggsave(filename = paste0("importance", output_name, ".jpg"), plot = plot, height
 print(Sys.time())
 ```
 
-    ## [1] "2020-08-11 17:34:40 EDT"
+    ## [1] "2020-08-11 20:58:14 EDT"

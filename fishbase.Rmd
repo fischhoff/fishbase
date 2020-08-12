@@ -22,20 +22,20 @@ for (package in neededPackages){pkgTest(package)}
 
 ```{r}
 date = "20200811"
-time = "1457"
+time = "1811"
 output_name = paste("vert_haddock", date, time, sep = "_")
 save(output_name, file = "output_name.Rdata")
 print(Sys.time())
+nruns = 10
 ```
 
 ##cores
 ```{r, include = FALSE}
 cores = 4
-  cl <- makeCluster(cores, "SOCK", timeout = 60)  
+cl <- makeCluster(cores, "SOCK", timeout = 60)  
   # stopCluster(cl)
-  registerDoSNOW(cl)
+registerDoSNOW(cl)
   
-  nruns = 5
 ```
 
 ##set up function gridSearch.R
@@ -1914,7 +1914,7 @@ print("null data, eval test")
 mean(R$eval_test)
 
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 corrected_test_eval
 
 ```
@@ -2042,7 +2042,7 @@ print("null data, eval test")
 mean(R$eval_test)
 
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 corrected_test_eval
 ```
 
@@ -2141,6 +2141,8 @@ for (a in 1:length(species)){
 }  
 R$haddock = haddock
 R_highest = subset(R, haddock == max(R$haddock))
+print("infected species w/ conspecific transmission and highest haddock score")
+R_highest
 haddock_cutoff = R_highest$haddock
 
 haddock_infected_and_below = rep(0, dim(DF)[1])#default is that you have a haddock score that is above species infectable and w/ highest score
@@ -2295,7 +2297,7 @@ print("null data, eval test")
 mean(R$eval_test)
 
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 corrected_test_eval
 
 ```
@@ -2389,7 +2391,7 @@ print("null data, eval test")
 mean(R$eval_test)
 
 corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+print(paste("corrected test AUC", output_name))
 corrected_test_eval
  print(Sys.time())
 
@@ -2578,8 +2580,8 @@ mean(R$eval_train)
 print("null data, eval test")
 mean(R$eval_test)
 
-corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+corrected_test_eval = mean(I$eval_test) - mean(R$eval_test)
+print(paste("corrected test pseudo-R2", output_name))
 corrected_test_eval
 
 ```
@@ -2672,8 +2674,8 @@ mean(R$eval_train)
 print("null data, eval test")
 mean(R$eval_test)
 
-corrected_test_eval = mean(I$eval_test) - (mean(R$eval_test) - 0.5)
-print("corrected test AUC")
+corrected_test_eval = mean(I$eval_test) - mean(R$eval_test)
+print(paste("corrected test pseudo-R2", output_name))
 corrected_test_eval
 
 ```
